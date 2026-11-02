@@ -12,7 +12,7 @@ const ignored = [
   'src/core/api/**',
   'src/ui/routeTree.gen.ts',
   'public/mockServiceWorker.js',
-  'src/locales/**',
+  'locales/**',
 ]
 
 const env = readEnv(loadEnv(process.env.APP_ENV ?? 'development', process.cwd(), ''))

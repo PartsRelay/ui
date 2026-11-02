@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import ICU from 'i18next-icu'
 import { initReactI18next } from 'react-i18next'
 
-const files = import.meta.glob<Record<string, unknown>>('./locales/*/*.json', {
+const files = import.meta.glob<Record<string, unknown>>('../locales/*/*.json', {
   eager: true,
   import: 'default',
 })

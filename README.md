@@ -1,6 +1,6 @@
 # Parts Relay UI
 
-The web app of Parts Relay. It talks to [PartsRelay/core](https://github.com/PartsRelay/core) and reads every text from [PartsRelay/locales](https://github.com/PartsRelay/locales), mounted as a git submodule at `src/locales`.
+The web app of Parts Relay. It talks to [PartsRelay/core](https://github.com/PartsRelay/core) and reads every text from [PartsRelay/locales](https://github.com/PartsRelay/locales), mounted as a git submodule at `locales`.
 
 ## Run it
 

@@ -6,8 +6,11 @@ services:
     init: true
     command: sleep infinity
     working_dir: /workspace
+    ports:
+      - 127.0.0.1:${UI_PORT:-5173}:5173
     environment:
       CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-0}
+      UI_PORT: ${UI_PORT:-5173}
     volumes:
       - .:/workspace:cached
       - bun-cache:/home/node/.bun/install/cache

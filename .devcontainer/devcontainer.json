@@ -14,9 +14,8 @@
     "ghcr.io/devcontainers-extra/features/bun:1": { "version": "latest" }
   },
 
-  "forwardPorts": [5173],
   "portsAttributes": {
-    "5173": { "label": "UI", "onAutoForward": "notify" }
+    "5173": { "label": "UI", "onAutoForward": "ignore" }
   },
 
   "remoteEnv": {

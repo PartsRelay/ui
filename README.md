@@ -27,4 +27,5 @@ MOCKS=false API_URL=http://localhost:3333 bun run dev
 - `bun run check`: format, lint and types.
 - `bun run build`: the production bundle in `dist`.
 - `bun run test:unit` and `bun run test:e2e`: Vitest and Playwright, as described in `CLAUDE.md`.
+- `bun run test:coverage`: the unit tests with their coverage, as a table in the terminal and a report in `coverage/index.html`.
 - `API_URL=http://localhost:3333 bun run generate`: regenerates the Orval client in `src/core/api` from a running core.

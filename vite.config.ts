@@ -5,6 +5,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vite-plus'
+import pkg from './package.json' with { type: 'json' }
 import { readEnv } from './src/env'
 
 const ignored = [
@@ -40,6 +41,7 @@ export default defineConfig({
 
   define: {
     __ENV__: JSON.stringify(env),
+    __APP_VERSION__: JSON.stringify(pkg.version),
   },
 
   server: {

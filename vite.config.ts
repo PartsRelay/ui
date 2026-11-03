@@ -13,6 +13,8 @@ const ignored = [
   'src/ui/routeTree.gen.ts',
   'public/mockServiceWorker.js',
   'locales/**',
+  'CHANGELOG.md',
+  '.release-please-manifest.json',
 ]
 
 const env = readEnv(loadEnv(process.env.APP_ENV ?? 'development', process.cwd(), ''))

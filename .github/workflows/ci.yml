@@ -44,6 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container: mcr.microsoft.com/playwright:v${{ needs.install.outputs.playwright }}-noble
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: true
       matrix:
@@ -53,7 +56,8 @@ jobs:
           - name: build
             run: build
           - name: unit
-            run: test:unit
+            run: test:coverage
+            coverage: true
           - name: e2e (chromium)
             run: test:e2e --project=chromium
             report: chromium
@@ -81,4 +85,14 @@ jobs:
         with:
           name: playwright-report-${{ matrix.report }}
           path: playwright-report
+          retention-days: 7
+      - if: ${{ !cancelled() && matrix.coverage }}
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          vite-config-path: vitest.config.ts
+      - if: ${{ !cancelled() && matrix.coverage }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: coverage
           retention-days: 7

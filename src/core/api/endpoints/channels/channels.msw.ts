@@ -13,6 +13,7 @@ import {
   http
 } from 'msw';
 import type {
+  HttpResponseResolver,
   RequestHandlerOptions
 } from 'msw';
 
@@ -24,8 +25,8 @@ import type {
 export const getGetApiV1ChannelsResponseMock = (overrideResponse: Partial<Extract<GetApiV1Channels200, object>> = {}): GetApiV1Channels200 => ({data: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({source: faker.helpers.arrayElement(['whatsapp'] as const), address: faker.string.alpha({length: {min: 10, max: 20}}), url: faker.internet.url()})), ...overrideResponse})
 
 
-export const getGetApiV1ChannelsMockHandler = (overrideResponse?: GetApiV1Channels200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetApiV1Channels200> | GetApiV1Channels200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/channels', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1ChannelsMockHandler = (overrideResponse?: GetApiV1Channels200 | ((info: Parameters<HttpResponseResolver>[0]) => Promise<GetApiV1Channels200> | GetApiV1Channels200), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/channels', async (info: Parameters<HttpResponseResolver>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined

@@ -11,7 +11,6 @@ import {
   needsSetup,
   toWorkspace,
   transferAction,
-  transferCandidates,
   withoutInvitation,
   withoutMember,
   type Workspace,
@@ -235,20 +234,13 @@ describe('memberRows', () => {
   })
 })
 
-describe('transferCandidates', () => {
-  it('offers every other member but the owner', () => {
-    const names = transferCandidates(workspace(), meAs(people.mark)).map(({ name }) => name)
-
-    expect(names).toEqual(['Julia Bennett', 'Luke Foster', 'Sarah Collins'])
-  })
-})
-
 describe('transferAction', () => {
   it('names the chosen member', () => {
-    const [julia] = transferCandidates(workspace(), meAs(people.mark))
-
     expect(transferAction()).toEqual(['workspace.transfer.title'])
-    expect(transferAction(julia)).toEqual(['workspace.transfer.action', { name: 'Julia Bennett' }])
+    expect(transferAction({ name: 'Julia Bennett' })).toEqual([
+      'workspace.transfer.action',
+      { name: 'Julia Bennett' },
+    ])
   })
 })
 

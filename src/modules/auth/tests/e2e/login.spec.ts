@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import pkg from '../../../../../package.json' with { type: 'json' }
 
 async function signOut(page: Page) {
   await page.goto('/profile')
@@ -19,6 +20,7 @@ test('signing out lands on the login page', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: /^Sign in to / })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled()
   await expect(page.getByRole('textbox', { name: 'Email' })).toBeEmpty()
+  await expect(page.getByText(pkg.version, { exact: true })).toBeVisible()
 })
 
 test('the magic link form rejects an invalid email', async ({ page }) => {

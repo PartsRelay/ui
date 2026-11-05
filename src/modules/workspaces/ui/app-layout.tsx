@@ -13,7 +13,7 @@ import { AppHeader } from '@/modules/workspaces/ui/app-header'
 import { AppSidebar } from '@/modules/workspaces/ui/app-sidebar'
 import { AppTabs } from '@/modules/workspaces/ui/app-tabs'
 import { AccountContext, useMe } from '@/modules/workspaces/ui/hooks/use-me'
-import { LegalFooter } from '@/ui/components/legal-footer'
+import { AppFooter } from '@/ui/components/app-footer'
 import { SidebarInset, SidebarProvider } from '@/ui/components/ui/sidebar'
 
 type AppGuard = { context: { queryClient: QueryClient }; location: { href: string } }
@@ -84,7 +84,7 @@ function AppShell() {
             {allowed ? <Outlet /> : <AccessDenied />}
           </div>
         </div>
-        <LegalFooter />
+        <AppFooter />
       </SidebarInset>
     </SidebarProvider>
   )

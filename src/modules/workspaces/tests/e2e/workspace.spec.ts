@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import pkg from '../../../../../package.json' with { type: 'json' }
 
 const notices = (page: Page) => page.getByRole('region', { name: /Notifications/ })
 
@@ -13,6 +14,10 @@ test.describe('as the owner', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/workspace')
     await expect(page.getByRole('heading', { level: 1, name: 'Workspace' })).toBeVisible()
+  })
+
+  test('shows the app version in the footer', async ({ page }) => {
+    await expect(page.getByText(pkg.version, { exact: true })).toBeVisible()
   })
 
   test('shows the members and the pending invitations', async ({ page }) => {

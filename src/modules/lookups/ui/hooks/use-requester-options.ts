@@ -12,7 +12,7 @@ export function useRequesterOptions(search: string) {
   const current = membersDone ? contacts : members
 
   const pages: AutocompletePages = {
-    isPending: members.isPending || contacts.isPending,
+    isPending: members.isPending || (membersDone && contacts.isPending),
     hasNextPage: current.hasNextPage,
     isFetchingNextPage: current.isFetchingNextPage,
     fetchNextPage: current.fetchNextPage,

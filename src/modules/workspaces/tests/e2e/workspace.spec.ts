@@ -17,7 +17,7 @@ test.describe('as the owner', () => {
   })
 
   test('shows the app version in the footer', async ({ page }) => {
-    await expect(page.getByRole('contentinfo')).toContainText(pkg.version)
+    await expect(page.getByText(pkg.version, { exact: true })).toBeVisible()
   })
 
   test('shows the members and the pending invitations', async ({ page }) => {

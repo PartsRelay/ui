@@ -84,8 +84,11 @@ test.describe('as the owner', () => {
     await expect(page.getByRole('option', { name: 'Julia Bennett' })).toBeVisible()
     await expect(options).toHaveCount(25)
 
-    await options.last().scrollIntoViewIfNeeded()
-    await expect(options).toHaveCount(29)
+    await page.getByRole('listbox').hover()
+    await expect(async () => {
+      await page.mouse.wheel(0, 400)
+      await expect(options).toHaveCount(29, { timeout: 500 })
+    }).toPass()
     await expect(page.getByRole('option', { name: 'Oakfield Garage' })).toBeAttached()
 
     await page.getByRole('combobox', { name: 'Search…' }).fill('nobody here')

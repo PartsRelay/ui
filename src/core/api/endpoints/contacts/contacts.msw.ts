@@ -13,13 +13,17 @@ import {
   http
 } from 'msw';
 import type {
+  HttpResponseResolver,
+  PathParams,
   RequestHandlerOptions
 } from 'msw';
 
 import type {
   GetApiV1WorkspaceContacts200,
   PatchApiV1WorkspaceContactsContactId200,
-  PostApiV1WorkspaceContacts201
+  PatchApiV1WorkspaceContactsContactIdBody,
+  PostApiV1WorkspaceContacts201,
+  PostApiV1WorkspaceContactsBody
 } from '../../models';
 
 
@@ -30,8 +34,8 @@ export const getPostApiV1WorkspaceContactsResponseMock = (overrideResponse: Part
 export const getPatchApiV1WorkspaceContactsContactIdResponseMock = (overrideResponse: Partial<Extract<PatchApiV1WorkspaceContactsContactId200, object>> = {}): PatchApiV1WorkspaceContactsContactId200 => ({data: {id: faker.number.int(), waId: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), profileName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), status: faker.helpers.arrayElement(['active','blocked'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', lookupsCount: faker.number.int(), monthLookupsCount: faker.number.int(), lastLookupAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])}, ...overrideResponse})
 
 
-export const getGetApiV1WorkspaceContactsMockHandler = (overrideResponse?: GetApiV1WorkspaceContacts200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetApiV1WorkspaceContacts200> | GetApiV1WorkspaceContacts200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/workspace/contacts', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1WorkspaceContactsMockHandler = (overrideResponse?: GetApiV1WorkspaceContacts200 | ((info: Parameters<HttpResponseResolver>[0]) => Promise<GetApiV1WorkspaceContacts200> | GetApiV1WorkspaceContacts200), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/workspace/contacts', async (info: Parameters<HttpResponseResolver>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
@@ -42,8 +46,8 @@ export const getGetApiV1WorkspaceContactsMockHandler = (overrideResponse?: GetAp
   }, options)
 }
 
-export const getPostApiV1WorkspaceContactsMockHandler = (overrideResponse?: PostApiV1WorkspaceContacts201 | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PostApiV1WorkspaceContacts201> | PostApiV1WorkspaceContacts201), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/workspace/contacts', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+export const getPostApiV1WorkspaceContactsMockHandler = (overrideResponse?: PostApiV1WorkspaceContacts201 | ((info: Parameters<HttpResponseResolver<PathParams, PostApiV1WorkspaceContactsBody>>[0]) => Promise<PostApiV1WorkspaceContacts201> | PostApiV1WorkspaceContacts201), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, PostApiV1WorkspaceContactsBody>('*/api/v1/workspace/contacts', async (info: Parameters<HttpResponseResolver<PathParams, PostApiV1WorkspaceContactsBody>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
@@ -54,8 +58,8 @@ export const getPostApiV1WorkspaceContactsMockHandler = (overrideResponse?: Post
   }, options)
 }
 
-export const getPatchApiV1WorkspaceContactsContactIdMockHandler = (overrideResponse?: PatchApiV1WorkspaceContactsContactId200 | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<PatchApiV1WorkspaceContactsContactId200> | PatchApiV1WorkspaceContactsContactId200), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/v1/workspace/contacts/:contactId', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+export const getPatchApiV1WorkspaceContactsContactIdMockHandler = (overrideResponse?: PatchApiV1WorkspaceContactsContactId200 | ((info: Parameters<HttpResponseResolver<{ contactId: string }, PatchApiV1WorkspaceContactsContactIdBody>>[0]) => Promise<PatchApiV1WorkspaceContactsContactId200> | PatchApiV1WorkspaceContactsContactId200), options?: RequestHandlerOptions) => {
+  return http.patch<{ contactId: string }, PatchApiV1WorkspaceContactsContactIdBody>('*/api/v1/workspace/contacts/:contactId', async (info: Parameters<HttpResponseResolver<{ contactId: string }, PatchApiV1WorkspaceContactsContactIdBody>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
@@ -66,8 +70,8 @@ export const getPatchApiV1WorkspaceContactsContactIdMockHandler = (overrideRespo
   }, options)
 }
 
-export const getDeleteApiV1WorkspaceContactsContactIdMockHandler = (overrideResponse?: unknown | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<unknown> | unknown), options?: RequestHandlerOptions) => {
-  return http.delete('*/api/v1/workspace/contacts/:contactId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+export const getDeleteApiV1WorkspaceContactsContactIdMockHandler = (overrideResponse?: unknown | ((info: Parameters<HttpResponseResolver<{ contactId: string }>>[0]) => Promise<unknown> | unknown), options?: RequestHandlerOptions) => {
+  return http.delete<{ contactId: string }>('*/api/v1/workspace/contacts/:contactId', async (info: Parameters<HttpResponseResolver<{ contactId: string }>>[0]) => {
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
 
     return new HttpResponse(null,

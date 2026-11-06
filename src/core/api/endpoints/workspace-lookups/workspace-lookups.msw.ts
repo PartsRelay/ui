@@ -13,6 +13,7 @@ import {
   http
 } from 'msw';
 import type {
+  HttpResponseResolver,
   RequestHandlerOptions
 } from 'msw';
 
@@ -27,8 +28,8 @@ export const getGetApiV1WorkspaceLookupsResponseMock = (overrideResponse: Partia
 export const getGetApiV1WorkspaceLookupsStatsResponseMock = (overrideResponse: Partial<Extract<GetApiV1WorkspaceLookupsStats200, object>> = {}): GetApiV1WorkspaceLookupsStats200 => ({data: {days: faker.number.int(), total: faker.number.int(), done: faker.number.int(), failed: faker.number.int(), previousTotal: faker.number.int(), topSearchers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({searcher: faker.helpers.arrayElement([{type: faker.helpers.arrayElement(['user','contact'] as const), id: faker.number.int(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])},null,]), total: faker.number.int()}))}, ...overrideResponse})
 
 
-export const getGetApiV1WorkspaceLookupsMockHandler = (overrideResponse?: GetApiV1WorkspaceLookups200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetApiV1WorkspaceLookups200> | GetApiV1WorkspaceLookups200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/workspace/lookups', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1WorkspaceLookupsMockHandler = (overrideResponse?: GetApiV1WorkspaceLookups200 | ((info: Parameters<HttpResponseResolver>[0]) => Promise<GetApiV1WorkspaceLookups200> | GetApiV1WorkspaceLookups200), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/workspace/lookups', async (info: Parameters<HttpResponseResolver>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
@@ -39,8 +40,8 @@ export const getGetApiV1WorkspaceLookupsMockHandler = (overrideResponse?: GetApi
   }, options)
 }
 
-export const getGetApiV1WorkspaceLookupsStatsMockHandler = (overrideResponse?: GetApiV1WorkspaceLookupsStats200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetApiV1WorkspaceLookupsStats200> | GetApiV1WorkspaceLookupsStats200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/workspace/lookups/stats', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1WorkspaceLookupsStatsMockHandler = (overrideResponse?: GetApiV1WorkspaceLookupsStats200 | ((info: Parameters<HttpResponseResolver>[0]) => Promise<GetApiV1WorkspaceLookupsStats200> | GetApiV1WorkspaceLookupsStats200), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/workspace/lookups/stats', async (info: Parameters<HttpResponseResolver>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined

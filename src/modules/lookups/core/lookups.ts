@@ -5,11 +5,11 @@ import {
   LookupObjectSource,
   LookupObjectStatus,
   SearcherType,
+  type WorkspaceMemberObject,
 } from '@/core/api/models'
 import { type Message, message } from '@/core/message'
 import { contactName } from '@/modules/contacts/core/contact-row'
 import { textKey } from '@/modules/lookups/core/lookup-row'
-import type { Workspace } from '@/modules/workspaces/core/workspace'
 
 export const EVERYONE = 'everyone'
 
@@ -111,21 +111,28 @@ export function requesterSearch(value: string): Requester {
     : { searcherType: undefined, searcherId: undefined }
 }
 
-const byLabel = (a: RequesterOption, b: RequesterOption) => a.label.localeCompare(b.label)
+export type RequesterGroup = { label: Message; items: RequesterOption[] }
 
-export function requesterOptions(workspace: Workspace, contacts: ContactObject[]) {
-  return {
-    members: workspace.members
-      .map((member) => ({
-        value: requesterValue({ searcherType: 'user', searcherId: Number(member.userId) }),
+export function requesterGroups(
+  members: WorkspaceMemberObject[],
+  contacts: ContactObject[]
+): RequesterGroup[] {
+  const groups = [
+    {
+      label: message('lookups.filter.members'),
+      items: members.map((member) => ({
+        value: requesterValue({ searcherType: 'user', searcherId: member.userId }),
         label: member.name,
-      }))
-      .sort(byLabel),
-    contacts: contacts
-      .map((contact) => ({
+      })),
+    },
+    {
+      label: message('lookups.filter.contacts'),
+      items: contacts.map((contact) => ({
         value: requesterValue({ searcherType: 'contact', searcherId: contact.id }),
         label: contactName(contact),
-      }))
-      .sort(byLabel),
-  }
+      })),
+    },
+  ]
+
+  return groups.filter(({ items }) => items.length > 0)
 }

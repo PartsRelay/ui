@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { message } from '@/core/message'
-import { pageInfo } from '@/core/pagination'
+import { nextPage, pageInfo } from '@/core/pagination'
 
 function metadata(currentPage: number, perPage: number, total: number) {
   return { total, perPage, currentPage, lastPage: Math.max(1, Math.ceil(total / perPage)) }
@@ -24,5 +24,11 @@ describe('pagination', () => {
       pages: 1,
       outOfRange: false,
     })
+  })
+
+  it('tells the next page to load until the last one', () => {
+    expect(nextPage({ metadata: metadata(1, 20, 45) })).toBe(2)
+    expect(nextPage({ metadata: metadata(3, 20, 45) })).toBeUndefined()
+    expect(nextPage({ metadata: metadata(1, 20, 0) })).toBeUndefined()
   })
 })

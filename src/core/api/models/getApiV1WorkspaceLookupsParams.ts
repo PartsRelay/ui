@@ -9,24 +9,19 @@ import type { GetApiV1WorkspaceLookupsSource } from './getApiV1WorkspaceLookupsS
 import type { GetApiV1WorkspaceLookupsStatus } from './getApiV1WorkspaceLookupsStatus';
 
 export type GetApiV1WorkspaceLookupsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- */
-perPage?: number;
-searcherType?: GetApiV1WorkspaceLookupsSearcherType;
-/**
- * @minimum 0
- */
-searcherId?: number;
-search?: string;
-status?: GetApiV1WorkspaceLookupsStatus;
-source?: GetApiV1WorkspaceLookupsSource;
-/**
- * @minimum 1
- */
-days?: number;
+  /** @minimum 1 */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  perPage?: number;
+  searcherType?: GetApiV1WorkspaceLookupsSearcherType;
+  /** @minimum 0 */
+  searcherId?: number;
+  search?: string;
+  status?: GetApiV1WorkspaceLookupsStatus;
+  source?: GetApiV1WorkspaceLookupsSource;
+  /** @minimum 1 */
+  days?: number;
 };

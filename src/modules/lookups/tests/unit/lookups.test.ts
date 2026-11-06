@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import type { ContactObject } from '@/core/api/models'
+import type { ContactObject, WorkspaceMemberObject } from '@/core/api/models'
 import { message } from '@/core/message'
 import {
   ALL,
@@ -9,11 +9,20 @@ import {
   filterValues,
   lookupListParams,
   lookupsSearchSchema,
-  requesterOptions,
+  requesterGroups,
   requesterSearch,
   requesterValue,
 } from '@/modules/lookups/core/lookups'
-import { workspaceFixture } from '@/modules/lookups/tests/unit/fixtures'
+
+const member = (userId: number, name: string): WorkspaceMemberObject => ({
+  id: userId - 100,
+  userId,
+  role: 'viewer',
+  name,
+  email: `${name.toLowerCase().replace(' ', '.')}@redwoodparts.com`,
+  image: null,
+  createdAt: new Date(2026, 0, 1).toISOString(),
+})
 
 const contact = (id: number, name: string | null, profileName: string | null): ContactObject => ({
   id,
@@ -126,22 +135,38 @@ describe('requester filter', () => {
     expect(requesterSearch('robot:7')).toEqual({})
   })
 
-  it('offers the team and the WhatsApp contacts by name', () => {
+  it('groups the team and the WhatsApp contacts in the order of their pages', () => {
+    const members = [member(102, 'Julia White'), member(101, 'Mark Reed')]
     const contacts = [
       contact(3, null, 'Hillside Auto Repair'),
       contact(1, 'Oakfield Garage', 'Tom Walker'),
     ]
 
-    expect(requesterOptions(workspaceFixture(), contacts)).toEqual({
-      members: [
-        { value: 'user:102', label: 'Julia White' },
-        { value: 'user:103', label: 'Luke Ford' },
-        { value: 'user:101', label: 'Mark Reed' },
-      ],
-      contacts: [
-        { value: 'contact:3', label: 'Hillside Auto Repair' },
-        { value: 'contact:1', label: 'Oakfield Garage' },
-      ],
-    })
+    expect(requesterGroups(members, contacts)).toEqual([
+      {
+        label: message('lookups.filter.members'),
+        items: [
+          { value: 'user:102', label: 'Julia White' },
+          { value: 'user:101', label: 'Mark Reed' },
+        ],
+      },
+      {
+        label: message('lookups.filter.contacts'),
+        items: [
+          { value: 'contact:3', label: 'Hillside Auto Repair' },
+          { value: 'contact:1', label: 'Oakfield Garage' },
+        ],
+      },
+    ])
+  })
+
+  it('leaves out a group without options', () => {
+    expect(requesterGroups([], [contact(1, 'Oakfield Garage', null)])).toEqual([
+      {
+        label: message('lookups.filter.contacts'),
+        items: [{ value: 'contact:1', label: 'Oakfield Garage' }],
+      },
+    ])
+    expect(requesterGroups([], [])).toEqual([])
   })
 })

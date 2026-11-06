@@ -20,6 +20,12 @@ async function pick(page: Page, filter: string, option: string) {
   await page.getByRole('option', { name: option, exact: true }).click()
 }
 
+async function pickRequester(page: Page, search: string, option: string) {
+  await page.getByRole('combobox', { name: 'Requester' }).click()
+  await page.getByRole('combobox', { name: 'Search…' }).fill(search)
+  await page.getByRole('option', { name: option, exact: true }).click()
+}
+
 test.describe('as the owner', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/lookups')
@@ -55,7 +61,7 @@ test.describe('as the owner', () => {
   })
 
   test('filters the searches by requester', async ({ page }) => {
-    await pick(page, 'Requester', 'Oakfield Garage')
+    await pickRequester(page, 'oak', 'Oakfield Garage')
 
     await expect(page).toHaveURL('/lookups?searcherType=contact&searcherId=1')
     await expect(page.getByText('7 searches')).toBeVisible()
@@ -63,12 +69,30 @@ test.describe('as the owner', () => {
       await expect(row).toContainText(/Requester|Oakfield Garage/)
     }
 
-    await pick(page, 'Requester', 'Elm Street Garage')
+    await pickRequester(page, 'elm', 'Elm Street Garage')
     await expect(page.getByText('No searches match the filters')).toBeVisible()
 
     await page.getByRole('link', { name: 'Clear filters' }).click()
     await expect(page).toHaveURL('/lookups')
     await expect(page.getByText('24 searches')).toBeVisible()
+  })
+
+  test('the requester list loads the team, then the contacts page by page', async ({ page }) => {
+    await page.getByRole('combobox', { name: 'Requester' }).click()
+    const options = page.getByRole('option')
+    await expect(options.first()).toHaveText('Everyone')
+    await expect(page.getByRole('option', { name: 'Julia Bennett' })).toBeVisible()
+    await expect(options).toHaveCount(25)
+
+    await page.getByRole('listbox').hover()
+    await expect(async () => {
+      await page.mouse.wheel(0, 400)
+      await expect(options).toHaveCount(29, { timeout: 500 })
+    }).toPass()
+    await expect(page.getByRole('option', { name: 'Oakfield Garage' })).toBeAttached()
+
+    await page.getByRole('combobox', { name: 'Search…' }).fill('nobody here')
+    await expect(page.getByText('No results')).toBeVisible()
   })
 
   test('filters the searches by status, period and channel together', async ({ page }) => {

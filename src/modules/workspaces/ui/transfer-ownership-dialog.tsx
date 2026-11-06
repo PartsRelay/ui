@@ -1,18 +1,18 @@
 import { useForm, useSelector } from '@tanstack/react-form'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { WorkspaceMemberObject } from '@/core/api/models'
+import { optionsKey } from '@/core/options.query'
 import { authClient } from '@/modules/auth/core/auth.client'
 import { sessionQuery } from '@/modules/auth/core/session.query'
-import {
-  type Member,
-  transferAction,
-  transferCandidates,
-} from '@/modules/workspaces/core/workspace'
-import { roleLabel } from '@/modules/workspaces/core/role'
+import { memberOptionsQuery } from '@/modules/workspaces/core/members.query'
+import { roleLabel, toRole } from '@/modules/workspaces/core/role'
+import { transferAction, transferRoles } from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
-import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
+import { AutocompleteField } from '@/ui/components/autocomplete-field'
 import { Form } from '@/ui/components/form'
 import { SubmitButton } from '@/ui/components/submit-button'
-import { TextField } from '@/ui/components/text-field'
 import { useBetterAuthAction } from '@/ui/hooks/use-better-auth-action'
 import { useReturnFocus } from '@/ui/hooks/use-return-focus'
 import {
@@ -24,14 +24,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/ui/components/ui/alert-dialog'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/ui/components/ui/select'
 
 type TransferOwnershipDialogProps = { open: boolean; onOpenChange: (open: boolean) => void }
 
@@ -49,26 +41,29 @@ export function TransferOwnershipDialog({ open, onOpenChange }: TransferOwnershi
 
 function TransferForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation()
-  const { workspace, me } = useMe()
-  const candidates = transferCandidates(workspace, me)
+  const [search, setSearch] = useState('')
+  const candidates = useInfiniteQuery(
+    memberOptionsQuery({ role: transferRoles, search: search || undefined })
+  )
+  const nobody = !search && candidates.data?.pages[0].metadata.total === 0
   const { client, run } = useBetterAuthAction()
   const form = useForm({
-    defaultValues: { candidateId: '' },
-    onSubmit: async ({ value }) => {
-      const candidate = candidates.find((member) => member.id === value.candidateId)
+    defaultValues: { candidate: null as WorkspaceMemberObject | null },
+    onSubmit: async ({ value: { candidate } }) => {
       if (!candidate) return
 
       const result = await run(
         async () => {
           try {
             await authClient.organization.updateMemberRole({
-              memberId: candidate.id,
+              memberId: String(candidate.id),
               role: 'owner',
             })
           } finally {
             await Promise.all([
               client.invalidateQueries({ queryKey: workspaceKey }),
               client.invalidateQueries({ queryKey: sessionQuery.queryKey }),
+              client.invalidateQueries({ queryKey: optionsKey }),
             ])
           }
         },
@@ -77,42 +72,35 @@ function TransferForm({ onDone }: { onDone: () => void }) {
       if (result.ok) onDone()
     },
   })
-  const candidateId = useSelector(form.store, (state) => state.values.candidateId)
-  const candidate = candidates.find((member) => member.id === candidateId)
-  const candidateLabel = (member: Member) =>
-    t('workspace.transfer.candidate', { name: member.name, role: t(...roleLabel(member.role)) })
+  const candidate = useSelector(form.store, (state) => state.values.candidate)
+  const candidateLabel = (member: WorkspaceMemberObject) =>
+    t('workspace.transfer.candidate', {
+      name: member.name,
+      role: t(...roleLabel(toRole(member.role))),
+    })
 
   return (
     <Form form={form} className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
       <AlertDialogHeader>
         <AlertDialogTitle>{t('workspace.transfer.title')}</AlertDialogTitle>
         <AlertDialogDescription>
-          {t(
-            candidates.length > 0 ? 'workspace.transfer.description' : 'workspace.transfer.nobody'
-          )}
+          {t(nobody ? 'workspace.transfer.nobody' : 'workspace.transfer.description')}
         </AlertDialogDescription>
       </AlertDialogHeader>
-      {candidates.length > 0 && (
-        <form.Field name="candidateId">
+      {!nobody && (
+        <form.Field name="candidate">
           {(field) => (
-            <Select value={field.state.value} onValueChange={field.handleChange}>
-              <TextField label={t('workspace.transfer.new-owner')}>
-                <SelectTrigger className="w-full min-w-0 *:data-[slot=select-value]:min-w-0">
-                  <SelectValue placeholder={t('workspace.transfer.choose')}>
-                    {candidate && <span className="truncate">{candidateLabel(candidate)}</span>}
-                  </SelectValue>
-                </SelectTrigger>
-              </TextField>
-              <SelectContent className="max-w-[calc(100vw-2rem)]">
-                <SelectGroup>
-                  {candidates.map((member) => (
-                    <SelectItem key={member.id} value={member.id} className="wrap-anywhere">
-                      {candidateLabel(member)}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <AutocompleteField
+              label={t('workspace.transfer.new-owner')}
+              placeholder={t('workspace.transfer.choose')}
+              value={field.state.value}
+              groups={[{ items: candidates.data?.pages.flatMap(({ data }) => data) ?? [] }]}
+              pages={candidates}
+              itemKey={(member) => String(member.id)}
+              itemLabel={candidateLabel}
+              onValueChange={field.handleChange}
+              onSearch={setSearch}
+            />
           )}
         </form.Field>
       )}
@@ -123,7 +111,7 @@ function TransferForm({ onDone }: { onDone: () => void }) {
           className="h-auto min-h-8 min-w-0 shrink whitespace-normal wrap-anywhere"
           disabled={!candidate}
         >
-          {t(...transferAction(candidate))}
+          {t(...transferAction(candidate ?? undefined))}
         </SubmitButton>
       </AlertDialogFooter>
     </Form>

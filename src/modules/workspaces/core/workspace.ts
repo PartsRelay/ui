@@ -164,13 +164,9 @@ export function memberRows(workspace: Workspace, me: Me): MemberRow[] {
   })
 }
 
-export function transferCandidates(workspace: Workspace, me: Me) {
-  return byRole(workspace.members).filter(
-    (member) => member.id !== me.member.id && member.role !== 'owner'
-  )
-}
+export const transferRoles = ['admin', 'viewer'] satisfies Role[]
 
-export function transferAction(candidate?: Member) {
+export function transferAction(candidate?: { name: string }) {
   return candidate
     ? message('workspace.transfer.action', { name: candidate.name })
     : message('workspace.transfer.title')

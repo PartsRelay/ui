@@ -6,8 +6,6 @@
  */
 
 export type GetApiV1WorkspaceLookupsStatsParams = {
-/**
- * @minimum 1
- */
-days?: number;
+  /** @minimum 1 */
+  days?: number;
 };

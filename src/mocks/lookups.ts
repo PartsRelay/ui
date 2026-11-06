@@ -20,7 +20,7 @@ import { member } from '@/mocks/auth'
 import { checkedPage, page, people, type Person } from '@/mocks/data'
 import { apiBody, fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
-import { DEFAULT_PER_PAGE } from '@/core/pagination'
+import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
 
 type Text = [en: string, it: string]
 
@@ -425,7 +425,7 @@ export const lookupMocks = [
     const { company } = member()
     const query = new URL(request.url).searchParams
     const currentPage = checkedPage(query, 'page', 1)
-    const perPage = checkedPage(query, 'perPage', DEFAULT_PER_PAGE)
+    const perPage = checkedPage(query, 'perPage', DEFAULT_PER_PAGE, MAX_PER_PAGE)
     const searcherType = query.get('searcherType')
     if (searcherType !== null && !isSearcherType(searcherType)) rejected('searcherType', 'enum')
     if (searcherType === null && query.has('searcherId')) rejected('searcherType', 'required')

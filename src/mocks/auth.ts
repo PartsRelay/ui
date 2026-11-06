@@ -68,6 +68,12 @@ export function member() {
   return signedInMember() ?? fail(401, 'unauthorized-access', 'Unauthorized access')
 }
 
+export function team() {
+  member()
+
+  return world((state) => state.company.members)
+}
+
 function ownerOnly(state: World, code: string, message: string) {
   if (myRole(state) !== 'owner') fail(403, code, message)
 }

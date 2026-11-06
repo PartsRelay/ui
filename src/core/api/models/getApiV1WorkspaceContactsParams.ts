@@ -7,14 +7,13 @@
 import type { GetApiV1WorkspaceContactsStatus } from './getApiV1WorkspaceContactsStatus';
 
 export type GetApiV1WorkspaceContactsParams = {
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- */
-perPage?: number;
-status?: GetApiV1WorkspaceContactsStatus;
-search?: string;
+  /** @minimum 1 */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  perPage?: number;
+  status?: GetApiV1WorkspaceContactsStatus;
+  search?: string;
 };

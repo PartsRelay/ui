@@ -1,35 +1,5 @@
 import type { CatalogUnit, GetApiV1WorkspaceLookups200, LookupObject } from '@/core/api/models'
 import { DEFAULT_PER_PAGE } from '@/core/pagination'
-import type { Role } from '@/modules/workspaces/core/role'
-import type { Member, Workspace } from '@/modules/workspaces/core/workspace'
-
-function memberFixture(id: number, role: Role, name: string): Member {
-  return {
-    id: String(id),
-    userId: String(100 + id),
-    role,
-    name,
-    email: `${name.toLowerCase().replace(' ', '.')}@redwoodparts.com`,
-    image: null,
-    joinedAt: new Date(2026, 0, 12),
-  }
-}
-
-export function workspaceFixture(): Workspace {
-  return {
-    id: '1',
-    name: 'Redwood Parts',
-    locale: 'en-US',
-    setup: 'done',
-    metadata: { setup: 'done' },
-    members: [
-      memberFixture(1, 'owner', 'Mark Reed'),
-      memberFixture(2, 'admin', 'Julia White'),
-      memberFixture(3, 'viewer', 'Luke Ford'),
-    ],
-    invitations: [],
-  }
-}
 
 export function unitFixture(overrides: Partial<CatalogUnit> = {}): CatalogUnit {
   return {

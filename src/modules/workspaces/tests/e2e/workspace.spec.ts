@@ -159,6 +159,24 @@ test.describe('as the owner', () => {
     await expect(members(page).getByRole('row', { name: /Mark Reed/ })).toContainText('Admin')
     await expect(page.getByRole('link', { name: 'Company' })).toHaveCount(0)
   })
+
+  test('the new owner list searches the team and closes alone on Escape', async ({ page }) => {
+    await page.getByRole('button', { name: 'Transfer ownership' }).click()
+    const dialog = page.getByRole('alertdialog', { name: 'Transfer ownership' })
+    const newOwner = dialog.getByRole('combobox', { name: 'New owner' })
+    await newOwner.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('option')).toHaveCount(3)
+    await expect(page.getByRole('option', { name: /Mark Reed/ })).toHaveCount(0)
+
+    await page.getByRole('combobox', { name: 'Search…' }).fill('luke')
+    await expect(page.getByRole('option')).toHaveText(['Luke Foster · Viewer'])
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('option')).toHaveCount(0)
+    await expect(dialog).toBeVisible()
+    await expect(newOwner).toBeFocused()
+  })
 })
 
 test.describe('as an admin', () => {

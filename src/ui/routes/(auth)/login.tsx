@@ -5,7 +5,7 @@ import { LoginPage, redirectIfSignedIn } from '@/modules/auth/ui/login-page'
 
 export const Route = createFileRoute('/(auth)/login')({
   validateSearch: loginSearchSchema,
-  head: pageHead('login.sign-in'),
+  head: pageHead('login.sign-in', true),
   beforeLoad: redirectIfSignedIn,
   component: LoginPage,
 })

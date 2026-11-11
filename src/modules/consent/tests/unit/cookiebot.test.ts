@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vite-plus/test'
-import { answerCookiebot, choose, watchCookiebot } from '@/modules/consent/core/cookiebot'
+import {
+  answerCookiebot,
+  choose,
+  reopenCookiebot,
+  watchCookiebot,
+} from '@/modules/consent/core/cookiebot'
 
 const cookiebot = {
   consent: { necessary: true, preferences: true, statistics: false, marketing: false },
@@ -25,7 +30,7 @@ afterEach(() => {
   scripts.length = 0
 })
 
-test('loads the Cookiebot script once, with its widget', () => {
+test('loads the Cookiebot script once, without its widget', () => {
   watchCookiebot(() => {})
   watchCookiebot(() => {})
 
@@ -34,7 +39,7 @@ test('loads the Cookiebot script once, with its widget', () => {
       id: 'Cookiebot',
       src: 'https://consent.cookiebot.com/uc.js',
       async: true,
-      dataset: { cbid: '', widgetEnabled: 'true' },
+      dataset: { cbid: '', widgetEnabled: 'false' },
     },
   ])
 })
@@ -58,12 +63,14 @@ test('asks with the current choices in place of the Cookiebot dialog', () => {
   expect(ask).toHaveBeenCalledOnce()
 })
 
-test('sends the answer', () => {
+test('sends the answer and asks again on request', () => {
   answerCookiebot(choose(false))
   answerCookiebot({ ...choose(true), marketing: false })
+  reopenCookiebot()
 
   expect(cookiebot.submitCustomConsent.mock.calls).toEqual([
     [false, false, false],
     [true, true, false],
   ])
+  expect(cookiebot.renew).toHaveBeenCalledOnce()
 })

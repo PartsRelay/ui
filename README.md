@@ -26,7 +26,7 @@ The dev container of `.devcontainer` checks out the submodule, copies `.env` and
 
 ## Cookies
 
-Set `COOKIEBOT_ID` to the ID of a [Cookiebot](https://www.cookiebot.com) domain group to ask for the cookie consent. Cookiebot stores and logs the answer; the UI shows its own banner in place of the Cookiebot dialog, and the Cookiebot icon in a corner of the page opens it again. Without the ID nothing loads.
+Set `COOKIEBOT_ID` to the ID of a [Cookiebot](https://www.cookiebot.com) domain group to ask for the cookie consent. Cookiebot stores and logs the answer; the UI shows its own banner in place of the Cookiebot dialog, and a Cookies link in the footer opens it again. Without the ID nothing loads.
 
 In the Cookiebot admin:
 

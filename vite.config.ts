@@ -24,7 +24,6 @@ const env = readEnv(loadEnv(process.env.APP_ENV ?? 'development', process.cwd(),
 const html: Record<string, string> = {
   APP_NAME: env.APP_NAME,
   DESCRIPTION: app.description,
-  SHARE_IMAGE: env.SITE_URL ? new URL('/og.png', env.SITE_URL).href : '/og.png',
 }
 
 const reactImports = ['react', 'react-dom', '@tanstack/react-*', '@/ui/*', '@/modules/*/ui/*']

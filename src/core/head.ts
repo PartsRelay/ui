@@ -2,7 +2,7 @@ import { env } from '@/env'
 import { i18n } from '@/i18n'
 
 export function appHead() {
-  const url = new URL(window.location.pathname, env.SITE_URL || window.location.origin).href
+  const url = `${window.location.origin}${window.location.pathname}`
 
   return {
     meta: [

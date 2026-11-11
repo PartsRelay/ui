@@ -22,6 +22,8 @@ To use a core running on your machine, start it with `UI_URL=http://localhost:51
 MOCKS=false API_URL=http://localhost:3333 bun run dev
 ```
 
+The dev container of `.devcontainer` checks out the submodule, copies `.env` and installs, then runs `bun run dev` in the terminal of the editor that attaches, where Ctrl+C stops it and frees the port. `docker-compose.yml` publishes port 5173 on `127.0.0.1`. To share the UI, run `cloudflared tunnel --url http://localhost:5173`, which the dev container has installed.
+
 ## Checks
 
 - `bun run check`: format, lint and types.

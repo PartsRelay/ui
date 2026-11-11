@@ -15,11 +15,10 @@ test('asks for the cookies once', async ({ page }) => {
   await page.reload()
   await page.waitForFunction(() => window.Cookiebot)
 
-  await expect(page.getByRole('button', { name: 'Cookies' })).toBeVisible()
   await expect(banner(page)).toBeHidden()
 })
 
-test('keeps a custom choice and shows it again from the footer', async ({ page }) => {
+test('keeps a custom choice and shows it when the Cookiebot icon asks again', async ({ page }) => {
   const statistics = banner(page).getByRole('switch', { name: 'Statistics' })
 
   await banner(page).getByRole('button', { name: 'Customize' }).click()
@@ -31,7 +30,7 @@ test('keeps a custom choice and shows it again from the footer', async ({ page }
   await banner(page).getByRole('button', { name: 'Save my choices' }).click()
   await expect(banner(page)).toBeHidden()
 
-  await page.getByRole('button', { name: 'Cookies' }).click()
+  await page.evaluate(() => window.Cookiebot!.renew())
   await banner(page).getByRole('button', { name: 'Customize' }).click()
 
   await expect(statistics).toBeChecked()

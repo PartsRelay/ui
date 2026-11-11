@@ -57,7 +57,7 @@ export function CookieBanner() {
       role="dialog"
       aria-labelledby={title}
       size="sm"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-h-[calc(100svh-2rem)] max-w-xl overflow-y-auto shadow-lg"
+      className="fixed inset-x-4 bottom-4 z-50 ml-auto max-h-[calc(100svh-2rem)] max-w-md overflow-y-auto shadow-lg"
     >
       <CardHeader>
         <CardTitle id={title}>{t('consent.title')}</CardTitle>

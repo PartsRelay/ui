@@ -3,7 +3,6 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Navigate, Outlet, redirect, useLocation, useRouter } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { requireSession, type Session, sessionQuery } from '@/modules/auth/core/session.query'
-import { CookieSettings } from '@/modules/consent/ui/cookie-settings'
 import { useLiveLookups } from '@/modules/lookups/ui/hooks/use-live-lookups'
 import { loadAccount } from '@/modules/workspaces/core/account'
 import { canOpen, homePath, pageAt } from '@/modules/workspaces/core/navigation'
@@ -85,9 +84,7 @@ function AppShell() {
             {allowed ? <Outlet /> : <AccessDenied />}
           </div>
         </div>
-        <AppFooter>
-          <CookieSettings />
-        </AppFooter>
+        <AppFooter />
       </SidebarInset>
     </SidebarProvider>
   )

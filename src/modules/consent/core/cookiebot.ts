@@ -41,7 +41,7 @@ export function watchCookiebot(ask: (choices: Choices) => void) {
     script.src = 'https://consent.cookiebot.com/uc.js'
     script.async = true
     script.dataset.cbid = env.COOKIEBOT_ID ?? ''
-    script.dataset.widgetEnabled = 'false'
+    script.dataset.widgetEnabled = 'true'
     document.head.append(script)
   }
 
@@ -50,8 +50,4 @@ export function watchCookiebot(ask: (choices: Choices) => void) {
 
 export function answerCookiebot({ preferences, statistics, marketing }: Choices) {
   window.Cookiebot?.submitCustomConsent(preferences, statistics, marketing)
-}
-
-export function reopenCookiebot() {
-  window.Cookiebot?.renew()
 }

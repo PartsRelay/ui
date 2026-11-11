@@ -1,10 +1,10 @@
-import { Fragment } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { legalLinks } from '@/core/legal'
 import { AppVersion } from '@/ui/components/app-version'
 import { ExternalLink } from '@/ui/components/external-link'
 
-export function AppFooter() {
+export function AppFooter({ children }: { children?: ReactNode }) {
   const { t } = useTranslation()
   const links = legalLinks()
 
@@ -16,6 +16,7 @@ export function AppFooter() {
           <span aria-hidden>·</span>
         </Fragment>
       ))}
+      {children}
       <AppVersion />
     </footer>
   )

@@ -5,6 +5,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vite-plus'
+import app from './locales/en-US/app.json' with { type: 'json' }
 import pkg from './package.json' with { type: 'json' }
 import { readEnv } from './src/env'
 
@@ -20,6 +21,12 @@ const ignored = [
 
 const env = readEnv(loadEnv(process.env.APP_ENV ?? 'development', process.cwd(), ''))
 
+const html: Record<string, string> = {
+  APP_NAME: env.APP_NAME,
+  DESCRIPTION: app.description,
+  SHARE_IMAGE: env.SITE_URL ? new URL('/og.png', env.SITE_URL).href : '/og.png',
+}
+
 const reactImports = ['react', 'react-dom', '@tanstack/react-*', '@/ui/*', '@/modules/*/ui/*']
 
 export default defineConfig({
@@ -33,6 +40,10 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
+    {
+      name: 'html-texts',
+      transformIndexHtml: (source) => source.replace(/%(\w+)%/g, (text, key) => html[key] ?? text),
+    },
   ],
 
   resolve: {

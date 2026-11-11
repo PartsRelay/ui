@@ -23,6 +23,22 @@ test('signing out lands on the login page', async ({ page }) => {
   await expect(page.getByText(pkg.version, { exact: true })).toBeVisible()
 })
 
+test('only the login page is open to search engines', async ({ page }) => {
+  const robots = page.locator('meta[name="robots"]')
+  const canonical = page.locator('link[rel="canonical"]')
+
+  await expect(robots).toHaveAttribute('content', 'index, follow')
+  await expect(canonical).toHaveAttribute('href', /\/login$/)
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /WhatsApp/)
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', '/og.png')
+
+  await page.goto('/nowhere?page=2')
+
+  await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
+  await expect(robots).toHaveAttribute('content', 'noindex')
+  await expect(canonical).toHaveAttribute('href', /\/nowhere$/)
+})
+
 test('the magic link form rejects an invalid email', async ({ page }) => {
   const email = page.getByRole('textbox', { name: 'Email' })
 

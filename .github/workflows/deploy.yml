@@ -14,7 +14,7 @@ jobs:
   sevalla:
     runs-on: ubuntu-latest
     steps:
-      - uses: sevalla-hosting/sevalla-deploy@v2.0.0
+      - uses: sevalla-hosting/sevalla-deploy@v3.0.0
         with:
           action: deploy-static-site
           sevalla-token: ${{ secrets.SEVALLA_TOKEN }}

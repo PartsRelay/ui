@@ -2,7 +2,7 @@ import { message } from '@/core/message'
 
 export const DEFAULT_PER_PAGE = 20
 
-export const OPTIONS_PER_PAGE = 100
+export const MAX_PER_PAGE = 100
 
 export type PageMetadata = {
   total: number
@@ -27,4 +27,8 @@ export function pageInfo({ total, perPage, currentPage, lastPage }: PageMetadata
     outOfRange: total > 0 && from > total,
     range: message('pagination.range', { from, to, total }),
   }
+}
+
+export function nextPage({ metadata }: { metadata: PageMetadata }) {
+  return metadata.currentPage < metadata.lastPage ? metadata.currentPage + 1 : undefined
 }

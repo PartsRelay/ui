@@ -13,12 +13,15 @@ import {
   http
 } from 'msw';
 import type {
+  HttpResponseResolver,
+  PathParams,
   RequestHandlerOptions
 } from 'msw';
 
 import type {
   GetApiV1LookupsLookupId200,
-  PostApiV1Lookups202
+  PostApiV1Lookups202,
+  PostApiV1LookupsBody
 } from '../../models';
 
 
@@ -27,8 +30,8 @@ export const getPostApiV1LookupsResponseMock = (overrideResponse: Partial<Extrac
 export const getGetApiV1LookupsLookupIdResponseMock = (overrideResponse: Partial<Extract<GetApiV1LookupsLookupId200, object>> = {}): GetApiV1LookupsLookupId200 => ({data: {id: faker.number.int(), plate: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), vin: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), query: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), nodeIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), status: faker.helpers.arrayElement(['running','done','vehicle_not_found','not_matched','failed'] as const), source: faker.helpers.arrayElement(['web','whatsapp'] as const), searcher: faker.helpers.arrayElement([{type: faker.helpers.arrayElement(['user','contact'] as const), id: faker.number.int(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])},null,]), vehicleDescription: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), categories: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), units: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), imageUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), thumbnailUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), original: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), position: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), aftermarket: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), brand: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}))}))}))})), undefined]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, ...overrideResponse})
 
 
-export const getPostApiV1LookupsMockHandler = (overrideResponse?: PostApiV1Lookups202 | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PostApiV1Lookups202> | PostApiV1Lookups202), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/lookups', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+export const getPostApiV1LookupsMockHandler = (overrideResponse?: PostApiV1Lookups202 | ((info: Parameters<HttpResponseResolver<PathParams, PostApiV1LookupsBody>>[0]) => Promise<PostApiV1Lookups202> | PostApiV1Lookups202), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, PostApiV1LookupsBody>('*/api/v1/lookups', async (info: Parameters<HttpResponseResolver<PathParams, PostApiV1LookupsBody>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
@@ -39,8 +42,8 @@ export const getPostApiV1LookupsMockHandler = (overrideResponse?: PostApiV1Looku
   }, options)
 }
 
-export const getGetApiV1LookupsLookupIdMockHandler = (overrideResponse?: GetApiV1LookupsLookupId200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetApiV1LookupsLookupId200> | GetApiV1LookupsLookupId200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/lookups/:lookupId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1LookupsLookupIdMockHandler = (overrideResponse?: GetApiV1LookupsLookupId200 | ((info: Parameters<HttpResponseResolver<{ lookupId: string }>>[0]) => Promise<GetApiV1LookupsLookupId200> | GetApiV1LookupsLookupId200), options?: RequestHandlerOptions) => {
+  return http.get<{ lookupId: string }>('*/api/v1/lookups/:lookupId', async (info: Parameters<HttpResponseResolver<{ lookupId: string }>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined

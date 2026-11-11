@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import pkg from '../../../../../package.json' with { type: 'json' }
 
 const notices = (page: Page) => page.getByRole('region', { name: /Notifications/ })
 
@@ -13,6 +14,10 @@ test.describe('as the owner', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/workspace')
     await expect(page.getByRole('heading', { level: 1, name: 'Workspace' })).toBeVisible()
+  })
+
+  test('shows the app version in the footer', async ({ page }) => {
+    await expect(page.getByText(pkg.version, { exact: true })).toBeVisible()
   })
 
   test('shows the members and the pending invitations', async ({ page }) => {
@@ -153,6 +158,24 @@ test.describe('as the owner', () => {
     await expect(members(page).getByRole('row', { name: /Julia Bennett/ })).toContainText('Owner')
     await expect(members(page).getByRole('row', { name: /Mark Reed/ })).toContainText('Admin')
     await expect(page.getByRole('link', { name: 'Company' })).toHaveCount(0)
+  })
+
+  test('the new owner list searches the team and closes alone on Escape', async ({ page }) => {
+    await page.getByRole('button', { name: 'Transfer ownership' }).click()
+    const dialog = page.getByRole('alertdialog', { name: 'Transfer ownership' })
+    const newOwner = dialog.getByRole('combobox', { name: 'New owner' })
+    await newOwner.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('option')).toHaveCount(3)
+    await expect(page.getByRole('option', { name: /Mark Reed/ })).toHaveCount(0)
+
+    await page.getByRole('combobox', { name: 'Search…' }).fill('luke')
+    await expect(page.getByRole('option')).toHaveText(['Luke Foster · Viewer'])
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('option')).toHaveCount(0)
+    await expect(dialog).toBeVisible()
+    await expect(newOwner).toBeFocused()
   })
 })
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/PartsRelay/ui/compare/0.2.0...0.3.0) (2026-11-11)
+
+
+### Features
+
+* make the app ready for search engines and link previews ([#12](https://github.com/PartsRelay/ui/issues/12)) ([f2ebcc1](https://github.com/PartsRelay/ui/commit/f2ebcc10437376d221d8c9ebfa64da880ff0e98f))
+
 ## [0.2.0](https://github.com/PartsRelay/ui/compare/0.1.1...0.2.0) (2026-11-05)
 
 

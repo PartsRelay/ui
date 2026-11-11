@@ -30,7 +30,7 @@ type AutocompleteFieldProps<Item> = {
   placeholder?: string
   value: Item | null
   groups: AutocompleteGroup<Item>[]
-  pages: AutocompletePages
+  pages?: AutocompletePages
   itemKey: (item: Item) => string
   itemLabel: (item: Item) => string
   onValueChange: (item: Item) => void
@@ -69,7 +69,7 @@ export function AutocompleteField<Item>({
   const loadMore = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget
     if (scrollHeight - scrollTop - clientHeight > NEAR_END) return
-    if (pages.hasNextPage && !pages.isFetchingNextPage) void pages.fetchNextPage()
+    if (pages?.hasNextPage && !pages.isFetchingNextPage) void pages.fetchNextPage()
   }
 
   return (
@@ -94,7 +94,7 @@ export function AutocompleteField<Item>({
           <CommandInput value={text} onValueChange={type} placeholder={t('common.search')} />
           <CommandList onScroll={loadMore}>
             <CommandEmpty>
-              {t(pages.isPending ? 'common.loading' : 'common.no-results')}
+              {t(pages?.isPending ? 'common.loading' : 'common.no-results')}
             </CommandEmpty>
             {groups
               .filter(({ items }) => items.length > 0)
@@ -116,7 +116,7 @@ export function AutocompleteField<Item>({
                   ))}
                 </CommandGroup>
               ))}
-            {pages.isFetchingNextPage && (
+            {pages?.isFetchingNextPage && (
               <div className="flex justify-center py-2">
                 <Spinner />
               </div>

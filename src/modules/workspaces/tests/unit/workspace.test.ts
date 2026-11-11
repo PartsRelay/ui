@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vite-plus/test'
 import type { Role } from '@/modules/workspaces/core/role'
 import {
   findMe,
+  findMembers,
   type FullOrganization,
   invitationLink,
   invitationRows,
@@ -11,6 +12,7 @@ import {
   needsSetup,
   toWorkspace,
   transferAction,
+  transferRoles,
   withoutInvitation,
   withoutMember,
   type Workspace,
@@ -231,6 +233,26 @@ describe('memberRows', () => {
     const rows = memberRows(workspace(), meAs(people.sarah))
 
     expect(rows.some(({ canTransfer, canRemove }) => canTransfer || canRemove)).toBe(false)
+  })
+})
+
+describe('findMembers', () => {
+  const names = (search: string, roles?: Role[]) =>
+    findMembers(workspace().members, search, roles).map(({ name }) => name)
+
+  it('lists the team by name', () => {
+    expect(names('')).toEqual(['Julia Bennett', 'Luke Foster', 'Mark Reed', 'Sarah Collins'])
+  })
+
+  it('searches the name and the email in any case', () => {
+    expect(names('BENN')).toEqual(['Julia Bennett'])
+    expect(names('gmail')).toEqual(['Luke Foster'])
+    expect(names('nobody')).toEqual([])
+  })
+
+  it('keeps only the roles asked for', () => {
+    expect(names('', transferRoles)).toEqual(['Julia Bennett', 'Luke Foster', 'Sarah Collins'])
+    expect(names('redwood', ['viewer'])).toEqual(['Sarah Collins'])
   })
 })
 

@@ -166,6 +166,15 @@ export function memberRows(workspace: Workspace, me: Me): MemberRow[] {
 
 export const transferRoles = ['admin', 'viewer'] satisfies Role[]
 
+export function findMembers(members: Member[], search: string, roles?: Role[]) {
+  const text = search.toLowerCase()
+
+  return members
+    .filter(({ role }) => !roles || roles.includes(role))
+    .filter(({ name, email }) => [name, email].some((value) => value.toLowerCase().includes(text)))
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
 export function transferAction(candidate?: { name: string }) {
   return candidate
     ? message('workspace.transfer.action', { name: candidate.name })

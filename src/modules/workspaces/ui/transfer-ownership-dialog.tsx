@@ -1,15 +1,17 @@
 import { useForm, useSelector } from '@tanstack/react-form'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { WorkspaceMemberObject } from '@/core/api/models'
-import { optionsKey } from '@/core/options.query'
 import { authClient } from '@/modules/auth/core/auth.client'
 import { sessionQuery } from '@/modules/auth/core/session.query'
-import { memberOptionsQuery } from '@/modules/workspaces/core/members.query'
-import { roleLabel, toRole } from '@/modules/workspaces/core/role'
-import { transferAction, transferRoles } from '@/modules/workspaces/core/workspace'
+import { roleLabel } from '@/modules/workspaces/core/role'
+import {
+  findMembers,
+  type Member,
+  transferAction,
+  transferRoles,
+} from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
+import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { AutocompleteField } from '@/ui/components/autocomplete-field'
 import { Form } from '@/ui/components/form'
 import { SubmitButton } from '@/ui/components/submit-button'
@@ -41,14 +43,13 @@ export function TransferOwnershipDialog({ open, onOpenChange }: TransferOwnershi
 
 function TransferForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation()
+  const { workspace } = useMe()
   const [search, setSearch] = useState('')
-  const candidates = useInfiniteQuery(
-    memberOptionsQuery({ role: transferRoles, search: search || undefined })
-  )
-  const nobody = !search && candidates.data?.pages[0].metadata.total === 0
+  const candidates = findMembers(workspace.members, search, transferRoles)
+  const nobody = !search && candidates.length === 0
   const { client, run } = useBetterAuthAction()
   const form = useForm({
-    defaultValues: { candidate: null as WorkspaceMemberObject | null },
+    defaultValues: { candidate: null as Member | null },
     onSubmit: async ({ value: { candidate } }) => {
       if (!candidate) return
 
@@ -56,14 +57,13 @@ function TransferForm({ onDone }: { onDone: () => void }) {
         async () => {
           try {
             await authClient.organization.updateMemberRole({
-              memberId: String(candidate.id),
+              memberId: candidate.id,
               role: 'owner',
             })
           } finally {
             await Promise.all([
               client.invalidateQueries({ queryKey: workspaceKey }),
               client.invalidateQueries({ queryKey: sessionQuery.queryKey }),
-              client.invalidateQueries({ queryKey: optionsKey }),
             ])
           }
         },
@@ -73,11 +73,8 @@ function TransferForm({ onDone }: { onDone: () => void }) {
     },
   })
   const candidate = useSelector(form.store, (state) => state.values.candidate)
-  const candidateLabel = (member: WorkspaceMemberObject) =>
-    t('workspace.transfer.candidate', {
-      name: member.name,
-      role: t(...roleLabel(toRole(member.role))),
-    })
+  const candidateLabel = (member: Member) =>
+    t('workspace.transfer.candidate', { name: member.name, role: t(...roleLabel(member.role)) })
 
   return (
     <Form form={form} className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
@@ -94,9 +91,8 @@ function TransferForm({ onDone }: { onDone: () => void }) {
               label={t('workspace.transfer.new-owner')}
               placeholder={t('workspace.transfer.choose')}
               value={field.state.value}
-              groups={[{ items: candidates.data?.pages.flatMap(({ data }) => data) ?? [] }]}
-              pages={candidates}
-              itemKey={(member) => String(member.id)}
+              groups={[{ items: candidates }]}
+              itemKey={(member) => member.id}
               itemLabel={candidateLabel}
               onValueChange={field.handleChange}
               onSearch={setSearch}

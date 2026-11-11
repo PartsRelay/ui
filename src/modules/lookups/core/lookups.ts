@@ -5,11 +5,11 @@ import {
   LookupObjectSource,
   LookupObjectStatus,
   SearcherType,
-  type WorkspaceMemberObject,
 } from '@/core/api/models'
 import { type Message, message } from '@/core/message'
 import { contactName } from '@/modules/contacts/core/contact-row'
 import { textKey } from '@/modules/lookups/core/lookup-row'
+import type { Member } from '@/modules/workspaces/core/workspace'
 
 export const EVERYONE = 'everyone'
 
@@ -113,15 +113,12 @@ export function requesterSearch(value: string): Requester {
 
 export type RequesterGroup = { label: Message; items: RequesterOption[] }
 
-export function requesterGroups(
-  members: WorkspaceMemberObject[],
-  contacts: ContactObject[]
-): RequesterGroup[] {
+export function requesterGroups(members: Member[], contacts: ContactObject[]): RequesterGroup[] {
   const groups = [
     {
       label: message('lookups.filter.members'),
       items: members.map((member) => ({
-        value: requesterValue({ searcherType: 'user', searcherId: member.userId }),
+        value: requesterValue({ searcherType: 'user', searcherId: Number(member.userId) }),
         label: member.name,
       })),
     },

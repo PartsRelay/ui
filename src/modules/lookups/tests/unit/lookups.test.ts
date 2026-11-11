@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import type { ContactObject, WorkspaceMemberObject } from '@/core/api/models'
+import type { ContactObject } from '@/core/api/models'
 import { message } from '@/core/message'
 import {
   ALL,
@@ -13,15 +13,16 @@ import {
   requesterSearch,
   requesterValue,
 } from '@/modules/lookups/core/lookups'
+import type { Member } from '@/modules/workspaces/core/workspace'
 
-const member = (userId: number, name: string): WorkspaceMemberObject => ({
-  id: userId - 100,
-  userId,
+const member = (userId: number, name: string): Member => ({
+  id: `m${userId}`,
+  userId: String(userId),
   role: 'viewer',
   name,
   email: `${name.toLowerCase().replace(' ', '.')}@redwoodparts.com`,
   image: null,
-  createdAt: new Date(2026, 0, 1).toISOString(),
+  joinedAt: new Date(2026, 0, 1),
 })
 
 const contact = (id: number, name: string | null, profileName: string | null): ContactObject => ({
@@ -135,7 +136,7 @@ describe('requester filter', () => {
     expect(requesterSearch('robot:7')).toEqual({})
   })
 
-  it('groups the team and the WhatsApp contacts in the order of their pages', () => {
+  it('groups the team and the WhatsApp contacts in the order given', () => {
     const members = [member(102, 'Julia White'), member(101, 'Mark Reed')]
     const contacts = [
       contact(3, null, 'Hillside Auto Repair'),

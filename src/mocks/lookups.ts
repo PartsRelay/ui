@@ -290,10 +290,10 @@ function archive<T>(change: (state: Archive) => T): T {
   return result
 }
 
-const languageOf = (request: Request): Language =>
+export const languageOf = (request: Request): Language =>
   request.headers.get('accept-language')?.startsWith('it') ? 1 : 0
 
-function categoriesOf(nodeIds: string[], language: Language) {
+export function categoriesOf(nodeIds: string[], language: Language) {
   return nodeIds.map((id) => {
     const { name, units } = CATALOG[id]!
 

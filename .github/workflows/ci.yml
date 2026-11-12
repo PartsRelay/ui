@@ -18,10 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       playwright: ${{ steps.playwright.outputs.version }}
+      tests: ${{ steps.tests.outputs.changed }}
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          fetch-depth: 2
+      - id: tests
+        run: git diff --quiet HEAD^ HEAD -- . ':!*.md' ':!.devcontainer' ':!docker-compose.yml' || echo changed=true >> "$GITHUB_OUTPUT"
       - uses: oven-sh/setup-bun@v2
       - id: modules
         uses: actions/cache/restore@v6
@@ -77,7 +81,8 @@ jobs:
           key: modules-${{ runner.os }}-${{ hashFiles('bun.lock', 'package.json') }}
           fail-on-cache-miss: true
       - run: npm install --global "$(node -p "require('./package.json').packageManager")"
-      - run: bun run ${{ matrix.run }}
+      - if: ${{ needs.install.outputs.tests || !startsWith(matrix.run, 'test') }}
+        run: bun run ${{ matrix.run }}
         env:
           HOME: /root
       - if: ${{ failure() && matrix.report }}
@@ -86,11 +91,11 @@ jobs:
           name: playwright-report-${{ matrix.report }}
           path: playwright-report
           retention-days: 7
-      - if: ${{ !cancelled() && matrix.coverage }}
+      - if: ${{ !cancelled() && matrix.coverage && needs.install.outputs.tests }}
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           vite-config-path: vitest.config.ts
-      - if: ${{ !cancelled() && matrix.coverage }}
+      - if: ${{ !cancelled() && matrix.coverage && needs.install.outputs.tests }}
         uses: actions/upload-artifact@v7
         with:
           name: coverage

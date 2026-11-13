@@ -36,7 +36,7 @@ function absolute(path: string) {
 }
 
 function coreURL(path: string, params: Record<string, string | undefined>) {
-  const url = new URL(path, env.API_URL || window.location.origin)
+  const url = new URL(path, env.CORE_URL || window.location.origin)
   for (const [name, value] of Object.entries(params)) if (value) url.searchParams.set(name, value)
 
   return url.href

@@ -12,7 +12,7 @@ import { authToken } from '@/modules/auth/core/auth-token'
 import { ac, roles } from '@/modules/workspaces/core/access'
 
 export const authClient = createAuthClient({
-  baseURL: env.API_URL || window.location.origin,
+  baseURL: env.CORE_URL || window.location.origin,
   fetchOptions: {
     throw: true,
     credentials: 'omit',

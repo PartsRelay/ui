@@ -15,5 +15,5 @@ const output: OutputOptions = {
 }
 
 export default defineConfig({
-  api: { input: `${process.env.API_URL}/openapi.json`, output },
+  api: { input: `${process.env.CORE_URL}/openapi.json`, output },
 })

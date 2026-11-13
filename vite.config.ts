@@ -23,7 +23,6 @@ const env = readEnv(loadEnv(process.env.NODE_ENV ?? 'development', process.cwd()
 
 const html: Record<string, string> = {
   APP_NAME: env.APP_NAME,
-  UI_URL: env.UI_URL,
   DESCRIPTION: app.description,
 }
 

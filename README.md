@@ -1,6 +1,6 @@
 # Parts Relay UI
 
-The web app of Parts Relay. It talks to [PartsRelay/core](https://github.com/PartsRelay/core) and reads every text from [PartsRelay/locales](https://github.com/PartsRelay/locales), mounted as a git submodule at `locales`.
+The web app of Parts Relay. It talks to [PartsRelay/core](https://github.com/PartsRelay/core) reads every text from [PartsRelay/locales](https://github.com/PartsRelay/locales), mounted as a git submodule at `locales`, and serves the favicon, the image of a shared link and `robots.txt` of [PartsRelay/public](https://github.com/PartsRelay/public), mounted at `public`.
 
 ## Run it
 
@@ -22,7 +22,7 @@ To use a core running on your machine, start it with `UI_URL=http://localhost:51
 MOCKS=false API_URL=http://localhost:3333 bun run dev
 ```
 
-The dev container of `.devcontainer` checks out the submodule, copies `.env` and installs, then runs `bun run dev` in the terminal of the editor that attaches, where Ctrl+C stops it and frees the port. `docker-compose.yml` publishes port 5173 on `127.0.0.1`. To share the UI, run `cloudflared tunnel --url http://localhost:5173`, which the dev container has installed.
+The dev container of `.devcontainer` checks out the submodules, copies `.env` and installs, then runs `bun run dev` in the terminal of the editor that attaches, where Ctrl+C stops it and frees the port. `docker-compose.yml` publishes port 5173 on `127.0.0.1`. To share the UI, run `cloudflared tunnel --url http://localhost:5173`, which the dev container has installed.
 
 ## Checks
 

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
@@ -13,7 +15,7 @@ const ignored = [
   '**/dist/**',
   'src/core/api/**',
   'src/ui/routeTree.gen.ts',
-  'public/mockServiceWorker.js',
+  'public/**',
   'locales/**',
   'CHANGELOG.md',
   '.release-please-manifest.json',
@@ -25,6 +27,8 @@ const html: Record<string, string> = {
   APP_NAME: env.APP_NAME,
   DESCRIPTION: app.description,
 }
+
+const mswWorker = createRequire(import.meta.url).resolve('msw/mockServiceWorker.js')
 
 const reactImports = ['react', 'react-dom', '@tanstack/react-*', '@/ui/*', '@/modules/*/ui/*']
 
@@ -43,7 +47,19 @@ export default defineConfig({
       name: 'html-texts',
       transformIndexHtml: (source) => source.replace(/%(\w+)%/g, (text, key) => html[key] ?? text),
     },
+    {
+      name: 'msw-worker',
+      apply: 'serve',
+      configureServer: ({ middlewares }) => {
+        middlewares.use('/mockServiceWorker.js', (_request, response) => {
+          response.setHeader('content-type', 'text/javascript')
+          response.end(readFileSync(mswWorker))
+        })
+      },
+    },
   ],
+
+  publicDir: './public/static',
 
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },

@@ -80,10 +80,5 @@
     "skills": [
       "@tanstack/*"
     ]
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
   }
 }

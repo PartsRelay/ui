@@ -5,15 +5,15 @@ import { memberOptionsQuery } from '@/modules/workspaces/core/members.query'
 
 export function useRequesterOptions(search: string) {
   const params = { search: search || undefined }
-  const memberPages = useInfiniteQuery(memberOptionsQuery(params))
-  const contactPages = useInfiniteQuery(contactOptionsQuery(params))
-  const [members, contacts] = requesterGroups(
-    memberPages.data?.pages.flatMap(({ data }) => data) ?? [],
-    contactPages.data?.pages.flatMap(({ data }) => data) ?? []
+  const members = useInfiniteQuery(memberOptionsQuery(params))
+  const contacts = useInfiniteQuery(contactOptionsQuery(params))
+  const groups = requesterGroups(
+    members.data?.pages.flatMap(({ data }) => data) ?? [],
+    contacts.data?.pages.flatMap(({ data }) => data) ?? []
   )
 
   return [
-    { ...members, pages: memberPages },
-    { ...contacts, pages: contactPages },
+    { ...groups[0], pages: members },
+    { ...groups[1], pages: contacts },
   ]
 }

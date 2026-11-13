@@ -46,7 +46,7 @@ export type Company = {
 
 export const daysAgo = (days: number) => subDays(new Date(), days).toISOString()
 
-export const setting = (name: 'user' | 'setup' | 'invitation') =>
+export const setting = (name: 'user' | 'setup' | 'invitation' | 'team') =>
   localStorage.getItem(`mock.${name}`)
 
 const person = (id: string, name: string, email: string): Person => ({

@@ -29,6 +29,6 @@ export default defineConfig({
     command: `bun run dev --port ${port}`,
     url: baseURL,
     reuseExistingServer: !ci,
-    env: { MOCKS: 'true', GOOGLE_CLIENT_ID: '' },
+    env: { MOCKS: 'true', GOOGLE_CLIENT_ID: '', UI_URL: '' },
   },
 })

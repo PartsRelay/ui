@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/PartsRelay/ui/compare/0.3.1...0.3.2) (2026-11-13)
+
+
+### Bug Fixes
+
+* load the team and the contacts of the requester list on their own ([#19](https://github.com/PartsRelay/ui/issues/19)) ([477eb40](https://github.com/PartsRelay/ui/commit/477eb4045f51a3f413e5d9f5b3011e495b1f6c6a))
+
 ## [0.3.1](https://github.com/PartsRelay/ui/compare/0.3.0...0.3.1) (2026-11-13)
 
 

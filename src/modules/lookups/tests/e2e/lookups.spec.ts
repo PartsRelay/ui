@@ -26,6 +26,44 @@ async function pickRequester(page: Page, search: string, option: string) {
   await page.getByRole('option', { name: option, exact: true }).click()
 }
 
+test.describe('with a large team', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.team', 'large'))
+    await page.goto('/lookups')
+    await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+  })
+
+  test('the requester list shows the contacts before the whole team is loaded', async ({
+    page,
+  }) => {
+    await page.getByRole('combobox', { name: 'Requester' }).click()
+    const team = page.getByRole('group', { name: 'Team' })
+    const contacts = page.getByRole('group', { name: 'WhatsApp contacts' })
+    const more = team.getByRole('option', { name: 'Show more' })
+
+    await expect(team.getByRole('option')).toHaveCount(21)
+    await expect(contacts.getByRole('option')).toHaveCount(20)
+    await expect(contacts.getByRole('option', { name: 'Show more' })).toHaveCount(0)
+
+    await more.click()
+    await expect(team.getByRole('option')).toHaveCount(34)
+    await expect(more).toHaveCount(0)
+    await expect(team.getByRole('option', { name: 'Sarah Collins' })).toBeAttached()
+    await expect(contacts.getByRole('option')).toHaveCount(20)
+
+    await page.getByRole('listbox').hover()
+    await expect(async () => {
+      await page.mouse.wheel(0, 2000)
+      await expect(contacts.getByRole('option')).toHaveCount(24, { timeout: 500 })
+    }).toPass()
+
+    await page.getByRole('combobox', { name: 'Search…' }).fill('colleague 3')
+    await expect(team.getByRole('option')).toHaveCount(1)
+    await page.getByRole('option', { name: 'Colleague 30' }).click()
+    await expect(page.getByRole('combobox', { name: 'Requester' })).toHaveText('Colleague 30')
+  })
+})
+
 test.describe('as the owner', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/lookups')
@@ -77,12 +115,15 @@ test.describe('as the owner', () => {
     await expect(page.getByText('24 searches')).toBeVisible()
   })
 
-  test('the requester list loads the team, then the contacts page by page', async ({ page }) => {
+  test('the requester list loads the team and the contacts, then more contacts while scrolling', async ({
+    page,
+  }) => {
     await page.getByRole('combobox', { name: 'Requester' }).click()
     const options = page.getByRole('option')
     await expect(options.first()).toHaveText('Everyone')
     await expect(page.getByRole('option', { name: 'Julia Bennett' })).toBeVisible()
     await expect(options).toHaveCount(25)
+    await expect(page.getByRole('option', { name: 'Show more' })).toHaveCount(0)
 
     await page.getByRole('listbox').hover()
     await expect(async () => {

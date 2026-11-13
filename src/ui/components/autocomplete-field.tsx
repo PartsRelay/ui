@@ -16,8 +16,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/components/ui/popover'
 import { Spinner } from '@/ui/components/ui/spinner'
 
-export type AutocompleteGroup<Item> = { label?: string; items: Item[] }
-
 export type AutocompletePages = {
   isPending: boolean
   hasNextPage: boolean
@@ -25,12 +23,13 @@ export type AutocompletePages = {
   fetchNextPage: () => unknown
 }
 
+export type AutocompleteGroup<Item> = { label?: string; items: Item[]; pages?: AutocompletePages }
+
 type AutocompleteFieldProps<Item> = {
   label: string
   placeholder?: string
   value: Item | null
   groups: AutocompleteGroup<Item>[]
-  pages: AutocompletePages
   itemKey: (item: Item) => string
   itemLabel: (item: Item) => string
   onValueChange: (item: Item) => void
@@ -44,7 +43,6 @@ export function AutocompleteField<Item>({
   placeholder,
   value,
   groups,
-  pages,
   itemKey,
   itemLabel,
   onValueChange,
@@ -55,6 +53,8 @@ export function AutocompleteField<Item>({
   const [text, setText] = useState('')
   const search = useDebouncedCallback((next: string) => onSearch(next.trim()), { wait: 300 })
   const selected = value === null ? undefined : itemKey(value)
+  const shown = groups.filter(({ items }) => items.length > 0)
+  const last = shown.at(-1)?.pages
 
   const type = (next: string) => {
     setText(next)
@@ -69,7 +69,7 @@ export function AutocompleteField<Item>({
   const loadMore = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget
     if (scrollHeight - scrollTop - clientHeight > NEAR_END) return
-    if (pages.hasNextPage && !pages.isFetchingNextPage) void pages.fetchNextPage()
+    if (last?.hasNextPage && !last.isFetchingNextPage) void last.fetchNextPage()
   }
 
   return (
@@ -94,29 +94,42 @@ export function AutocompleteField<Item>({
           <CommandInput value={text} onValueChange={type} placeholder={t('common.search')} />
           <CommandList onScroll={loadMore}>
             <CommandEmpty>
-              {t(pages.isPending ? 'common.loading' : 'common.no-results')}
+              {t(
+                groups.some(({ pages }) => pages?.isPending)
+                  ? 'common.loading'
+                  : 'common.no-results'
+              )}
             </CommandEmpty>
-            {groups
-              .filter(({ items }) => items.length > 0)
-              .map((group, index) => (
-                <CommandGroup key={group.label ?? index} heading={group.label}>
-                  {group.items.map((item) => (
-                    <CommandItem
-                      key={itemKey(item)}
-                      value={itemKey(item)}
-                      data-checked={itemKey(item) === selected}
-                      className="wrap-anywhere"
-                      onSelect={() => {
-                        onValueChange(item)
-                        toggle(false)
-                      }}
-                    >
-                      {itemLabel(item)}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              ))}
-            {pages.isFetchingNextPage && (
+            {shown.map(({ label: heading, items, pages }, index) => (
+              <CommandGroup key={heading ?? index} heading={heading}>
+                {items.map((item) => (
+                  <CommandItem
+                    key={itemKey(item)}
+                    value={itemKey(item)}
+                    data-checked={itemKey(item) === selected}
+                    className="wrap-anywhere"
+                    onSelect={() => {
+                      onValueChange(item)
+                      toggle(false)
+                    }}
+                  >
+                    {itemLabel(item)}
+                  </CommandItem>
+                ))}
+                {pages?.hasNextPage && pages !== last && (
+                  <CommandItem
+                    value={`more:${heading ?? index}`}
+                    disabled={pages.isFetchingNextPage}
+                    className="text-muted-foreground"
+                    onSelect={() => void pages.fetchNextPage()}
+                  >
+                    {pages.isFetchingNextPage ? <Spinner /> : <ChevronDownIcon />}
+                    {t('common.show-more')}
+                  </CommandItem>
+                )}
+              </CommandGroup>
+            ))}
+            {last?.isFetchingNextPage && (
               <div className="flex justify-center py-2">
                 <Spinner />
               </div>

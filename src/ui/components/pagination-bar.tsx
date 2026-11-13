@@ -28,6 +28,7 @@ export function PaginationBar({ metadata }: { metadata: PageMetadata }) {
           <PreviousLink
             to="."
             search={(prev) => ({ ...prev, page: info.page - 1 })}
+            resetScroll={false}
             disabled={!info.hasPrevious}
             tabIndex={0}
             text={t('pagination.previous')}
@@ -39,6 +40,7 @@ export function PaginationBar({ metadata }: { metadata: PageMetadata }) {
           <NextLink
             to="."
             search={(prev) => ({ ...prev, page: info.page + 1 })}
+            resetScroll={false}
             disabled={!info.hasNext}
             tabIndex={0}
             text={t('pagination.next')}

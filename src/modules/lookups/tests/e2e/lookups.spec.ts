@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Locator, type Page, test } from '@playwright/test'
 
 const queue = (page: Page) =>
   page.getByRole('table').filter({ has: page.getByRole('columnheader', { name: 'Plate' }) })
@@ -134,6 +134,44 @@ test.describe('as the owner', () => {
 
     await page.getByRole('combobox', { name: 'Search…' }).fill('nobody here')
     await expect(page.getByText('No results')).toBeVisible()
+  })
+
+  test('an action on the page keeps the scroll, another page starts from the top', async ({
+    page,
+  }) => {
+    const scroll = () => page.evaluate(() => Math.round(window.scrollY))
+    const scrollTo = async (target: Locator) => {
+      await target.evaluate((element) =>
+        window.scrollTo(0, window.scrollY + element.getBoundingClientRect().top - 120)
+      )
+
+      return scroll()
+    }
+
+    await page.setViewportSize({ width: 1280, height: 480 })
+    await page.goto('/lookups?page=2')
+    await expect(page.getByText('21-24 of 24')).toBeVisible()
+
+    const previous = page.getByRole('link', { name: 'Previous' })
+    const paged = await scrollTo(previous)
+    await previous.click()
+    await expect(page.getByText('1-20 of 24')).toBeVisible()
+    expect(paged).toBeGreaterThan(0)
+    expect(await scroll()).toBe(paged)
+
+    const filtered = await scrollTo(page.getByRole('combobox', { name: 'Status' }))
+    await pick(page, 'Status', 'Done')
+    await expect(page.getByText('17 searches')).toBeVisible()
+    expect(filtered).toBeGreaterThan(0)
+    expect(await scroll()).toBe(filtered)
+
+    await page.getByRole('link', { name: 'Contacts', exact: true }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Contacts' })).toBeVisible()
+    expect(await scroll()).toBe(0)
+
+    await page.goBack()
+    await expect(page.getByText('17 searches')).toBeVisible()
+    await expect.poll(scroll).toBe(filtered)
   })
 
   test('filters the searches by status, period and channel together', async ({ page }) => {

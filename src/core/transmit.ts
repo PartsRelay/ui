@@ -13,7 +13,7 @@ const authorize = (request: Request) => {
 
 export function liveClient() {
   return (client ??= new Transmit({
-    baseUrl: `${env.API_URL || window.location.origin}/api/v1`,
+    baseUrl: `${env.CORE_URL || window.location.origin}/api/v1`,
     maxReconnectAttempts: Infinity,
     beforeSubscribe: authorize,
     beforeUnsubscribe: authorize,

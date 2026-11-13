@@ -19,7 +19,7 @@ const ignored = [
   '.release-please-manifest.json',
 ]
 
-const env = readEnv(loadEnv(process.env.APP_ENV ?? 'development', process.cwd(), ''))
+const env = readEnv(loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), ''))
 
 const html: Record<string, string> = {
   APP_NAME: env.APP_NAME,

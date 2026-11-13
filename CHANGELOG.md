@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/PartsRelay/ui/compare/0.3.0...0.3.1) (2026-11-13)
+
+
+### Bug Fixes
+
+* keep the scroll position when an action stays on the page ([#20](https://github.com/PartsRelay/ui/issues/20)) ([99f3b53](https://github.com/PartsRelay/ui/commit/99f3b5306752057acb29c796d5b9f9c5c0fcd5c6))
+
 ## [0.3.0](https://github.com/PartsRelay/ui/compare/0.2.0...0.3.0) (2026-11-11)
 
 

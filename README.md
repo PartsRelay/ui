@@ -1,6 +1,6 @@
 # Parts Relay UI
 
-The web app of Parts Relay. It talks to [PartsRelay/core](https://github.com/PartsRelay/core) reads every text from [PartsRelay/locales](https://github.com/PartsRelay/locales), mounted as a git submodule at `locales`, and serves the favicon, the image of a shared link and `robots.txt` of [PartsRelay/public](https://github.com/PartsRelay/public), mounted at `public`.
+The web app of Parts Relay. It talks to [PartsRelay/core](https://github.com/PartsRelay/core), reads every text from [PartsRelay/locales](https://github.com/PartsRelay/locales), mounted as a git submodule at `locales`, and serves the favicon, the image of a shared link and `robots.txt` of [PartsRelay/public](https://github.com/PartsRelay/public), mounted at `public`.
 
 ## Run it
 

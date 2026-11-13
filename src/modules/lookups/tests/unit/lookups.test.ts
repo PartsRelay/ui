@@ -135,7 +135,7 @@ describe('requester filter', () => {
     expect(requesterSearch('robot:7')).toEqual({})
   })
 
-  it('groups the team and the WhatsApp contacts in the order of their pages', () => {
+  it('groups the members and the contacts in the order of their pages', () => {
     const members = [member(102, 'Julia White'), member(101, 'Mark Reed')]
     const contacts = [
       contact(3, null, 'Hillside Auto Repair'),
@@ -160,7 +160,7 @@ describe('requester filter', () => {
     ])
   })
 
-  it('keeps the team first and the contacts second, also without options', () => {
+  it('keeps the members first and the contacts second, also without options', () => {
     expect(requesterGroups([], [contact(1, 'Oakfield Garage', null)])).toEqual([
       { label: message('lookups.filter.members'), items: [] },
       {

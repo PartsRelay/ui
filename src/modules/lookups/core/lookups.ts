@@ -116,7 +116,7 @@ export type RequesterGroup = { label: Message; items: RequesterOption[] }
 export function requesterGroups(
   members: WorkspaceMemberObject[],
   contacts: ContactObject[]
-): [team: RequesterGroup, workshops: RequesterGroup] {
+): [members: RequesterGroup, contacts: RequesterGroup] {
   return [
     {
       label: message('lookups.filter.members'),

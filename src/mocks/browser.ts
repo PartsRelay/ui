@@ -1,6 +1,7 @@
 import { setupWorker } from 'msw/browser'
 import * as apiMocks from '@/core/api/endpoints/index.msw'
 import { authMocks } from '@/mocks/auth'
+import { consentMocks } from '@/mocks/consent'
 import { contactMocks } from '@/mocks/contacts'
 import { lookupMocks } from '@/mocks/lookups'
 import { memberMocks } from '@/mocks/members'
@@ -12,5 +13,6 @@ export const worker = setupWorker(
   ...memberMocks,
   ...contactMocks,
   ...lookupMocks,
+  ...consentMocks,
   ...generated
 )

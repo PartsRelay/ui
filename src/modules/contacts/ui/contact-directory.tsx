@@ -80,6 +80,7 @@ export function ContactDirectory() {
           onValueChange={(value) =>
             void navigate({
               search: (prev) => ({ ...prev, status: tabStatus(value), page: undefined }),
+              resetScroll: false,
             })
           }
           className="gap-4"
@@ -90,7 +91,10 @@ export function ContactDirectory() {
             value={search.search}
             className="sm:max-w-xs"
             onSearch={(value) =>
-              void navigate({ search: (prev) => ({ ...prev, search: value, page: undefined }) })
+              void navigate({
+                search: (prev) => ({ ...prev, search: value, page: undefined }),
+                resetScroll: false,
+              })
             }
           />
           <TabsList aria-label={t('contacts.tabs.label')}>

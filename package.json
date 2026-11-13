@@ -80,5 +80,10 @@
     "skills": [
       "@tanstack/*"
     ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "src/mocks"
+    ]
   }
 }

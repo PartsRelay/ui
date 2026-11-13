@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
@@ -15,6 +14,7 @@ const ignored = [
   '**/dist/**',
   'src/core/api/**',
   'src/ui/routeTree.gen.ts',
+  'src/mocks/mockServiceWorker.js',
   'public/**',
   'locales/**',
   'CHANGELOG.md',
@@ -28,7 +28,7 @@ const html: Record<string, string> = {
   DESCRIPTION: app.description,
 }
 
-const mswWorker = createRequire(import.meta.url).resolve('msw/mockServiceWorker.js')
+const mswWorker = new URL('./src/mocks/mockServiceWorker.js', import.meta.url)
 
 const reactImports = ['react', 'react-dom', '@tanstack/react-*', '@/ui/*', '@/modules/*/ui/*']
 

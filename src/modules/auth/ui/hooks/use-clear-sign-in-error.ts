@@ -4,5 +4,10 @@ export function useClearSignInError() {
   const navigate = useNavigate()
 
   return () =>
-    navigate({ to: '.', search: (search) => ({ ...search, error: undefined }), replace: true })
+    navigate({
+      to: '.',
+      search: (search) => ({ ...search, error: undefined }),
+      replace: true,
+      resetScroll: false,
+    })
 }

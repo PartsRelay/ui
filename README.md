@@ -22,7 +22,7 @@ To use a core running on your machine, start it with `UI_URL=http://localhost:51
 MOCKS=false CORE_URL=http://localhost:3333 bun run dev
 ```
 
-The core and the site use the same names: `SITE_URL`, `UI_URL` and `CORE_URL` always name the site, the app and the core. Here `UI_URL` is the public address of the app, for the canonical link, `og:url` and `og:image`, and `CORE_URL` the address of the core. Vite sets `NODE_ENV`, `development` for `bun run dev` and `production` for `bun run build`, and the config reads the `.env` files of that name: do not set it in `.env`.
+The core and the site use the same names: `SITE_URL`, `UI_URL` and `CORE_URL` always name the site, the app and the core. Here `UI_URL` is the public address of the app, for `og:image`, and `CORE_URL` the address of the core. The config reads the `.env` files of `NODE_ENV`, which `.env.example` sets to `development`: with that `.env`, `bun run build` makes a development build, so build for production without it or with `NODE_ENV=production`.
 
 The dev container of `.devcontainer` checks out the submodule, copies `.env` and installs, then runs `bun run dev` in the terminal of the editor that attaches, where Ctrl+C stops it and frees the port. `docker-compose.yml` publishes port 5173 on `127.0.0.1`. To share the UI, run `cloudflared tunnel --url http://localhost:5173`, which the dev container has installed.
 

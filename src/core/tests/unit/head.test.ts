@@ -1,10 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test'
 import { appHead, pageHead } from '@/core/head'
 
-const env = vi.hoisted(() => ({ APP_NAME: 'Parts Relay', UI_URL: '' }))
-
-vi.mock('@/env', () => ({ env }))
-
 function visit(href: string) {
   vi.stubGlobal('window', { location: new URL(href) })
 }
@@ -20,16 +16,6 @@ describe('head', () => {
     expect(meta).toContainEqual({ property: 'og:url', content: address })
     expect(meta).toContainEqual({ name: 'twitter:url', content: address })
     expect(meta).toContainEqual({ name: 'robots', content: 'noindex' })
-  })
-
-  it('names the public address of the app when it has one', () => {
-    env.UI_URL = 'https://app.example.com'
-    visit('https://preview.example.com/login?next=/')
-
-    const { links } = appHead()
-    env.UI_URL = ''
-
-    expect(links).toEqual([{ rel: 'canonical', href: 'https://app.example.com/login' }])
   })
 
   it('titles a page and opens only an indexed one to search engines', () => {

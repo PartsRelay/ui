@@ -111,26 +111,30 @@ export function requesterSearch(value: string): Requester {
     : { searcherType: undefined, searcherId: undefined }
 }
 
-export type RequesterGroup = { label: Message; items: RequesterOption[] }
+type Pages<Item> = { data?: { pages: { data: Item[] }[] } }
 
-export function requesterGroups(
-  members: WorkspaceMemberObject[],
-  contacts: ContactObject[]
-): [members: RequesterGroup, contacts: RequesterGroup] {
+const records = <Item>({ data }: Pages<Item>) => data?.pages.flatMap((page) => page.data) ?? []
+
+export function requesterGroups<
+  Members extends Pages<WorkspaceMemberObject>,
+  Contacts extends Pages<ContactObject>,
+>(members: Members, contacts: Contacts) {
   return [
     {
       label: message('lookups.filter.members'),
-      items: members.map((member) => ({
+      items: records(members).map((member) => ({
         value: requesterValue({ searcherType: 'user', searcherId: member.userId }),
         label: member.name,
       })),
+      pages: members,
     },
     {
       label: message('lookups.filter.contacts'),
-      items: contacts.map((contact) => ({
+      items: records(contacts).map((contact) => ({
         value: requesterValue({ searcherType: 'contact', searcherId: contact.id }),
         label: contactName(contact),
       })),
+      pages: contacts,
     },
   ]
 }

@@ -19,8 +19,10 @@ With `MOCKS=true`, the default of `.env.example`, the MSW mocks of `src/mocks` a
 To use a core running on your machine, start it with `UI_URL=http://localhost:5173`, then run the UI without the mocks:
 
 ```sh
-MOCKS=false API_URL=http://localhost:3333 bun run dev
+MOCKS=false CORE_URL=http://localhost:3333 bun run dev
 ```
+
+The core and the site use the same names: `SITE_URL`, `UI_URL` and `CORE_URL` always name the site, the app and the core. Here `UI_URL` is the public address of the app, for the canonical link, `og:url` and `og:image`, and `CORE_URL` the address of the core. Vite sets `NODE_ENV`, `development` for `bun run dev` and `production` for `bun run build`, and the config reads the `.env` files of that name: do not set it in `.env`.
 
 The dev container of `.devcontainer` checks out the submodule, copies `.env` and installs, then runs `bun run dev` in the terminal of the editor that attaches, where Ctrl+C stops it and frees the port. `docker-compose.yml` publishes port 5173 on `127.0.0.1`. To share the UI, run `cloudflared tunnel --url http://localhost:5173`, which the dev container has installed.
 
@@ -30,4 +32,4 @@ The dev container of `.devcontainer` checks out the submodule, copies `.env` and
 - `bun run build`: the production bundle in `dist`.
 - `bun run test:unit` and `bun run test:e2e`: Vitest and Playwright, as described in `CLAUDE.md`.
 - `bun run test:coverage`: the unit tests with their coverage, as a table in the terminal and a report in `coverage/index.html`.
-- `API_URL=http://localhost:3333 bun run generate`: regenerates the Orval client in `src/core/api` from a running core.
+- `CORE_URL=http://localhost:3333 bun run generate`: regenerates the Orval client in `src/core/api` from a running core.

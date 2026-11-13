@@ -6,7 +6,8 @@ export function readEnv(source: Record<string, string | undefined>) {
     server: {
       MOCKS: z.stringbool().default(false),
       APP_NAME: z.string().default('Parts Relay'),
-      API_URL: z.url().default(''),
+      UI_URL: z.url().default(''),
+      CORE_URL: z.url().default(''),
       GOOGLE_CLIENT_ID: z.string().optional(),
       SUPPORT_URL: z.url().optional(),
       PRIVACY_URL: z.url().optional(),

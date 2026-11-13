@@ -30,7 +30,7 @@ test('only the login page is open to search engines', async ({ page }) => {
   await expect(robots).toHaveAttribute('content', 'index, follow')
   await expect(canonical).toHaveAttribute('href', /\/login$/)
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /WhatsApp/)
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', '/og.png')
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\.png$/)
 
   await page.goto('/nowhere?page=2')
 

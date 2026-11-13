@@ -29,6 +29,7 @@ export function LookupsPage() {
             query: undefined,
           }),
           replace: true,
+          resetScroll: false,
         })
 
   return (

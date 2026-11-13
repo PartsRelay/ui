@@ -14,10 +14,10 @@ export function RequesterFilter({ selected }: { selected?: string }) {
   const { t } = useTranslation()
   const { search: filters, change } = useLookupFilters()
   const [search, setSearch] = useState('')
-  const { groups, pages } = useRequesterOptions(search)
+  const groups = useRequesterOptions(search)
   const value = requesterValue(filters)
   const everyone: RequesterOption = { value: EVERYONE, label: t('lookups.filter.everyone') }
-  const options = groups.map(({ label, items }) => ({ label: t(...label), items }))
+  const options = groups.map((group) => ({ ...group, label: t(...group.label) }))
   const known = groups.flatMap(({ items }) => items).find((option) => option.value === value)
   const current =
     value === EVERYONE
@@ -29,7 +29,6 @@ export function RequesterFilter({ selected }: { selected?: string }) {
       label={t('lookups.filter.label')}
       value={current}
       groups={search ? options : [{ items: [everyone] }, ...options]}
-      pages={pages}
       itemKey={(option) => option.value}
       itemLabel={(option) => option.label}
       onValueChange={(option) => change(requesterSearch(option.value))}

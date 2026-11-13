@@ -86,6 +86,7 @@ export function LookupStats() {
                     <Link
                       to="/lookups"
                       search={{ searcherType: searcher.type, searcherId: searcher.id }}
+                      resetScroll={false}
                       className="justify-self-start text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                     >
                       {t(...label)}

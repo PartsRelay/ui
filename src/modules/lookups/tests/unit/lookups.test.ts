@@ -36,6 +36,10 @@ const contact = (id: number, name: string | null, profileName: string | null): C
   lastLookupAt: null,
 })
 
+const loaded = <Item>(...pages: Item[][]) => ({
+  data: { pages: pages.map((data) => ({ data })) },
+})
+
 describe('searches address', () => {
   it('keeps the page, the filters and the new search sheet', () => {
     const search = {
@@ -135,12 +139,12 @@ describe('requester filter', () => {
     expect(requesterSearch('robot:7')).toEqual({})
   })
 
-  it('groups the team and the WhatsApp contacts in the order of their pages', () => {
-    const members = [member(102, 'Julia White'), member(101, 'Mark Reed')]
-    const contacts = [
-      contact(3, null, 'Hillside Auto Repair'),
-      contact(1, 'Oakfield Garage', 'Tom Walker'),
-    ]
+  it('groups the members and the contacts in the order of their pages', () => {
+    const members = loaded([member(102, 'Julia White')], [member(101, 'Mark Reed')])
+    const contacts = loaded(
+      [contact(3, null, 'Hillside Auto Repair')],
+      [contact(1, 'Oakfield Garage', 'Tom Walker')]
+    )
 
     expect(requesterGroups(members, contacts)).toEqual([
       {
@@ -149,6 +153,7 @@ describe('requester filter', () => {
           { value: 'user:102', label: 'Julia White' },
           { value: 'user:101', label: 'Mark Reed' },
         ],
+        pages: members,
       },
       {
         label: message('lookups.filter.contacts'),
@@ -156,17 +161,21 @@ describe('requester filter', () => {
           { value: 'contact:3', label: 'Hillside Auto Repair' },
           { value: 'contact:1', label: 'Oakfield Garage' },
         ],
+        pages: contacts,
       },
     ])
   })
 
-  it('leaves out a group without options', () => {
-    expect(requesterGroups([], [contact(1, 'Oakfield Garage', null)])).toEqual([
+  it('keeps the members first and the contacts second, also before they load', () => {
+    const contacts = loaded([contact(1, 'Oakfield Garage', null)])
+
+    expect(requesterGroups({}, contacts)).toEqual([
+      { label: message('lookups.filter.members'), items: [], pages: {} },
       {
         label: message('lookups.filter.contacts'),
         items: [{ value: 'contact:1', label: 'Oakfield Garage' }],
+        pages: contacts,
       },
     ])
-    expect(requesterGroups([], [])).toEqual([])
   })
 })

@@ -59,7 +59,7 @@ function NoMatches() {
       description={t('lookups.empty.filtered-description')}
     >
       <Button variant="outline" asChild>
-        <Link to="/lookups" search={{}}>
+        <Link to="/lookups" search={{}} resetScroll={false}>
           {t('lookups.empty.clear')}
         </Link>
       </Button>

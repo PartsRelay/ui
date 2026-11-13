@@ -7,7 +7,10 @@ export function useLookupFilters() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
   const change = (filters: LookupFilters) =>
-    void navigate({ search: (prev) => ({ ...prev, ...filters, page: undefined }) })
+    void navigate({
+      search: (prev) => ({ ...prev, ...filters, page: undefined }),
+      resetScroll: false,
+    })
 
   return { search, change }
 }

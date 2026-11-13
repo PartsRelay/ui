@@ -160,13 +160,13 @@ describe('requester filter', () => {
     ])
   })
 
-  it('leaves out a group without options', () => {
+  it('keeps the team first and the contacts second, also without options', () => {
     expect(requesterGroups([], [contact(1, 'Oakfield Garage', null)])).toEqual([
+      { label: message('lookups.filter.members'), items: [] },
       {
         label: message('lookups.filter.contacts'),
         items: [{ value: 'contact:1', label: 'Oakfield Garage' }],
       },
     ])
-    expect(requesterGroups([], [])).toEqual([])
   })
 })

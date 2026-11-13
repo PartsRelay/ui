@@ -116,8 +116,8 @@ export type RequesterGroup = { label: Message; items: RequesterOption[] }
 export function requesterGroups(
   members: WorkspaceMemberObject[],
   contacts: ContactObject[]
-): RequesterGroup[] {
-  const groups = [
+): [team: RequesterGroup, workshops: RequesterGroup] {
+  return [
     {
       label: message('lookups.filter.members'),
       items: members.map((member) => ({
@@ -133,6 +133,4 @@ export function requesterGroups(
       })),
     },
   ]
-
-  return groups.filter(({ items }) => items.length > 0)
 }

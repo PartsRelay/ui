@@ -94,8 +94,12 @@ function TransferForm({ onDone }: { onDone: () => void }) {
               label={t('workspace.transfer.new-owner')}
               placeholder={t('workspace.transfer.choose')}
               value={field.state.value}
-              groups={[{ items: candidates.data?.pages.flatMap(({ data }) => data) ?? [] }]}
-              pages={candidates}
+              groups={[
+                {
+                  items: candidates.data?.pages.flatMap(({ data }) => data) ?? [],
+                  pages: candidates,
+                },
+              ]}
               itemKey={(member) => String(member.id)}
               itemLabel={candidateLabel}
               onValueChange={field.handleChange}

@@ -1,4 +1,5 @@
 export { getChannelsMock } from './channels/channels.msw'
+export { getCheckoutsMock } from './checkouts/checkouts.msw'
 export { getContactsMock } from './contacts/contacts.msw'
 export { getLookupsMock } from './lookups/lookups.msw'
 export { getMembersMock } from './members/members.msw'

@@ -1,4 +1,5 @@
 export * from './channels/channels';
+export * from './checkouts/checkouts';
 export * from './contacts/contacts';
 export * from './lookups/lookups';
 export * from './members/members';

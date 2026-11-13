@@ -13,7 +13,11 @@ export function WorkspacePage() {
   const { transfer } = route.useSearch()
   const navigate = route.useNavigate()
   const setTransfer = (open: boolean) =>
-    void navigate({ search: { transfer: open || undefined }, replace: !open })
+    void navigate({
+      search: { transfer: open || undefined },
+      replace: !open,
+      resetScroll: false,
+    })
 
   return (
     <>

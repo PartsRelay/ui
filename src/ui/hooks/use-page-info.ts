@@ -9,7 +9,12 @@ export function usePageInfo(metadata: PageMetadata | undefined) {
 
   useEffect(() => {
     if (lastPage) {
-      void navigate({ to: '.', search: (prev) => ({ ...prev, page: lastPage }), replace: true })
+      void navigate({
+        to: '.',
+        search: (prev) => ({ ...prev, page: lastPage }),
+        replace: true,
+        resetScroll: false,
+      })
     }
   }, [lastPage, navigate])
 

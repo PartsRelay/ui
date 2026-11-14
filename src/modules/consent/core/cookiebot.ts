@@ -5,17 +5,6 @@ export const categories = ['preferences', 'statistics', 'marketing'] as const
 
 export type Choices = Record<(typeof categories)[number], boolean>
 
-declare global {
-  interface Window {
-    Cookiebot?: {
-      consent: Choices
-      hide(): void
-      renew(): void
-      submitCustomConsent(preferences: boolean, statistics: boolean, marketing: boolean): void
-    }
-  }
-}
-
 export const cookiebotEnabled = Boolean(env.COOKIEBOT_ID) || mocksEnabled
 
 export const choose = (granted: boolean): Choices => ({

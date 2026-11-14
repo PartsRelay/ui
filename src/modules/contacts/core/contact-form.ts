@@ -1,4 +1,5 @@
 import type { ContactObject, PostApiV1WorkspaceContactsBody } from '@/core/api/models'
+import { fieldErrors, toErrorBody } from '@/core/errors'
 import { requiredText } from '@/core/schemas'
 import type { ContactChange } from '@/modules/contacts/core/contacts.mutation'
 
@@ -12,8 +13,12 @@ export function newContact({ phone, name }: ContactValues): PostApiV1WorkspaceCo
   return trimmed ? { phone: phone.trim(), name: trimmed } : { phone: phone.trim() }
 }
 
-export const contactFieldErrors = {
-  phone: 'contacts.add.errors.phone',
+export function contactFieldErrors(error: unknown) {
+  const full = toErrorBody(error).fields?.some(({ rule }) => rule === 'companies')
+
+  return fieldErrors(error, {
+    phone: full ? 'contacts.add.errors.companies' : 'contacts.add.errors.phone',
+  })
 }
 
 export function renameChange(value: string, contact: ContactObject): ContactChange | null {

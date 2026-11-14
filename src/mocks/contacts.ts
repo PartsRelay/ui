@@ -20,6 +20,8 @@ import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
 
 type Directory = { companies: Record<string, ContactObject[]>; nextId: number }
 
+const MAX_COMPANIES = 3
+
 type Searches = [total: number, month: number, lastDaysAgo: number | null]
 
 const contact = (
@@ -82,7 +84,13 @@ function seed(): Directory['companies'] {
         )
       ),
     ],
-    'ironworks-garage': [contact(40, '447700900201', 'Ironworks Fleet Desk', null)],
+    'ironworks-garage': [
+      contact(40, '447700900201', 'Ironworks Fleet Desk', null),
+      contact(41, '12025550188', 'Union Station Garage', null),
+      contact(42, '12025550189', 'Potomac Auto Body', null),
+    ],
+    'harbour-spares': [contact(43, '12025550188', 'Union Station Garage', null)],
+    'northline-motors': [contact(44, '12025550188', 'Union Station Garage', null)],
   }
 }
 
@@ -160,10 +168,13 @@ export const contactMocks = [
     const name = checkedName(body.name)
 
     return directory((state) => {
-      const taken = Object.values(state.companies).some((items) =>
+      const companies = Object.values(state.companies).filter((items) =>
         items.some((item) => item.waId === waId)
       )
-      if (taken) rejected('phone', 'database.unique')
+      if (contactsOf(state, company).some((item) => item.waId === waId)) {
+        rejected('phone', 'database.unique')
+      }
+      if (companies.length >= MAX_COMPANIES) rejected('phone', 'companies')
 
       const created = { ...contact(state.nextId++, waId, name, null), createdAt: daysAgo(0) }
       contactsOf(state, company).push(created)

@@ -2,7 +2,6 @@ import { useForm } from '@tanstack/react-form'
 import { PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { fieldErrors } from '@/core/errors'
 import {
   contactFieldErrors,
   emptyContact,
@@ -55,7 +54,7 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
         await add.mutateAsync(newContact(value))
         onDone()
       } catch (error) {
-        const fields = fieldErrors(error, contactFieldErrors)
+        const fields = contactFieldErrors(error)
         if (fields) formApi.setErrorMap({ onSubmit: { fields } })
       }
     },

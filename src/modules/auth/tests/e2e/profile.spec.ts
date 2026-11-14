@@ -46,10 +46,17 @@ test.describe('as the owner', () => {
   })
 
   test('signing out of this device opens the login', async ({ page }) => {
-    await page.getByRole('main').getByRole('button', { name: 'Sign out' }).click()
+    await page.getByRole('main').getByRole('button', { name: 'Sign out', exact: true }).click()
 
     await expect(page).toHaveURL('/login')
     await expect(notices(page).getByText('You signed out.')).toBeVisible()
+  })
+
+  test('signing out everywhere opens the login', async ({ page }) => {
+    await page.getByRole('button', { name: 'Sign out everywhere' }).click()
+
+    await expect(page).toHaveURL('/login')
+    await expect(notices(page).getByText('You signed out on every device.')).toBeVisible()
   })
 
   test('the owner has to hand over the company before leaving', async ({ page }) => {

@@ -1,0 +1,6 @@
+{
+  "label": "Pagine",
+  "previous": "Precedente",
+  "next": "Successiva",
+  "range": "{from}-{to} di {total}"
+}

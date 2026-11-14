@@ -1,0 +1,18 @@
+{
+  "go-home": "Torna alla home",
+  "title": "{page} · Parts Relay",
+  "description": "Trova ricambi auto originali e aftermarket da targa o telaio, e lascia che le officine li cerchino su WhatsApp.",
+  "error": {
+    "title": "Impossibile caricare la pagina",
+    "retry": "Riprova"
+  },
+  "not-found": {
+    "title": "Pagina non trovata",
+    "description": "L'indirizzo potrebbe essere sbagliato, oppure la pagina non esiste più."
+  },
+  "legal": {
+    "help": "Centro assistenza",
+    "privacy": "Privacy",
+    "terms": "Termini"
+  }
+}

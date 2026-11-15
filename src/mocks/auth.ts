@@ -161,6 +161,13 @@ export const authMocks = [
       return { success: true }
     })
   ),
+  post('/revoke-sessions', () =>
+    world((state) => {
+      state.signedIn = false
+
+      return { status: true }
+    })
+  ),
   get('/organization/get-full-organization', () => world((state) => signedIn(state).company)),
   post('/update-user', async ({ request }) => {
     const { name } = await body<{ name?: string }>(request)

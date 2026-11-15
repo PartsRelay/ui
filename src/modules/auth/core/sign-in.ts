@@ -56,11 +56,14 @@ export function googleSignInURL({ back, failed, selectAccount }: SignInFlow) {
 
 const encodedAgain = (url: string) => url.replaceAll('%', '%25')
 
-export function magicLinkSignIn({ back, failed }: SignInFlow, email: string) {
+export const turnstileSiteKey = env.TURNSTILE_SITE_KEY
+
+export function magicLinkSignIn({ back, failed }: SignInFlow, email: string, captcha?: string) {
   return {
     email,
     callbackURL: encodedAgain(handoffURL(back)),
     errorCallbackURL: encodedAgain(absolute(failed)),
+    ...(captcha && { fetchOptions: { headers: { 'x-captcha-response': captcha } } }),
   } satisfies Parameters<typeof authClient.signIn.magicLink>[0]
 }
 

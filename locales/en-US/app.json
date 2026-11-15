@@ -1,0 +1,18 @@
+{
+  "go-home": "Back to home",
+  "title": "{page} · Parts Relay",
+  "description": "Find original and aftermarket car parts from a plate or VIN, and let workshops search them on WhatsApp.",
+  "error": {
+    "title": "Couldn't load the page",
+    "retry": "Try again"
+  },
+  "not-found": {
+    "title": "Page not found",
+    "description": "The address may be wrong, or the page no longer exists."
+  },
+  "legal": {
+    "help": "Help centre",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}

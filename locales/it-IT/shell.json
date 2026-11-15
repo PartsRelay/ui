@@ -1,0 +1,18 @@
+{
+  "user": {
+    "profile": "Profilo",
+    "sign-out": "Esci"
+  },
+  "access-denied": {
+    "title": "Non hai accesso a questa pagina.",
+    "ask-owner": "Chiedi aiuto a {owner}, il proprietario della tua azienda.",
+    "ask-any-owner": "Chiedi aiuto al proprietario della tua azienda.",
+    "back": "Torna alla home"
+  },
+  "sidebar": {
+    "toggle": "Apri/chiudi menu",
+    "title": "Menu",
+    "description": "Mostra il menu laterale."
+  },
+  "notifications": "Notifiche"
+}

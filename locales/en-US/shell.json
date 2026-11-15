@@ -1,0 +1,18 @@
+{
+  "user": {
+    "profile": "Profile",
+    "sign-out": "Sign out"
+  },
+  "access-denied": {
+    "title": "You don't have access to this page.",
+    "ask-owner": "Ask {owner}, your company owner, for help.",
+    "ask-any-owner": "Ask your company owner for help.",
+    "back": "Back to home"
+  },
+  "sidebar": {
+    "toggle": "Toggle Sidebar",
+    "title": "Sidebar",
+    "description": "Displays the mobile sidebar."
+  },
+  "notifications": "Notifications"
+}

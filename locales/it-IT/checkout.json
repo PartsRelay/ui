@@ -1,0 +1,31 @@
+{
+  "title": "Ordine",
+  "heading": "Ordina da {company}",
+  "description": "Scegli i ricambi che ti servono e conferma. {company} riceve l'ordine e tu trovi la conferma su WhatsApp.",
+  "original": "Originale",
+  "decrease": "Uno in meno di {name}",
+  "increase": "Uno in più di {name}",
+  "selected": "{count, plural, =0 {Nessun ricambio scelto} one {# ricambio scelto} other {# ricambi scelti}}",
+  "confirm": "Conferma l'ordine",
+  "cancel": "Non ordinare",
+  "ordered": "Ricambi ordinati",
+  "item": "{quantity} × {name}",
+  "back": "Torna a WhatsApp",
+  "close": "Puoi chiudere questa pagina.",
+  "confirmed": {
+    "title": "Ordine inviato",
+    "description": "{company} ha ricevuto il tuo ordine. Trovi la conferma nella chat WhatsApp."
+  },
+  "cancelled": {
+    "title": "Ordine annullato",
+    "description": "Non è stato inviato nulla a {company}. Fai una nuova ricerca su WhatsApp per ordinare."
+  },
+  "unavailable": {
+    "title": "Questo link non è più valido",
+    "description": "È scaduto oppure la ricerca non è più disponibile. Fai una nuova ricerca su WhatsApp per riceverne uno nuovo."
+  },
+  "decline": {
+    "title": "Chiudere senza ordinare?",
+    "description": "Il link si chiude e non viene inviato nulla a {company}. Per ordinare più tardi, fai una nuova ricerca su WhatsApp."
+  }
+}

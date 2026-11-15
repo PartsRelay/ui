@@ -69,6 +69,6 @@ test('a number in 3 companies explains why under the field', async ({ page }) =>
   await dialog.getByRole('button', { name: 'Add contact' }).click()
 
   await expect(phone).toHaveAccessibleDescription(
-    'This number already belongs to 3 companies, the most it can.'
+    'This number already belongs to as many companies as it can.'
   )
 })

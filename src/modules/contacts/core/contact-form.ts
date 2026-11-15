@@ -3,6 +3,8 @@ import { fieldErrors, toErrorBody } from '@/core/errors'
 import { requiredText } from '@/core/schemas'
 import type { ContactChange } from '@/modules/contacts/core/contacts.mutation'
 
+export const MAX_COMPANIES = 3
+
 export type ContactValues = { phone: string; name: string }
 
 export const emptyContact: ContactValues = { phone: '', name: '' }

@@ -17,10 +17,9 @@ import { member } from '@/mocks/auth'
 import { checkedPage, daysAgo, page } from '@/mocks/data'
 import { apiBody, fail, rejected } from '@/mocks/errors'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
+import { MAX_COMPANIES } from '@/modules/contacts/core/contact-form'
 
 type Directory = { companies: Record<string, ContactObject[]>; nextId: number }
-
-const MAX_COMPANIES = 3
 
 type Searches = [total: number, month: number, lastDaysAgo: number | null]
 

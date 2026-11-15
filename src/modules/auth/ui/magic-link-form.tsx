@@ -1,3 +1,4 @@
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useForm } from '@tanstack/react-form'
 import { MailCheckIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -6,6 +7,7 @@ import { useInterval } from 'usehooks-ts'
 import { authClient } from '@/modules/auth/core/auth.client'
 import { emailSchema, MAGIC_LINK_MINUTES, resendWait } from '@/modules/auth/core/magic-link'
 import { magicLinkSignIn, type SignInFlow } from '@/modules/auth/core/sign-in'
+import { Captcha } from '@/modules/auth/ui/captcha'
 import { useClearSignInError } from '@/modules/auth/ui/hooks/use-clear-sign-in-error'
 import { errorKey } from '@/core/errors'
 import { Callout } from '@/ui/components/callout'
@@ -29,6 +31,7 @@ export function MagicLinkForm({ flow }: { flow: SignInFlow }) {
   const input = useRef<HTMLInputElement>(null)
   const status = useRef<HTMLDivElement>(null)
   const wasSent = useRef(false)
+  const captcha = useRef<TurnstileInstance>(undefined)
 
   useEffect(() => {
     if (sent) status.current?.focus()
@@ -39,9 +42,18 @@ export function MagicLinkForm({ flow }: { flow: SignInFlow }) {
   useInterval(() => setNow(Date.now()), wait > 0 ? 1000 : null)
 
   const send = async (address: string) => {
-    const result = await run(() => authClient.signIn.magicLink(magicLinkSignIn(flow, address)), {
-      silent: true,
-    })
+    const result = await run(
+      async () => {
+        const token = await captcha.current?.getResponsePromise()
+
+        try {
+          return await authClient.signIn.magicLink(magicLinkSignIn(flow, address, token))
+        } finally {
+          captcha.current?.reset()
+        }
+      },
+      { silent: true }
+    )
     if (!result.ok) return errorKey(result.error)
 
     const at = Date.now()
@@ -77,6 +89,7 @@ export function MagicLinkForm({ flow }: { flow: SignInFlow }) {
           {t('login.magic-link.sent.description', { email: sent, minutes: MAGIC_LINK_MINUTES })}
         </Callout>
         {failure && <Callout tone="danger">{t(failure)}</Callout>}
+        <Captcha ref={captcha} />
         <div className="grid gap-2">
           <Button
             variant="outline"
@@ -121,6 +134,7 @@ export function MagicLinkForm({ flow }: { flow: SignInFlow }) {
             />
           )}
         </form.Field>
+        <Captcha ref={captcha} />
         <Field>
           <SubmitButton form={form} variant="outline">
             {t('login.magic-link.send')}

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { fieldErrors } from '@/core/errors'
 import { contactFieldErrors, newContact, renameChange } from '@/modules/contacts/core/contact-form'
 import { contactFixture, coreError } from '@/modules/contacts/tests/unit/fixtures'
 
@@ -21,9 +20,12 @@ describe('new contact', () => {
       { field: 'name', rule: 'minLength' },
     ])
 
-    expect(fieldErrors(taken, contactFieldErrors)).toEqual({ phone: 'contacts.add.errors.phone' })
-    expect(fieldErrors(both, contactFieldErrors)).toEqual({ phone: 'contacts.add.errors.phone' })
-    expect(fieldErrors(coreError(403, 'authorization-failure'), contactFieldErrors)).toBeNull()
+    const full = coreError(422, 'validation-error', [{ field: 'phone', rule: 'companies' }])
+
+    expect(contactFieldErrors(taken)).toEqual({ phone: 'contacts.add.errors.phone' })
+    expect(contactFieldErrors(both)).toEqual({ phone: 'contacts.add.errors.phone' })
+    expect(contactFieldErrors(full)).toEqual({ phone: 'contacts.add.errors.companies' })
+    expect(contactFieldErrors(coreError(403, 'authorization-failure'))).toBeNull()
   })
 })
 

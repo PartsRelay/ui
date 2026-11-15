@@ -65,6 +65,12 @@ describe('magicLinkSignIn', () => {
       errorCallbackURL: 'http://localhost:5173/login?next=%252Fcompany',
     })
   })
+
+  it('sends the Turnstile token in the header the core reads', () => {
+    expect(magicLinkSignIn(loginFlow, 'mark.reed@redwoodparts.com', 'token')).toMatchObject({
+      fetchOptions: { headers: { 'x-captcha-response': 'token' } },
+    })
+  })
 })
 
 describe('completeSignIn', () => {

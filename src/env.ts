@@ -9,6 +9,7 @@ export function readEnv(source: Record<string, string | undefined>) {
       UI_URL: z.url().default(''),
       CORE_URL: z.url().default(''),
       GOOGLE_CLIENT_ID: z.string().optional(),
+      TURNSTILE_SITE_KEY: z.string().optional(),
       COOKIEBOT_ID: z.guid().optional(),
       SUPPORT_URL: z.url().optional(),
       PRIVACY_URL: z.url().optional(),

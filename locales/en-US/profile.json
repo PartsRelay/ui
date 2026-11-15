@@ -43,7 +43,7 @@
   },
   "session": {
     "title": "Session",
-    "description": "Sign out of Parts Relay on this device, or on every device if an email told you of a sign-in that was not you.",
+    "description": "Sign out of {app} on this device, or on every device if an email told you of a sign-in that was not you.",
     "sign-out": "Sign out",
     "sign-out-everywhere": "Sign out everywhere"
   }

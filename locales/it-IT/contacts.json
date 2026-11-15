@@ -57,7 +57,7 @@
   "add": {
     "open": "Aggiungi contatto",
     "title": "Aggiungi un contatto",
-    "description": "Il numero può cercare ricambi su WhatsApp da subito. Un numero può appartenere a una sola azienda.",
+    "description": "Il numero può cercare ricambi su WhatsApp da subito. Un numero può appartenere fino a {max} aziende e ne sceglie una a ogni ricerca.",
     "phone": "Numero WhatsApp",
     "phone-hint": "Con il prefisso internazionale, ad esempio +39.",
     "phone-placeholder": "+39 333 123 4567",
@@ -66,7 +66,8 @@
     "submit": "Aggiungi contatto",
     "errors": {
       "phone-required": "Inserisci il numero WhatsApp.",
-      "phone": "Controlla il numero: serve il prefisso internazionale e potrebbe già appartenere a un'azienda."
+      "phone": "Controlla il numero: serve il prefisso internazionale e potrebbe essere già un contatto di quest'azienda.",
+      "companies": "Questo numero appartiene già al numero massimo di aziende."
     }
   },
   "confirm": {

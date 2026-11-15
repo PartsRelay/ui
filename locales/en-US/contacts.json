@@ -57,7 +57,7 @@
   "add": {
     "open": "Add contact",
     "title": "Add a contact",
-    "description": "The number can search parts on WhatsApp right away. A number can belong to one company only.",
+    "description": "The number can search parts on WhatsApp right away. A number can belong to up to {max} companies, and picks one for each search.",
     "phone": "WhatsApp number",
     "phone-hint": "With the international prefix, for example +1.",
     "phone-placeholder": "+1 202 555 0123",
@@ -66,7 +66,8 @@
     "submit": "Add contact",
     "errors": {
       "phone-required": "Enter the WhatsApp number.",
-      "phone": "Check the number: it needs the international prefix, and it may already belong to a company."
+      "phone": "Check the number: it needs the international prefix, and it may already be a contact of this company.",
+      "companies": "This number already belongs to as many companies as it can."
     }
   },
   "confirm": {

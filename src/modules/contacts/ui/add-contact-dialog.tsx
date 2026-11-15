@@ -2,10 +2,10 @@ import { useForm } from '@tanstack/react-form'
 import { PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { fieldErrors } from '@/core/errors'
 import {
   contactFieldErrors,
   emptyContact,
+  MAX_COMPANIES,
   newContact,
   phoneSchema,
 } from '@/modules/contacts/core/contact-form'
@@ -55,7 +55,7 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
         await add.mutateAsync(newContact(value))
         onDone()
       } catch (error) {
-        const fields = fieldErrors(error, contactFieldErrors)
+        const fields = contactFieldErrors(error)
         if (fields) formApi.setErrorMap({ onSubmit: { fields } })
       }
     },
@@ -65,7 +65,9 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
     <Form form={form} className="grid gap-6">
       <DialogHeader>
         <DialogTitle>{t('contacts.add.title')}</DialogTitle>
-        <DialogDescription>{t('contacts.add.description')}</DialogDescription>
+        <DialogDescription>
+          {t('contacts.add.description', { max: MAX_COMPANIES })}
+        </DialogDescription>
       </DialogHeader>
       <FieldGroup>
         <form.Field name="phone" validators={{ onSubmit: phoneSchema }}>

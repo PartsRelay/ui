@@ -1,0 +1,27 @@
+{
+  "title": "Cookies",
+  "description": "Parts Relay uses cookies to work and, if you agree, to remember your preferences, measure how it is used and show relevant content.",
+  "customize": "Customize",
+  "save": "Save my choices",
+  "reject": "Only necessary",
+  "accept": "Accept all",
+  "settings": "Cookies",
+  "categories": {
+    "necessary": {
+      "title": "Necessary",
+      "description": "Sign in and keep the app working. Always on."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Remember choices such as your language."
+    },
+    "statistics": {
+      "title": "Statistics",
+      "description": "Measure how the app is used, without identifying you."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "description": "Show content and ads that are relevant to you."
+    }
+  }
+}

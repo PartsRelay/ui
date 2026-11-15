@@ -22,7 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: true
           fetch-depth: 2
       - id: tests
         run: git diff --quiet HEAD^ HEAD -- . ':!*.md' ':!.devcontainer' ':!docker-compose.yml' || echo changed=true >> "$GITHUB_OUTPUT"
@@ -73,8 +72,6 @@ jobs:
             report: webkit
     steps:
       - uses: actions/checkout@v7
-        with:
-          submodules: true
       - uses: actions/cache/restore@v6
         with:
           path: node_modules

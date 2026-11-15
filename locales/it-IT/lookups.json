@@ -1,0 +1,160 @@
+{
+  "title": "Ricerche",
+  "description": "Tieni il banco in movimento. Avvia una ricerca o riprendi le ultime richieste delle officine.",
+  "status": {
+    "running": "In corso",
+    "done": "Completata",
+    "vehicle-not-found": "Veicolo non trovato",
+    "not-matched": "Nessuna categoria",
+    "failed": "Non riuscita"
+  },
+  "source": {
+    "web": "Web",
+    "whatsapp": "WhatsApp"
+  },
+  "searcher": {
+    "named": "{name}",
+    "gone": "Non più in azienda",
+    "unnamed-contact": "Contatto senza nome"
+  },
+  "list": {
+    "title": "Coda delle ricerche",
+    "description": "Le ricerche dal banco e da WhatsApp, dalla più recente.",
+    "stale": "Le ricerche mostrate potrebbero non essere aggiornate.",
+    "count": "{count, plural, one {# ricerca} other {# ricerche}}",
+    "open": "Apri la ricerca di {plate}"
+  },
+  "columns": {
+    "plate": "Targa o telaio",
+    "parts": "Ricambio e veicolo",
+    "status": "Stato",
+    "channel": "Canale",
+    "requester": "Richiedente",
+    "requested": "Data richiesta"
+  },
+  "filter": {
+    "label": "Richiedente",
+    "everyone": "Tutti",
+    "members": "Team",
+    "contacts": "Contatti WhatsApp",
+    "selected": "Richiedente selezionato",
+    "search": "Targa o telaio",
+    "search-placeholder": "Cerca targa o telaio",
+    "status": "Stato",
+    "period": "Periodo",
+    "channel": "Canale",
+    "all": "Tutti",
+    "all-time": "Sempre",
+    "days": "Ultimi {days} giorni"
+  },
+  "empty": {
+    "title": "Ancora nessuna ricerca",
+    "description": "Quando il tuo team o un contatto WhatsApp cerca un ricambio, qui compaiono il veicolo, i ricambi e il risultato.",
+    "filtered": "Nessuna ricerca corrisponde ai filtri",
+    "filtered-description": "Cambia o togli i filtri per vedere tutte le ricerche dell'azienda.",
+    "clear": "Togli i filtri",
+    "example": "Per esempio: GH482KL · Pastiglie freno anteriori",
+    "start": "Avvia una ricerca",
+    "invite": "Invita il tuo team",
+    "connect": "Collega le officine"
+  },
+  "new": {
+    "open": "Nuova ricerca",
+    "eyebrow": "Nuova richiesta · Web",
+    "title": "Trova il ricambio.",
+    "description": "Inserisci la targa o il telaio (VIN) e il ricambio che ti serve. Il risultato resta nella coda delle ricerche dell'azienda.",
+    "plate": "Targa",
+    "plate-hint": "Spazi, punti e trattini vanno bene.",
+    "plate-placeholder": "AB123CD",
+    "query": "Ricambio richiesto",
+    "query-hint": "Sii preciso: nome del ricambio e posizione, se la conosci.",
+    "query-placeholder": "Pastiglie freno anteriori",
+    "tips": {
+      "title": "Consigli per la ricerca",
+      "body": "Controlla la targa e indica la posizione del ricambio, per esempio anteriore o posteriore."
+    },
+    "requester": "Richiesta da {name} · Web",
+    "submit": "Avvia la ricerca",
+    "errors": {
+      "plate-required": "Inserisci la targa.",
+      "plate": "Controlla la targa: da 4 a 8 lettere e cifre.",
+      "query-required": "Inserisci il ricambio che ti serve, per esempio pastiglie freno anteriori.",
+      "query": "Descrivi il ricambio con almeno 2 caratteri.",
+      "vin-required": "Inserisci il telaio.",
+      "vin": "Controlla il telaio: 17 lettere e cifre, senza I, O e Q."
+    },
+    "identify": "Identifica il veicolo con",
+    "by": {
+      "plate": "Targa",
+      "vin": "Telaio (VIN)"
+    },
+    "vin": "Telaio (VIN)",
+    "vin-hint": "17 lettere e cifre, senza I, O e Q.",
+    "vin-placeholder": "WVWZZZAUZHW204411"
+  },
+  "fitment": "I risultati aiutano a identificare il ricambio. Verifica sempre la compatibilità con il veicolo prima dell'acquisto.",
+  "detail": {
+    "title": "Risultato della ricerca",
+    "description": "Il veicolo, lo stato e i ricambi trovati, aggiornati mentre la ricerca procede.",
+    "back": "Torna alle ricerche",
+    "vin": "Telaio (VIN)",
+    "no-vehicle": "Veicolo non identificato",
+    "retry": "Cerca di nuovo",
+    "stale": "Questa ricerca potrebbe non essere aggiornata.",
+    "query": "Ricambio richiesto"
+  },
+  "outcome": {
+    "running": {
+      "title": "Ricerca nel catalogo in corso",
+      "description": "Il risultato compare qui appena è pronto, senza ricaricare. Puoi lasciare questa pagina, la ricerca continua."
+    },
+    "results": {
+      "title": "Ricambi trovati"
+    },
+    "unavailable": {
+      "title": "Dettagli non disponibili",
+      "description": "La ricerca è conclusa, ma i suoi ricambi non sono più disponibili. Cerca di nuovo per vederli."
+    },
+    "vehicle-not-found": {
+      "title": "Veicolo non trovato",
+      "description": "Il catalogo non conosce questa targa o questo telaio. Controlla e cerca di nuovo."
+    },
+    "not-matched": {
+      "title": "Nessuna categoria corrispondente",
+      "description": "Il veicolo è stato identificato, ma nessuna categoria di ricambi corrisponde alla richiesta. Prova con un nome più preciso o con la posizione."
+    },
+    "failed": {
+      "title": "Ricerca non riuscita",
+      "description": "Il catalogo non ha potuto completare la ricerca. Riprova tra poco."
+    }
+  },
+  "results": {
+    "original": "{count, plural, one {# ricambio originale} other {# ricambi originali}}",
+    "aftermarket": "{count, plural, one {# equivalente aftermarket} other {# equivalenti aftermarket}}",
+    "unit": "Gruppo {code}",
+    "image": "Esploso di {name}",
+    "no-parts": "Nessun ricambio elencato per questo gruppo.",
+    "no-category-parts": "Nessun ricambio trovato per questo veicolo in questa categoria.",
+    "position": "Pos. {position}",
+    "original-code": "OEM {code}",
+    "no-aftermarket": "Nessun equivalente aftermarket."
+  },
+  "greeting": {
+    "morning": "Buongiorno, {name}.",
+    "afternoon": "Buon pomeriggio, {name}.",
+    "evening": "Buonasera, {name}."
+  },
+  "stats": {
+    "total": "Ricerche · ultimi {days} giorni",
+    "done": "Completate · ultimi {days} giorni",
+    "failed": "Non riuscite · ultimi {days} giorni",
+    "change": "{change, number, ::percent sign-always} rispetto ai {days} giorni precedenti",
+    "no-previous": "Nessuna ricerca nei {days} giorni precedenti",
+    "done-note": "Ricerche con ricambi trovati",
+    "failed-note": "Veicolo non trovato, nessuna categoria o ricerca fallita",
+    "top": {
+      "title": "Chi cerca di più",
+      "description": "Ultimi {days} giorni · Solo il proprietario lo vede"
+    }
+  }
+}

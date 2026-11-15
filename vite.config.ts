@@ -14,7 +14,6 @@ const ignored = [
   'src/core/api/**',
   'src/ui/routeTree.gen.ts',
   'public/mockServiceWorker.js',
-  'locales/**',
   'CHANGELOG.md',
   '.release-please-manifest.json',
 ]

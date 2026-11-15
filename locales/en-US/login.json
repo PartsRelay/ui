@@ -1,0 +1,29 @@
+{
+  "title": "Sign in to Parts Relay",
+  "sign-in": "Sign in",
+  "description": "Continue with Google or get a sign-in link by email.",
+  "google": "Continue with Google",
+  "or": "or",
+  "magic-link": {
+    "description": "Get a sign-in link by email.",
+    "email": "Email",
+    "placeholder": "name@company.com",
+    "send": "Email me a sign-in link",
+    "sent": {
+      "title": "Check your email",
+      "description": "We sent a sign-in link to {email}. It works once and expires in {minutes} minutes.",
+      "resend": "Send the link again",
+      "resend-in": "Send again in {seconds} s",
+      "edit": "Use another email"
+    }
+  },
+  "errors": {
+    "cancelled": "Google sign in was cancelled.",
+    "failed": "Sign in failed. Try again.",
+    "google": "Google sign in failed."
+  },
+  "legal": {
+    "consent": "By continuing, you agree to the <terms>Terms of Service</terms> and acknowledge the <privacy>Privacy Policy</privacy>.",
+    "support": "Need help signing in? <support>Contact support</support>"
+  }
+}

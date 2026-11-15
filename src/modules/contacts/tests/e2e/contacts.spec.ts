@@ -50,3 +50,25 @@ test('finds contacts by name or number, also within a tab', async ({ page }) => 
   await expect(page).toHaveURL(/\/contacts\?search=.*900105.*&status=active$/)
   await expect(page.getByText('No contacts match the search')).toBeVisible()
 })
+
+test('a number of another company can be added here too', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  await dialog.getByRole('textbox', { name: 'WhatsApp number' }).fill('+1 202 555 0189')
+  await dialog.getByRole('button', { name: 'Add contact' }).click()
+
+  await expect(dialog).toBeHidden()
+  await expect(page.getByRole('row', { name: /202.*555.*0189/ })).toBeVisible()
+})
+
+test('a number in 3 companies explains why under the field', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+  await phone.fill('+1 202 555 0188')
+  await dialog.getByRole('button', { name: 'Add contact' }).click()
+
+  await expect(phone).toHaveAccessibleDescription(
+    'This number already belongs to as many companies as it can.'
+  )
+})

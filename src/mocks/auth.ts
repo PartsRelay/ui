@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { isFuture } from 'date-fns'
 import { http, HttpResponse, type JsonBodyType } from 'msw'
 import { z } from 'zod'
@@ -15,6 +16,9 @@ import {
   type Role,
 } from '@/mocks/data'
 import { fail } from '@/mocks/errors'
+import { apiKeyModes } from '@/modules/developers/core/api-keys'
+
+type ApiKey = ReturnType<typeof apiKey>
 
 type World = {
   signedIn: boolean
@@ -22,6 +26,8 @@ type World = {
   company: Company
   offered: boolean
   nextInvitation: number
+  apiKeys: ApiKey[]
+  nextApiKey: number
 }
 
 const worldKey = () =>
@@ -37,6 +43,8 @@ function freshWorld(): World {
     company: pending ? newCompany(me) : redwoodParts(),
     offered: setting('invitation') === '1',
     nextInvitation: 100,
+    apiKeys: [],
+    nextApiKey: 1,
   }
 }
 
@@ -76,6 +84,59 @@ export function team() {
 
 function ownerOnly(state: World, code: string, message: string) {
   if (myRole(state) !== 'owner') fail(403, code, message)
+}
+
+const API_KEY_START = 12
+
+function apiKey(id: string, configId: string, referenceId: string, key: string) {
+  const createdAt = new Date().toISOString()
+
+  return {
+    id,
+    configId,
+    name: null,
+    start: key.slice(0, API_KEY_START),
+    prefix: `${configId}_`,
+    referenceId,
+    refillInterval: null,
+    refillAmount: null,
+    lastRefillAt: null,
+    enabled: true,
+    rateLimitEnabled: true,
+    rateLimitTimeWindow: 60_000,
+    rateLimitMax: 300,
+    requestCount: 0,
+    remaining: null,
+    lastRequest: null,
+    expiresAt: null,
+    createdAt,
+    updatedAt: createdAt,
+    permissions: null,
+    metadata: null,
+  }
+}
+
+function apiKeyMode(configId: string) {
+  if (!apiKeyModes.some((mode) => mode === configId)) {
+    fail(400, 'no-default-api-key-configuration-found', 'No default api-key configuration found.')
+  }
+}
+
+function apiKeyOwner(state: World, organizationId: string) {
+  if (organizationId !== state.company.id) {
+    fail(
+      403,
+      'user-not-member-of-organization',
+      'You are not a member of the organization that owns this API key.'
+    )
+  }
+  if (myRole(state) !== 'owner') {
+    fail(
+      403,
+      'insufficient-api-key-permissions',
+      'You do not have permission to perform this action on organization API keys.'
+    )
+  }
 }
 
 const MANAGES: Record<string, string[]> = { owner: ['admin', 'viewer'], admin: ['viewer'] }
@@ -416,6 +477,64 @@ export const authMocks = [
         invitation: { ...invitation, status: 'accepted' },
         member: state.company.members.at(-1),
       }
+    })
+  }),
+  get('/api-key/list', ({ request }) => {
+    const organizationId = new URL(request.url).searchParams.get('organizationId')
+
+    return world((state) => {
+      const { me } = signedIn(state)
+      if (organizationId) apiKeyOwner(state, organizationId)
+
+      const apiKeys = state.apiKeys.filter(
+        ({ referenceId }) => referenceId === (organizationId ?? me.id)
+      )
+
+      return { apiKeys, total: apiKeys.length }
+    })
+  }),
+  post('/api-key/create', async ({ request }) => {
+    const { configId, organizationId } = await body<{ configId: string; organizationId: string }>(
+      request
+    )
+
+    return world((state) => {
+      apiKeyMode(configId)
+      if (!organizationId) {
+        fail(
+          400,
+          'organization-id-required',
+          'Organization ID is required for organization-owned API keys.'
+        )
+      }
+      if (!state.signedIn) fail(401, 'unauthorized-session', 'Unauthorized or invalid session')
+      apiKeyOwner(state, organizationId)
+
+      const key = `${configId}_${faker.string.alpha(64)}`
+      const created = apiKey(String(state.nextApiKey++), configId, organizationId, key)
+      state.apiKeys = [
+        ...state.apiKeys.filter(
+          (item) => item.configId !== configId || item.referenceId !== organizationId
+        ),
+        created,
+      ]
+
+      return { ...created, key }
+    })
+  }),
+  post('/api-key/delete', async ({ request }) => {
+    const { configId, keyId } = await body<{ configId: string; keyId: string }>(request)
+
+    return world((state) => {
+      signedIn(state)
+      apiKeyMode(configId)
+      const target = state.apiKeys.find((item) => item.id === keyId && item.configId === configId)
+      if (!target) fail(404, 'key-not-found', 'API Key not found')
+      apiKeyOwner(state, target.referenceId)
+
+      state.apiKeys = state.apiKeys.filter((item) => item !== target)
+
+      return { success: true }
     })
   }),
 ]

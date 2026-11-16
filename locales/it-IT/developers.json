@@ -1,0 +1,55 @@
+{
+  "title": "Sviluppatori",
+  "description": "Le chiavi API della tua azienda, una per le prove e una per gli ordini veri. Solo il proprietario vede questa pagina.",
+  "keys": {
+    "test": {
+      "title": "Chiave di test",
+      "description": "Per costruire e provare un'integrazione: i suoi ordini restano separati da quelli veri.",
+      "empty": "Nessuna chiave di test.",
+      "create": "Crea la chiave di test",
+      "replace": "Sostituisci la chiave di test",
+      "delete": "Elimina la chiave di test"
+    },
+    "live": {
+      "title": "Chiave live",
+      "description": "Per un'integrazione in produzione: i suoi ordini sono veri.",
+      "empty": "Nessuna chiave live.",
+      "create": "Crea la chiave live",
+      "replace": "Sostituisci la chiave live",
+      "delete": "Elimina la chiave live"
+    }
+  },
+  "key": {
+    "start": "Chiave",
+    "created": "Creata"
+  },
+  "secret": {
+    "title": "Copia la chiave adesso",
+    "description": "Viene mostrata solo questa volta. Se la perdi, sostituisci la chiave.",
+    "copy": "Copia la chiave"
+  },
+  "confirm": {
+    "replace": {
+      "title": {
+        "test": "Sostituire la chiave di test?",
+        "live": "Sostituire la chiave live?"
+      },
+      "body": "La chiave attuale smette subito di funzionare: ogni software che la usa avrà bisogno di quella nuova.",
+      "action": "Sostituisci la chiave"
+    },
+    "delete": {
+      "title": {
+        "test": "Eliminare la chiave di test?",
+        "live": "Eliminare la chiave live?"
+      },
+      "body": "La chiave smette subito di funzionare. Puoi crearne una nuova quando vuoi.",
+      "action": "Elimina la chiave"
+    }
+  },
+  "notices": {
+    "created": "Chiave creata.",
+    "replaced": "Chiave sostituita. Quella vecchia non funziona più.",
+    "deleted": "Chiave eliminata. Non funziona più.",
+    "copied": "Chiave copiata."
+  }
+}

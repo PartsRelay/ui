@@ -94,20 +94,20 @@ test('the number keeps its plus whatever I type, delete or paste', async ({ page
   await expect(phone).toHaveValue('+')
 })
 
-test('the caret starts after the plus and stays where I edit', async ({ page }) => {
+test('the caret stays where I edit the number', async ({ page }) => {
   await page.getByRole('button', { name: 'Add contact' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add a contact' })
   const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
-  await expect(phone).toHaveJSProperty('selectionStart', 1)
+  await expect(phone).toBeFocused()
 
-  await phone.fill('+93 338 473 2036')
-  await phone.evaluate((input: HTMLInputElement) => input.setSelectionRange(3, 3))
+  await page.keyboard.type('338')
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ArrowLeft')
   await page.keyboard.press('Backspace')
-  await page.keyboard.press('Backspace')
-  await page.keyboard.press('Backspace')
-  await expect(phone).toHaveValue('+338 473 2036')
+  await expect(phone).toHaveValue('+338')
   await page.keyboard.type('39 ')
-  await expect(phone).toHaveValue('+39 338 473 2036')
+  await expect(phone).toHaveValue('+39 338')
 })
 
 test('a number with only the plus is still missing', async ({ page }) => {

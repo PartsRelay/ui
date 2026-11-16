@@ -34,7 +34,7 @@
     "cn": "^0.5.2",
     "date-fns": "^4.4.0",
     "http-status-codes": "^2.3.0",
-    "i18next": "^26.7.2",
+    "i18next": "^27.1.1",
     "i18next-browser-languagedetector": "^8.3.0",
     "i18next-icu": "^2.7.0",
     "intl-messageformat": "^12.1.5",
@@ -43,7 +43,7 @@
     "radix-ui": "^1.8.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-i18next": "^17.1.13",
+    "react-i18next": "^18.0.1",
     "sonner": "^2.0.8",
     "usehooks-ts": "^3.1.1",
     "zod": "^4.6.7"

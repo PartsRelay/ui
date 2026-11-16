@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { MessageValues } from '@/core/message'
+import { message, type MessageValues } from '@/core/message'
 import { reportError } from '@/query-client'
 import { notify } from '@/core/notify'
 
@@ -19,7 +19,7 @@ export function useBetterAuthAction() {
     mutationFn: ({ action }: Action) => action(),
     networkMode: 'always',
     onSuccess: (_data, { notice, values }) => {
-      if (notice) notify('success', notice, values)
+      if (notice) notify('success', ...message(notice, values))
     },
     onError: (failure, { silent }) =>
       reportError(failure, typeof silent === 'function' ? silent(failure) : silent),

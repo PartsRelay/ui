@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0](https://github.com/PartsRelay/ui/compare/0.3.2...0.4.0) (2026-11-15)
+
+
+### Features
+
+* explain that a number can belong to 3 companies ([#26](https://github.com/PartsRelay/ui/issues/26)) ([d22140f](https://github.com/PartsRelay/ui/commit/d22140ff145cd76aee93a279defc2823c60757ca))
+* let the profile sign out of every device ([#27](https://github.com/PartsRelay/ui/issues/27)) ([71166e5](https://github.com/PartsRelay/ui/commit/71166e57517d209088534f1612e7a12aa2fce020))
+* protect the magic link with Cloudflare Turnstile ([#28](https://github.com/PartsRelay/ui/issues/28)) ([3ba3130](https://github.com/PartsRelay/ui/commit/3ba3130939b44797e65236148e8dc9e020b18513))
+
 ## [0.3.2](https://github.com/PartsRelay/ui/compare/0.3.1...0.3.2) (2026-11-13)
 
 

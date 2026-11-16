@@ -9,7 +9,7 @@ export type ContactValues = { phone: string; name: string }
 
 export const emptyContact: ContactValues = { phone: '+', name: '' }
 
-export const withPlus = (value: string) => `+${value.replaceAll('+', '')}`
+export const withPlus = (value: string) => `+${value.replace(/^\P{Nd}+|\+/gu, '')}`
 
 export function newContact({ phone, name }: ContactValues): PostApiV1WorkspaceContactsBody {
   const trimmed = name.trim()

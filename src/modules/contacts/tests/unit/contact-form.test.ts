@@ -25,6 +25,13 @@ describe('new contact', () => {
     expect(withPlus('+39 338 473 2036+')).toBe('+39 338 473 2036')
   })
 
+  it('drops what a pasted number has before its first digit', () => {
+    expect(withPlus(' +39 338 473 2036')).toBe('+39 338 473 2036')
+    expect(withPlus('‭+39 338 473 2036')).toBe('+39 338 473 2036')
+    expect(withPlus('Tel. +39 338 473 2036')).toBe('+39 338 473 2036')
+    expect(withPlus('+٣٩٣٣٨٤٧٣٢٠٣٦')).toBe('+٣٩٣٣٨٤٧٣٢٠٣٦')
+  })
+
   it('asks for the number when only the plus is there', () => {
     expect(phoneError('+')).toBe('contacts.add.errors.phone-required')
     expect(phoneError('+ ')).toBe('contacts.add.errors.phone-required')

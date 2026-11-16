@@ -6,7 +6,6 @@ import react from '@vitejs/plugin-react'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vite-plus'
 import app from './locales/en-US/app.json' with { type: 'json' }
-import pkg from './package.json' with { type: 'json' }
 import { readEnv } from './src/env'
 
 const ignored = [
@@ -14,8 +13,6 @@ const ignored = [
   'src/core/api/**',
   'src/ui/routeTree.gen.ts',
   'public/mockServiceWorker.js',
-  'CHANGELOG.md',
-  '.release-please-manifest.json',
 ]
 
 const env = readEnv(loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), ''))
@@ -50,7 +47,6 @@ export default defineConfig({
 
   define: {
     __ENV__: JSON.stringify(env),
-    __APP_VERSION__: JSON.stringify(pkg.version),
   },
 
   server: {

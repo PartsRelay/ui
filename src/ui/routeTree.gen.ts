@@ -103,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/lookups/': typeof ApplookupsLookupsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AppworkspacesIndexRoute
   '/login': typeof authLoginRoute
   '/setup': typeof workspacesSetupRoute
   '/auth/callback': typeof authAuthCallbackRoute
@@ -111,7 +112,6 @@ export interface FileRoutesByTo {
   '/contacts': typeof AppcontactsContactsRoute
   '/company': typeof AppworkspacesCompanyRoute
   '/workspace': typeof AppworkspacesWorkspaceRoute
-  '/': typeof AppworkspacesIndexRoute
   '/lookups/$lookupId': typeof ApplookupsLookupsLookupIdRoute
   '/lookups': typeof ApplookupsLookupsIndexRoute
 }
@@ -147,6 +147,7 @@ export interface FileRouteTypes {
     | '/lookups/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/login'
     | '/setup'
     | '/auth/callback'
@@ -155,7 +156,6 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/company'
     | '/workspace'
-    | '/'
     | '/lookups/$lookupId'
     | '/lookups'
   id:
@@ -186,7 +186,7 @@ declare module '@tanstack/react-router' {
     '/(auth)': {
       id: '/(auth)'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof authRouteRouteImport
       parentRoute: typeof rootRouteImport
     }

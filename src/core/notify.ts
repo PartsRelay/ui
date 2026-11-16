@@ -12,5 +12,7 @@ const show = {
 }
 
 export function notify(type: NoticeType, ...message: Message) {
-  return show[type](i18n.t(...message), { id: message[0] })
+  const [key] = message
+
+  return show[type](i18n.t(...message), { id: key })
 }

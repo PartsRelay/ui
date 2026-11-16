@@ -43,7 +43,8 @@
   },
   "session": {
     "title": "Sessione",
-    "description": "Esci da Parts Relay su questo dispositivo.",
-    "sign-out": "Esci"
+    "description": "Esci da {app} su questo dispositivo, o su tutti se un'email ti ha segnalato un accesso che non hai fatto tu.",
+    "sign-out": "Esci",
+    "sign-out-everywhere": "Esci da tutti i dispositivi"
   }
 }

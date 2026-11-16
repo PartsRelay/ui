@@ -1,13 +1,15 @@
+import { z } from 'zod'
 import type { ContactObject, PostApiV1WorkspaceContactsBody } from '@/core/api/models'
 import { fieldErrors, toErrorBody } from '@/core/errors'
-import { requiredText } from '@/core/schemas'
 import type { ContactChange } from '@/modules/contacts/core/contacts.mutation'
 
 export const MAX_COMPANIES = 3
 
 export type ContactValues = { phone: string; name: string }
 
-export const emptyContact: ContactValues = { phone: '', name: '' }
+export const emptyContact: ContactValues = { phone: '+', name: '' }
+
+export const withPlus = (value: string) => `+${value.replaceAll('+', '')}`
 
 export function newContact({ phone, name }: ContactValues): PostApiV1WorkspaceContactsBody {
   const trimmed = name.trim()
@@ -29,4 +31,4 @@ export function renameChange(value: string, contact: ContactObject): ContactChan
   return name === contact.name ? null : { name }
 }
 
-export const phoneSchema = requiredText('contacts.add.errors.phone-required')
+export const phoneSchema = z.string().regex(/[^+\s]/, 'contacts.add.errors.phone-required')

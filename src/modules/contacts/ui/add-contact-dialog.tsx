@@ -8,6 +8,7 @@ import {
   MAX_COMPANIES,
   newContact,
   phoneSchema,
+  withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { useAddContact } from '@/modules/contacts/ui/hooks/use-add-contact'
 import { Form } from '@/ui/components/form'
@@ -70,7 +71,14 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
         </DialogDescription>
       </DialogHeader>
       <FieldGroup>
-        <form.Field name="phone" validators={{ onSubmit: phoneSchema }}>
+        <form.Field
+          name="phone"
+          validators={{ onSubmit: phoneSchema }}
+          listeners={{
+            onChange: ({ value, fieldApi }) =>
+              fieldApi.setValue(withPlus(value), { dontRunListeners: true }),
+          }}
+        >
           {(field) => (
             <InputField
               field={field}
@@ -79,7 +87,6 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               description={t('contacts.add.phone-hint')}
               type="tel"
               autoComplete="off"
-              placeholder={t('contacts.add.phone-placeholder')}
             />
           )}
         </form.Field>

@@ -71,14 +71,7 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
         </DialogDescription>
       </DialogHeader>
       <FieldGroup>
-        <form.Field
-          name="phone"
-          validators={{ onSubmit: phoneSchema }}
-          listeners={{
-            onChange: ({ value, fieldApi }) =>
-              fieldApi.setValue(withPlus(value), { dontRunListeners: true }),
-          }}
-        >
+        <form.Field name="phone" validators={{ onSubmit: phoneSchema }}>
           {(field) => (
             <InputField
               field={field}
@@ -86,7 +79,15 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               required
               description={t('contacts.add.phone-hint')}
               type="tel"
+              autoFocus
               autoComplete="off"
+              onInput={({ currentTarget: input }) => {
+                const value = withPlus(input.value)
+                if (value === input.value) return
+                const caret = withPlus(input.value.slice(0, input.selectionStart ?? 0)).length
+                input.value = value
+                input.setSelectionRange(caret, caret)
+              }}
             />
           )}
         </form.Field>

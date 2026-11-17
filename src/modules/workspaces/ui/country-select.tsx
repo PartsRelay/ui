@@ -43,7 +43,7 @@ export function CountrySelect({
         error={error && t(error)}
       >
         <SelectTrigger name={name} className="w-full">
-          <SelectValue />
+          <SelectValue placeholder={t('common.choose-country')} />
         </SelectTrigger>
       </TextField>
       <SelectContent>

@@ -81,7 +81,7 @@ test.describe('as a newcomer', () => {
 
     test('the country starts empty and is required', async ({ page }) => {
       const country = page.getByRole('combobox', { name: 'Country' })
-      await expect(country).toHaveText('')
+      await expect(country).toHaveText('Choose a country')
 
       await page.getByRole('textbox', { name: 'Company name' }).fill('North Garage Ltd')
       await page.getByRole('textbox', { name: 'Your name' }).fill('Anna North')

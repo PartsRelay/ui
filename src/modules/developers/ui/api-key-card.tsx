@@ -62,7 +62,7 @@ export function ApiKeyCard({ view }: { view: ApiKeyView }) {
             <p>
               <code className="font-mono break-all text-foreground">{secret}</code>
             </p>
-            <CopyButton text={secret} notice="developers.notices.copied" size="sm">
+            <CopyButton autoFocus text={secret} notice="developers.notices.copied" size="sm">
               {t('developers.secret.copy')}
             </CopyButton>
           </Callout>

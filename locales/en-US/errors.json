@@ -44,6 +44,7 @@
   "you-are-not-allowed-to-cancel-this-invitation": "You cannot revoke this invitation.",
   "invitation-limit-reached": "Too many pending invitations. Revoke some before inviting more people.",
   "organization-membership-limit-reached": "The company has reached its member limit.",
+  "insufficient-api-key-permissions": "Only the owner can manage the API keys.",
   "missing-response": "Wait for the check that you are not a robot, then try again.",
   "verification-failed": "We could not check that you are not a robot. Try again."
 }

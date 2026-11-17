@@ -44,6 +44,7 @@
   "you-are-not-allowed-to-cancel-this-invitation": "Non puoi revocare questo invito.",
   "invitation-limit-reached": "Troppi inviti in sospeso. Revocane qualcuno prima di invitare altre persone.",
   "organization-membership-limit-reached": "L'azienda ha raggiunto il limite di membri.",
+  "insufficient-api-key-permissions": "Solo il proprietario può gestire le chiavi API.",
   "missing-response": "Attendi la verifica che non sei un robot, poi riprova.",
   "verification-failed": "Non siamo riusciti a verificare che non sei un robot. Riprova."
 }

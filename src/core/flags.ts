@@ -15,7 +15,7 @@ export function loadFlags(userId: string) {
 
   loading ??= import('posthog-js').then(({ default: client }) => {
     client.init(token, {
-      api_host: 'https://eu.i.posthog.com',
+      api_host: env.POSTHOG_HOST,
       persistence: 'memory',
       opt_out_capturing_by_default: true,
       disable_external_dependency_loading: true,

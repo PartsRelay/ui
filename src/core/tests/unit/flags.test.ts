@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const { env, posthog } = vi.hoisted(() => ({
-  env: { POSTHOG_PROJECT_TOKEN: 'phc_test' as string | undefined, MOCKS: false },
+  env: {
+    POSTHOG_PROJECT_TOKEN: 'phc_test' as string | undefined,
+    POSTHOG_HOST: 'https://posthog.test',
+    MOCKS: false,
+  },
   posthog: { init: vi.fn(), onFeatureFlags: vi.fn(), isFeatureEnabled: vi.fn() },
 }))
 
@@ -47,7 +51,7 @@ describe('flags', () => {
     await vi.dynamicImportSettled()
 
     expect(posthog.init).toHaveBeenCalledExactlyOnceWith('phc_test', {
-      api_host: 'https://eu.i.posthog.com',
+      api_host: 'https://posthog.test',
       persistence: 'memory',
       opt_out_capturing_by_default: true,
       disable_external_dependency_loading: true,

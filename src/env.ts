@@ -10,6 +10,7 @@ export function readEnv(source: Record<string, string | undefined>) {
       CORE_URL: z.url().default(''),
       GOOGLE_CLIENT_ID: z.string().optional(),
       TURNSTILE_SITE_KEY: z.string().optional(),
+      POSTHOG_PROJECT_TOKEN: z.string().optional(),
       SUPPORT_URL: z.url().optional(),
       PRIVACY_URL: z.url().optional(),
       TERMS_URL: z.url().optional(),

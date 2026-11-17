@@ -9,9 +9,10 @@ import {
   sessionQuery,
 } from '@/modules/auth/core/session.query'
 
-const { getSession } = vi.hoisted(() => ({ getSession: vi.fn() }))
+const { getSession, loadFlags } = vi.hoisted(() => ({ getSession: vi.fn(), loadFlags: vi.fn() }))
 
 vi.mock('@/modules/auth/core/auth.client', () => ({ authClient: { getSession } }))
+vi.mock('@/core/flags', () => ({ loadFlags }))
 
 const authError = (status: number, code: string) => ({
   status,
@@ -44,6 +45,7 @@ let client: QueryClient
 beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   getSession.mockReset()
+  loadFlags.mockReset()
 })
 
 describe('requireSession', () => {
@@ -54,6 +56,7 @@ describe('requireSession', () => {
       session: null,
       redirect: { to: '/login', search: { next: '/company?tab=name' } },
     })
+    expect(loadFlags).not.toHaveBeenCalled()
   })
 
   it('lets a signed in user through, asking the core once', async () => {
@@ -62,6 +65,7 @@ describe('requireSession', () => {
     expect(await requireSession(client, '/workspace')).toEqual({ session, redirect: null })
     await requireSession(client, '/company')
     expect(getSession).toHaveBeenCalledTimes(1)
+    expect(loadFlags).toHaveBeenCalledWith('1')
   })
 })
 

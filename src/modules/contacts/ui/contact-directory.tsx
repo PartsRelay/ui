@@ -4,6 +4,7 @@ import { cn } from 'cn'
 import { BookUserIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 import { type ContactRow, contactRow } from '@/modules/contacts/core/contact-row'
 import { type ContactTab, contactTabs, tabStatus } from '@/modules/contacts/core/contacts'
 import { contactListParams, contactsQuery } from '@/modules/contacts/core/contacts.query'
@@ -48,7 +49,9 @@ export function ContactDirectory() {
   const list = useQuery(contactsQuery(contactListParams(search)))
   const info = usePageInfo(list.data?.metadata)
   const tab: ContactTab = search.status ?? 'all'
-  const rows = list.data?.data.map((contact) => contactRow(contact, me, i18n.language))
+  const rows = list.data?.data.map((contact) =>
+    contactRow(contact, me, formatLocale(i18n.language))
+  )
   const heading = useRef<HTMLHeadingElement>(null)
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const [confirming, setConfirming] = useState(false)

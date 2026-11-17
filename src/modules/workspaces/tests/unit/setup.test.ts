@@ -1,10 +1,15 @@
 import { addDays } from 'date-fns'
 import { describe, expect, it } from 'vite-plus/test'
-import { pendingInvitation, setupDefaults } from '@/modules/workspaces/core/setup'
+import { pendingInvitation, setupDefaults, setupSchemas } from '@/modules/workspaces/core/setup'
 
 const now = new Date('2026-10-21T10:00:00Z')
 
-const redwoodParts = { name: 'Redwood Parts Ltd', locale: 'en-US', setup: 'done' } as const
+const redwoodParts = {
+  name: 'Redwood Parts Ltd',
+  locale: 'en-US',
+  country: 'GB',
+  setup: 'done',
+} as const
 
 const offer = (id: string, status: string, expiresInDays: number) => ({
   id,
@@ -38,19 +43,38 @@ describe('pendingInvitation', () => {
 })
 
 describe('setupDefaults', () => {
-  it('starts a pending company empty, in the browser language', () => {
-    const pending = { ...redwoodParts, setup: 'pending' as const }
+  const pending = { ...redwoodParts, country: null, setup: 'pending' as const }
 
-    expect(setupDefaults(pending, 'it-IT')).toEqual({ name: '', locale: 'it-IT', userName: '' })
-  })
-
-  it('keeps the name and language of a company already set up', () => {
-    const company = { ...redwoodParts, locale: 'it-IT' as const }
-
-    expect(setupDefaults(company, 'en-US')).toEqual({
-      name: 'Redwood Parts Ltd',
+  it('starts a pending company empty, in the browser language and country', () => {
+    expect(setupDefaults(pending, 'it-IT', 'IT')).toEqual({
+      name: '',
       locale: 'it-IT',
+      country: 'IT',
       userName: '',
     })
+  })
+
+  it('leaves the country empty when the browser has none of the list', () => {
+    expect(setupDefaults(pending, 'en-US', null).country).toBe('')
+  })
+
+  it('keeps the name, language and country of a company already set up', () => {
+    const company = { ...redwoodParts, locale: 'it-IT' as const }
+
+    expect(setupDefaults(company, 'en-US', 'US')).toEqual({
+      name: 'Redwood Parts Ltd',
+      locale: 'it-IT',
+      country: 'GB',
+      userName: '',
+    })
+  })
+})
+
+describe('setupSchemas', () => {
+  it('refuses an empty country', () => {
+    expect(setupSchemas.country.safeParse('GB').success).toBe(true)
+    expect(setupSchemas.country.safeParse('').error?.issues[0]?.message).toBe(
+      'setup.errors.country-required'
+    )
   })
 })

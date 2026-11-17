@@ -27,6 +27,8 @@
   "workspace-role-not-managed": "Non puoi gestire questo ruolo.",
   "workspace-owner": "Il proprietario non può eliminare l'account: cedi l'azienda o eliminala.",
   "locale-not-supported": "Questa lingua non è disponibile.",
+  "country-not-supported": "Questo Paese non è disponibile.",
+  "country-required": "Scegli il Paese della tua azienda.",
   "workspace-name-not-allowed": "Il nome dell'azienda non può contenere < o >.",
   "role-change-not-allowed": "I ruoli non si possono cambiare, puoi solo cedere la proprietà.",
   "organization-not-found": "Questa azienda non esiste più.",

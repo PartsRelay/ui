@@ -3,6 +3,7 @@ import { getRouteApi, Link } from '@tanstack/react-router'
 import { cn } from 'cn'
 import { ScanSearchIcon, SearchXIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 import { lookupRow } from '@/modules/lookups/core/lookup-row'
 import { filtered, lookupListParams } from '@/modules/lookups/core/lookups'
 import { lookupsQuery } from '@/modules/lookups/core/lookups.query'
@@ -73,7 +74,7 @@ export function LookupQueue() {
   const list = useQuery(lookupsQuery(lookupListParams(search)))
   const narrowed = filtered(search)
   const info = usePageInfo(list.data?.metadata)
-  const rows = list.data?.data.map((lookup) => lookupRow(lookup, i18n.language))
+  const rows = list.data?.data.map((lookup) => lookupRow(lookup, formatLocale(i18n.language)))
   const [first] = rows ?? []
   const retry = () => void list.refetch()
 

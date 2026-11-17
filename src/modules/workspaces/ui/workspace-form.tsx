@@ -3,12 +3,14 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { authClient } from '@/modules/auth/core/auth.client'
 import { sessionQuery } from '@/modules/auth/core/session.query'
+import { countryOf } from '@/modules/workspaces/core/country'
 import { setupDefaults, setupSchemas } from '@/modules/workspaces/core/setup'
 import { toLocale } from '@/modules/workspaces/core/locale'
 import type { Workspace } from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
 import { CardHeading } from '@/ui/components/card-heading'
 import { AccountActions } from '@/modules/workspaces/ui/account-actions'
+import { CountrySelect } from '@/modules/workspaces/ui/country-select'
 import { InvitationHint } from '@/modules/workspaces/ui/invitation-hint'
 import { LocaleSelect } from '@/ui/components/locale-select'
 import { Form } from '@/ui/components/form'
@@ -25,18 +27,23 @@ export function WorkspaceForm({ workspace, askName }: WorkspaceFormProps) {
   const navigate = useNavigate()
   const { client, run } = useBetterAuthAction()
   const form = useForm({
-    defaultValues: setupDefaults(workspace, toLocale(i18n.resolvedLanguage)),
+    defaultValues: setupDefaults(
+      workspace,
+      toLocale(i18n.resolvedLanguage),
+      countryOf(navigator.language)
+    ),
     onSubmit: async ({ value }) => {
       const name = value.name.trim()
-      const { locale } = value
+      const { locale, country } = value
       const metadata = { ...workspace.metadata, setup: 'done' }
 
       await run(async () => {
         if (askName) await authClient.updateUser({ name: value.userName.trim() })
-        await authClient.organization.update({ data: { name, locale, metadata } })
+        await authClient.organization.update({ data: { name, locale, country, metadata } })
         client.setQueryData(
           workspaceKey,
-          (current) => current && { ...current, name, locale, metadata: JSON.stringify(metadata) }
+          (current) =>
+            current && { ...current, name, locale, country, metadata: JSON.stringify(metadata) }
         )
         await Promise.all([
           client.invalidateQueries({ queryKey: workspaceKey }),
@@ -65,6 +72,19 @@ export function WorkspaceForm({ workspace, askName }: WorkspaceFormProps) {
                   required
                   description={t('setup.form.name-hint')}
                   autoComplete="organization"
+                />
+              )}
+            </form.Field>
+            <form.Field name="country" validators={{ onSubmit: setupSchemas.country }}>
+              {(field) => (
+                <CountrySelect
+                  name={field.name}
+                  label={t('setup.form.country')}
+                  description={t('setup.form.country-hint')}
+                  required
+                  error={field.state.meta.errors[0]?.message}
+                  value={field.state.value}
+                  onValueChange={field.handleChange}
                 />
               )}
             </form.Field>

@@ -3,6 +3,7 @@ import { getRouteApi, Link, useCanGoBack, useRouter } from '@tanstack/react-rout
 import { ArrowLeftIcon, MapPinOffIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { alreadyGone } from '@/core/errors'
+import { formatLocale } from '@/core/format-locale'
 import { lookupDetail } from '@/modules/lookups/core/lookup-detail'
 import { lookupQuery } from '@/modules/lookups/core/lookups.query'
 import { LookupOutcome } from '@/modules/lookups/ui/lookup-outcome'
@@ -34,7 +35,7 @@ export function LookupPage() {
   const canGoBack = useCanGoBack()
   const { lookupId } = route.useParams()
   const lookup = useQuery(lookupQuery(Number(lookupId)))
-  const detail = lookup.data && lookupDetail(lookup.data, i18n.language)
+  const detail = lookup.data && lookupDetail(lookup.data, formatLocale(i18n.language))
   const retry = () => void lookup.refetch()
 
   return (

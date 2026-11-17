@@ -1,6 +1,7 @@
 import { MailIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 import { authClient } from '@/modules/auth/core/auth.client'
 import { type InvitationRow, invitationRows } from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
@@ -21,7 +22,13 @@ const columns = ['invitation', 'role', 'sent', 'actions']
 export function InvitationsTable() {
   const { t, i18n } = useTranslation()
   const { workspace, me } = useMe()
-  const rows = invitationRows(workspace, me, new Date(), window.location.origin, i18n.language)
+  const rows = invitationRows(
+    workspace,
+    me,
+    new Date(),
+    window.location.origin,
+    formatLocale(i18n.language)
+  )
   const heading = useRef<HTMLHeadingElement>(null)
   const [revoking, setRevoking] = useState<InvitationRow | null>(null)
   const [confirming, setConfirming] = useState(false)

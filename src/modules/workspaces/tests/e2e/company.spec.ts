@@ -65,6 +65,20 @@ test('the company name cannot be empty', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Redwood Parts Ltd/ })).toBeVisible()
 })
 
+test('the owner changes the country of the company', async ({ page }) => {
+  const country = page.getByRole('combobox', { name: 'Country' })
+  await expect(country).toHaveText('United Kingdom')
+
+  await country.click()
+  await page.getByRole('option', { name: 'Ireland' }).click()
+
+  await expect(notices(page).getByText('Country set to Ireland.')).toBeVisible()
+  await expect(country).toHaveText('Ireland')
+
+  await page.reload()
+  await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('Ireland')
+})
+
 test('changing the WhatsApp language keeps the app language', async ({ page }) => {
   const language = page.getByRole('combobox', { name: 'Reply language' })
   await expect(language).toHaveText('English')

@@ -36,6 +36,8 @@ const CATALOG_CODES = [
   'route-not-found',
   'role-change-not-allowed',
   'locale-not-supported',
+  'country-not-supported',
+  'country-required',
   'workspace-role-not-managed',
   'workspace-not-releasable',
   'invalid-token',

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 import { statsView } from '@/modules/lookups/core/lookup-stats'
 import { lookupStatsQuery } from '@/modules/lookups/core/lookups.query'
 import { CardHeading } from '@/ui/components/card-heading'
@@ -46,7 +47,7 @@ function StatsSkeleton() {
 export function LookupStats() {
   const { t, i18n } = useTranslation()
   const stats = useQuery(lookupStatsQuery)
-  const count = (value: number) => value.toLocaleString(i18n.language)
+  const count = (value: number) => value.toLocaleString(formatLocale(i18n.language))
 
   if (stats.isLoadingError) {
     return <LoadError error={stats.error} onRetry={() => void stats.refetch()} />

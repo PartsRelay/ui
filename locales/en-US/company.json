@@ -1,11 +1,16 @@
 {
   "title": "Company",
-  "description": "Name, WhatsApp language and deletion of your company. Only the owner sees this page.",
+  "description": "Name, country, WhatsApp language and deletion of your company. Only the owner sees this page.",
   "name": {
     "title": "Company name",
     "description": "Your team sees this name.",
     "label": "Name",
     "save": "Save name"
+  },
+  "country": {
+    "title": "Country",
+    "description": "The country where your company is based.",
+    "label": "Country"
   },
   "language": {
     "title": "WhatsApp language",
@@ -29,6 +34,7 @@
   },
   "notices": {
     "renamed": "Company name saved.",
+    "country": "Country set to {country}.",
     "language": "WhatsApp language set to {language}.",
     "deleted": "The company and every account were deleted. Signing in again starts a new company."
   }

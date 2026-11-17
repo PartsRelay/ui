@@ -1,11 +1,16 @@
 {
   "title": "Azienda",
-  "description": "Nome, lingua di WhatsApp ed eliminazione della tua azienda. Solo il proprietario vede questa pagina.",
+  "description": "Nome, Paese, lingua di WhatsApp ed eliminazione della tua azienda. Solo il proprietario vede questa pagina.",
   "name": {
     "title": "Nome dell'azienda",
     "description": "È il nome che vede il tuo team.",
     "label": "Nome",
     "save": "Salva il nome"
+  },
+  "country": {
+    "title": "Paese",
+    "description": "Il Paese in cui ha sede la tua azienda.",
+    "label": "Paese"
   },
   "language": {
     "title": "Lingua di WhatsApp",
@@ -29,6 +34,7 @@
   },
   "notices": {
     "renamed": "Nome dell'azienda salvato.",
+    "country": "Paese impostato su {country}.",
     "language": "Lingua di WhatsApp impostata su {language}.",
     "deleted": "L'azienda e tutti gli account sono stati eliminati. Accedendo di nuovo ne crei una nuova."
   }

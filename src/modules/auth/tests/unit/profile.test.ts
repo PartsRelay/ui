@@ -17,6 +17,7 @@ const company: Workspace = {
   id: '1',
   name: 'Redwood Parts Ltd',
   locale: 'en-US',
+  country: 'GB',
   setup: 'done',
   metadata: {},
   members: [

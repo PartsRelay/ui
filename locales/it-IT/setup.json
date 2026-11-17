@@ -1,9 +1,11 @@
 {
   "title": "Configura la tua azienda",
-  "description": "Dai un nome alla tua azienda e scegli la lingua delle sue risposte WhatsApp. Il proprietario può cambiarli in seguito.",
+  "description": "Dai un nome alla tua azienda, scegli il suo Paese e la lingua delle sue risposte WhatsApp. Il proprietario può cambiarli in seguito.",
   "form": {
     "name": "Nome dell'azienda",
     "name-hint": "È il nome che vedrà il tuo team.",
+    "country": "Paese",
+    "country-hint": "Il Paese in cui ha sede la tua azienda.",
     "language": "Lingua di WhatsApp",
     "language-hint": "Parts Relay risponde ai tuoi contatti su WhatsApp in questa lingua.",
     "user-name": "Il tuo nome",
@@ -12,6 +14,7 @@
   },
   "errors": {
     "name-required": "Inserisci il nome dell'azienda.",
+    "country-required": "Scegli il Paese della tua azienda.",
     "user-name-required": "Inserisci il tuo nome."
   },
   "invitation": {

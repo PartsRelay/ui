@@ -8,9 +8,10 @@ test.describe('as a newcomer', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Set up your company' })).toBeVisible()
   })
 
-  test('the setup starts empty, in the browser language', async ({ page }) => {
+  test('the setup starts empty, in the browser language and country', async ({ page }) => {
     await expect(page.getByRole('textbox', { name: 'Company name' })).toBeEmpty()
     await expect(page.getByRole('textbox', { name: 'Your name' })).toBeEmpty()
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('United States')
     await expect(page.getByRole('combobox', { name: 'WhatsApp language' })).toHaveText('English')
     await expect(page.getByText('Signed in as north.garage@gmail.com')).toBeVisible()
   })
@@ -30,6 +31,8 @@ test.describe('as a newcomer', () => {
   test('setting up opens the app for good', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Company name' }).fill('North Garage Ltd')
     await page.getByRole('textbox', { name: 'Your name' }).fill('Anna North')
+    await page.getByRole('combobox', { name: 'Country' }).click()
+    await page.getByRole('option', { name: 'Ireland' }).click()
     await page.getByRole('combobox', { name: 'WhatsApp language' }).click()
     await page.getByRole('option', { name: 'Italian' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
@@ -60,6 +63,7 @@ test.describe('as a newcomer', () => {
     await expect(page.getByRole('row', { name: /Anna North \(you\)/ })).toContainText('Owner')
 
     await page.goto('/company')
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('Ireland')
     await expect(page.getByRole('combobox', { name: 'Reply language' })).toHaveText('Italian')
 
     await page.goto('/')
@@ -70,6 +74,23 @@ test.describe('as a newcomer', () => {
     await page.getByRole('button', { name: 'Sign out' }).click()
 
     await expect(page).toHaveURL('/login')
+  })
+
+  test.describe('in a browser of a country outside the list', () => {
+    test.use({ locale: 'en-CA' })
+
+    test('the country starts empty and is required', async ({ page }) => {
+      const country = page.getByRole('combobox', { name: 'Country' })
+      await expect(country).toHaveText('')
+
+      await page.getByRole('textbox', { name: 'Company name' }).fill('North Garage Ltd')
+      await page.getByRole('textbox', { name: 'Your name' }).fill('Anna North')
+      await page.getByRole('button', { name: 'Continue' }).click()
+
+      await expect(country).toBeFocused()
+      await expect(country).toHaveAccessibleDescription('Choose the country of your company.')
+      await expect(page).toHaveURL('/setup')
+    })
   })
 })
 

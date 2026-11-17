@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import ICU from 'i18next-icu'
 import { initReactI18next } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 
 const files = import.meta.glob<Record<string, unknown>>('../locales/*/*.json', {
   eager: true,
@@ -31,6 +32,7 @@ void i18n
     load: 'currentOnly',
     fallbackLng: 'en-US',
     detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'] },
+    i18nFormat: { parseLngForICU: (language: string) => formatLocale(language) },
     parseMissingKeyHandler: (key) =>
       key.startsWith('errors.') ? i18n.t('errors.unknown-error') : key,
   })

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 import { apiKeyViews } from '@/modules/developers/core/api-keys'
 import { apiKeysQuery } from '@/modules/developers/core/api-keys.query'
 import { ApiKeyCard } from '@/modules/developers/ui/api-key-card'
@@ -23,7 +24,7 @@ export function DevelopersPage() {
         </RefetchError>
       )}
       {keys.data ? (
-        apiKeyViews(keys.data, i18n.language).map((view) => (
+        apiKeyViews(keys.data, formatLocale(i18n.language)).map((view) => (
           <ApiKeyCard key={view.mode} view={view} />
         ))
       ) : keys.isLoadingError ? (

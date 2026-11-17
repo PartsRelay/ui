@@ -427,3 +427,17 @@ test.describe('on a phone', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
   })
 })
+
+test.describe('in a British browser', () => {
+  test.use({ locale: 'en-GB', timezoneId: 'Europe/London' })
+
+  test('dates are day first with the 24 hour clock, the words stay English', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-11-17T15:04:00Z'))
+    await page.goto('/lookups')
+
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Good afternoon, Mark Reed.' })
+    ).toBeVisible()
+    await expect(queue(page).getByRole('row').nth(1)).toContainText('17 Nov 2026, 15:03')
+  })
+})

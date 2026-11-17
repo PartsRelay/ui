@@ -60,7 +60,6 @@
     "description": "Il numero può cercare ricambi su WhatsApp da subito. Un numero può appartenere fino a {max} aziende e ne sceglie una a ogni ricerca.",
     "phone": "Numero WhatsApp",
     "phone-hint": "Con il prefisso internazionale, ad esempio +39.",
-    "phone-placeholder": "+39 333 123 4567",
     "name": "Nome",
     "name-hint": "Facoltativo. Viene mostrato al posto del nome WhatsApp.",
     "submit": "Aggiungi contatto",

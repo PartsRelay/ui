@@ -60,7 +60,6 @@
     "description": "The number can search parts on WhatsApp right away. A number can belong to up to {max} companies, and picks one for each search.",
     "phone": "WhatsApp number",
     "phone-hint": "With the international prefix, for example +1.",
-    "phone-placeholder": "+1 202 555 0123",
     "name": "Name",
     "name-hint": "Optional. Shown instead of the WhatsApp name.",
     "submit": "Add contact",

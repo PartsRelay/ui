@@ -1,8 +1,43 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { contactFieldErrors, newContact, renameChange } from '@/modules/contacts/core/contact-form'
+import {
+  contactFieldErrors,
+  emptyContact,
+  newContact,
+  phoneSchema,
+  renameChange,
+  withPlus,
+} from '@/modules/contacts/core/contact-form'
 import { contactFixture, coreError } from '@/modules/contacts/tests/unit/fixtures'
 
+const phoneError = (value: string) => phoneSchema.safeParse(value).error?.issues[0]?.message
+
 describe('new contact', () => {
+  it('starts the number with a plus that cannot be removed', () => {
+    expect(emptyContact.phone).toBe('+')
+    expect(withPlus('')).toBe('+')
+    expect(withPlus('39 300 000 0000')).toBe('+39 300 000 0000')
+    expect(withPlus('3+9 300 000 0000')).toBe('+39 300 000 0000')
+  })
+
+  it('keeps one plus when a pasted number brings its own', () => {
+    expect(withPlus('+39 300 000 0000')).toBe('+39 300 000 0000')
+    expect(withPlus('++39 300 000 0000')).toBe('+39 300 000 0000')
+    expect(withPlus('+39 300 000 0000+')).toBe('+39 300 000 0000')
+  })
+
+  it('drops what a pasted number has before its first digit', () => {
+    expect(withPlus(' +39 300 000 0000')).toBe('+39 300 000 0000')
+    expect(withPlus('‭+39 300 000 0000')).toBe('+39 300 000 0000')
+    expect(withPlus('Tel. +39 300 000 0000')).toBe('+39 300 000 0000')
+    expect(withPlus('+٣٩٣٠٠٠٠٠٠٠٠٠')).toBe('+٣٩٣٠٠٠٠٠٠٠٠٠')
+  })
+
+  it('asks for the number when only the plus is there', () => {
+    expect(phoneError('+')).toBe('contacts.add.errors.phone-required')
+    expect(phoneError('+ ')).toBe('contacts.add.errors.phone-required')
+    expect(phoneError('+39 300 000 0000')).toBeUndefined()
+  })
+
   it('sends the number as typed and a trimmed optional name', () => {
     expect(newContact({ phone: ' 0044 7700 900103 ', name: '  Oakfield Garage ' })).toEqual({
       phone: '0044 7700 900103',

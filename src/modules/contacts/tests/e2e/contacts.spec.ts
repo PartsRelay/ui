@@ -72,3 +72,50 @@ test('a number in 3 companies explains why under the field', async ({ page }) =>
     'This number already belongs to as many companies as it can.'
   )
 })
+
+test('the number keeps its plus whatever I type, delete or paste', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+  await expect(phone).toHaveValue('+')
+
+  await phone.press('Backspace')
+  await expect(phone).toHaveValue('+')
+  await phone.pressSequentially('39 338')
+  await expect(phone).toHaveValue('+39 338')
+  await phone.fill('')
+  await expect(phone).toHaveValue('+')
+  await page.keyboard.insertText('+39 300 000 0000')
+  await expect(phone).toHaveValue('+39 300 000 0000')
+
+  await dialog.getByRole('button', { name: 'Cancel' }).click()
+  await expect(dialog).toBeHidden()
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  await expect(phone).toHaveValue('+')
+})
+
+test('the caret stays where I edit the number', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+  await expect(phone).toBeFocused()
+
+  await page.keyboard.type('338')
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('Backspace')
+  await expect(phone).toHaveValue('+338')
+  await page.keyboard.type('39 ')
+  await expect(phone).toHaveValue('+39 338')
+})
+
+test('a number with only the plus is still missing', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+  await dialog.getByRole('button', { name: 'Add contact' }).click()
+
+  await expect(phone).toHaveAccessibleDescription('Enter the WhatsApp number.')
+  await expect(phone).toHaveValue('+')
+})

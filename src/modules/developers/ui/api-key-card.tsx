@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { alreadyGone } from '@/core/errors'
 import type { ApiKeyView } from '@/modules/developers/core/api-keys'
 import { createApiKey, deleteApiKey } from '@/modules/developers/core/api-keys.mutation'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
@@ -113,7 +114,7 @@ export function ApiKeyCard({ view }: { view: ApiKeyView }) {
             const result = await (confirmation.action === 'replace'
               ? create('developers.notices.replaced')
               : remove(confirmation.keyId))
-            if (result.ok) setConfirming(false)
+            if (result.ok || alreadyGone(result.error)) setConfirming(false)
           }}
           onClose={() => setConfirming(false)}
           returnTo={heading}

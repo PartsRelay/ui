@@ -19,6 +19,7 @@ export function ApiKeyCard({ view }: { view: ApiKeyView }) {
   const { mode, key } = view
   const { workspace } = useMe()
   const { client, pending, run } = useBetterAuthAction()
+  const busy = useRef(false)
   const heading = useRef<HTMLHeadingElement>(null)
   const [secret, setSecret] = useState<string | null>(null)
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
@@ -27,10 +28,18 @@ export function ApiKeyCard({ view }: { view: ApiKeyView }) {
     setConfirmation({ action, keyId })
     setConfirming(true)
   }
+  const runAlone: typeof run = async (action, options) => {
+    if (busy.current) return { ok: false, error: null }
+    busy.current = true
+    const result = await run(action, options)
+    busy.current = false
+
+    return result
+  }
   const create = (notice: string) =>
-    run(async () => setSecret(await createApiKey(client, workspace.id, mode)), { notice })
+    runAlone(async () => setSecret(await createApiKey(client, workspace.id, mode)), { notice })
   const remove = (keyId: string) =>
-    run(
+    runAlone(
       async () => {
         await deleteApiKey(client, mode, keyId)
         setSecret(null)
@@ -100,6 +109,7 @@ export function ApiKeyCard({ view }: { view: ApiKeyView }) {
           action={t(`developers.confirm.${confirmation.action}.action`)}
           pending={pending}
           onConfirm={async () => {
+            if (!confirming) return
             const result = await (confirmation.action === 'replace'
               ? create('developers.notices.replaced')
               : remove(confirmation.keyId))

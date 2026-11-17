@@ -56,6 +56,13 @@ test.describe('as the owner', () => {
     await expect(page.getByRole('button', { name: 'Copy key' })).toHaveCount(0)
   })
 
+  test('a double click on create shows the key that works', async ({ page }) => {
+    await page.getByRole('button', { name: 'Create test key' }).dblclick()
+    const key = await page.getByText(/^test_[A-Za-z]{64}$/).innerText()
+
+    await expect(page.getByText(start(key))).toBeVisible()
+  })
+
   test('the new key is gone once I leave the page', async ({ page }) => {
     const key = await create(page, 'test')
 

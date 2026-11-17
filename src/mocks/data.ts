@@ -39,7 +39,7 @@ export type Company = {
   slug: string
   metadata: string
   locale: string
-  country: string | null
+  country: string
   createdAt: string
   members: Member[]
   invitations: Invitation[]
@@ -142,7 +142,7 @@ export function newCompany(owner: Person): Company {
     slug: crypto.randomUUID(),
     metadata: '{"setup":"pending"}',
     locale: 'en-US',
-    country: null,
+    country: 'US',
     createdAt,
     members: [member('2', '10', owner, 'owner', createdAt)],
     invitations: [],

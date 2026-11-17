@@ -43,7 +43,7 @@ describe('pendingInvitation', () => {
 })
 
 describe('setupDefaults', () => {
-  const pending = { ...redwoodParts, country: null, setup: 'pending' as const }
+  const pending = { ...redwoodParts, country: 'US', setup: 'pending' as const }
 
   it('starts a pending company empty, in the browser language and country', () => {
     expect(setupDefaults(pending, 'it-IT', 'IT')).toEqual({

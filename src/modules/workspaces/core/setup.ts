@@ -31,7 +31,7 @@ export function setupDefaults(
   return {
     name: pending ? '' : workspace.name,
     locale: pending ? browserLocale : workspace.locale,
-    country: workspace.country ?? browserCountry ?? '',
+    country: (pending ? browserCountry : workspace.country) ?? '',
     userName: '',
   }
 }

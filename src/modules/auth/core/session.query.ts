@@ -3,6 +3,7 @@ import { authClient } from '@/modules/auth/core/auth.client'
 import { authToken } from '@/modules/auth/core/auth-token'
 import { redirectPath } from '@/modules/auth/core/redirect-path'
 import { errorNotice, sessionEnded } from '@/core/errors'
+import { loadFlags } from '@/core/flags'
 import { message } from '@/core/message'
 
 export type Session = typeof authClient.$Infer.Session | null
@@ -19,9 +20,11 @@ export const sessionQuery = {
 
 export async function requireSession(client: QueryClient, href: string) {
   const session = await client.ensureQueryData(sessionQuery)
-  if (session) return { session, redirect: null }
+  if (!session) return { session, redirect: { to: '/login', search: { next: href } } as const }
 
-  return { session: null, redirect: { to: '/login', search: { next: href } } as const }
+  loadFlags(session.user.id)
+
+  return { session, redirect: null }
 }
 
 export async function redirectSignedIn(

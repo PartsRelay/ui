@@ -16,7 +16,6 @@ import {
   type Role,
 } from '@/mocks/data'
 import { fail } from '@/mocks/errors'
-import { apiKeyModes } from '@/modules/developers/core/api-keys'
 
 type ApiKey = ReturnType<typeof apiKey>
 
@@ -116,27 +115,12 @@ function apiKey(id: string, configId: string, referenceId: string, key: string) 
   }
 }
 
-function apiKeyMode(configId: string) {
-  if (!apiKeyModes.some((mode) => mode === configId)) {
-    fail(400, 'no-default-api-key-configuration-found', 'No default api-key configuration found.')
-  }
-}
-
-function apiKeyOwner(state: World, organizationId: string) {
-  if (organizationId !== state.company.id) {
-    fail(
-      403,
-      'user-not-member-of-organization',
-      'You are not a member of the organization that owns this API key.'
-    )
-  }
-  if (myRole(state) !== 'owner') {
-    fail(
-      403,
-      'insufficient-api-key-permissions',
-      'You do not have permission to perform this action on organization API keys.'
-    )
-  }
+function apiKeyOwner(state: World) {
+  ownerOnly(
+    state,
+    'insufficient-api-key-permissions',
+    'You do not have permission to perform this action on organization API keys.'
+  )
 }
 
 const MANAGES: Record<string, string[]> = { owner: ['admin', 'viewer'], admin: ['viewer'] }
@@ -412,6 +396,7 @@ export const authMocks = [
         'You are not allowed to delete this organization'
       )
       const { members: _members, invitations: _invitations, ...organization } = company
+      state.apiKeys = state.apiKeys.filter(({ referenceId }) => referenceId !== company.id)
       endAccount(state)
 
       return organization
@@ -483,12 +468,10 @@ export const authMocks = [
     const organizationId = new URL(request.url).searchParams.get('organizationId')
 
     return world((state) => {
-      const { me } = signedIn(state)
-      if (organizationId) apiKeyOwner(state, organizationId)
+      signedIn(state)
+      if (organizationId) apiKeyOwner(state)
 
-      const apiKeys = state.apiKeys.filter(
-        ({ referenceId }) => referenceId === (organizationId ?? me.id)
-      )
+      const apiKeys = state.apiKeys.filter(({ referenceId }) => referenceId === organizationId)
 
       return { apiKeys, total: apiKeys.length }
     })
@@ -499,16 +482,8 @@ export const authMocks = [
     )
 
     return world((state) => {
-      apiKeyMode(configId)
-      if (!organizationId) {
-        fail(
-          400,
-          'organization-id-required',
-          'Organization ID is required for organization-owned API keys.'
-        )
-      }
       if (!state.signedIn) fail(401, 'unauthorized-session', 'Unauthorized or invalid session')
-      apiKeyOwner(state, organizationId)
+      apiKeyOwner(state)
 
       const key = `${configId}_${faker.string.alpha(64)}`
       const created = apiKey(String(state.nextApiKey++), configId, organizationId, key)
@@ -527,10 +502,9 @@ export const authMocks = [
 
     return world((state) => {
       signedIn(state)
-      apiKeyMode(configId)
       const target = state.apiKeys.find((item) => item.id === keyId && item.configId === configId)
       if (!target) fail(404, 'key-not-found', 'API Key not found')
-      apiKeyOwner(state, target.referenceId)
+      apiKeyOwner(state)
 
       state.apiKeys = state.apiKeys.filter((item) => item !== target)
 

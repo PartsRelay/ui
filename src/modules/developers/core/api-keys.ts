@@ -1,6 +1,6 @@
 import { intlFormat } from 'date-fns'
 
-export const apiKeyModes = ['test', 'live'] as const
+const apiKeyModes = ['test', 'live'] as const
 
 export type ApiKeyMode = (typeof apiKeyModes)[number]
 

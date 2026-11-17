@@ -8,6 +8,7 @@ import {
   MAX_COMPANIES,
   newContact,
   phoneSchema,
+  withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { useAddContact } from '@/modules/contacts/ui/hooks/use-add-contact'
 import { Form } from '@/ui/components/form'
@@ -78,8 +79,15 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               required
               description={t('contacts.add.phone-hint')}
               type="tel"
+              autoFocus
               autoComplete="off"
-              placeholder={t('contacts.add.phone-placeholder')}
+              onInput={({ currentTarget: input }) => {
+                const value = withPlus(input.value)
+                if (value === input.value) return
+                const caret = withPlus(input.value.slice(0, input.selectionStart ?? 0)).length
+                input.value = value
+                input.setSelectionRange(caret, caret)
+              }}
             />
           )}
         </form.Field>

@@ -1,6 +1,7 @@
 {
   "title": "Developers",
   "description": "The API keys of your company, one for tests and one for real orders. Only the owner sees this page.",
+  "stale": "The keys shown may be out of date.",
   "keys": {
     "test": {
       "title": "Test key",

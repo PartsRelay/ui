@@ -1,6 +1,7 @@
 {
   "title": "Sviluppatori",
   "description": "Le chiavi API della tua azienda, una per le prove e una per gli ordini veri. Solo il proprietario vede questa pagina.",
+  "stale": "Le chiavi mostrate potrebbero non essere aggiornate.",
   "keys": {
     "test": {
       "title": "Chiave di test",

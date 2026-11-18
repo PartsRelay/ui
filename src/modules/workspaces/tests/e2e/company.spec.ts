@@ -65,19 +65,38 @@ test('the company name cannot be empty', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Redwood Parts Ltd/ })).toBeVisible()
 })
 
-test('changing the WhatsApp language keeps the app language', async ({ page }) => {
-  const language = page.getByRole('combobox', { name: 'Reply language' })
-  await expect(language).toHaveText('English')
+test('the company has a name and a country, no WhatsApp language', async ({ page }) => {
+  await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveText([
+    'Company name',
+    'Country',
+    'Delete company',
+  ])
+  await expect(page.getByRole('combobox')).toHaveCount(1)
+})
 
-  await language.click()
-  await page.getByRole('option', { name: 'Italian' }).click()
+test('the owner changes the country of the company', async ({ page }) => {
+  const country = page.getByRole('combobox', { name: 'Country' })
+  await expect(country).toHaveText('🇬🇧 United Kingdom')
 
-  await expect(notices(page).getByText('WhatsApp language set to Italian.')).toBeVisible()
-  await expect(language).toHaveText('Italian')
-  await expect(page.getByRole('heading', { level: 1, name: 'Company' })).toBeVisible()
+  await country.click()
+  const ireland = page.getByRole('option', { name: 'Ireland', exact: true })
+  await expect(ireland).toHaveText('🇮🇪 Ireland')
+  await ireland.click()
+
+  await expect(notices(page).getByText('Country set to Ireland.')).toBeVisible()
+  await expect(country).toHaveText('🇮🇪 Ireland')
 
   await page.reload()
-  await expect(page.getByRole('combobox', { name: 'Reply language' })).toHaveText('Italian')
+  await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('🇮🇪 Ireland')
+})
+
+test('typing in the country list finds a country by its name', async ({ page }) => {
+  await page.getByRole('combobox', { name: 'Country' }).click()
+  await expect(page.getByRole('option', { name: 'United Kingdom' })).toBeFocused()
+
+  await page.keyboard.type('it')
+
+  await expect(page.getByRole('option', { name: 'Italy' })).toBeFocused()
 })
 
 test('deleting the company signs everyone out', async ({ page }) => {

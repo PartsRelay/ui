@@ -76,7 +76,7 @@ function redwoodParts(): FullOrganization {
     slug: 'redwood-parts',
     logo: null,
     metadata: '{"setup":"done"}',
-    locale: 'en-US',
+    country: 'GB',
     createdAt: day(-400),
     members: [
       member(people.sarah, 'viewer', 31),
@@ -116,7 +116,7 @@ describe('toWorkspace', () => {
     expect(result).toMatchObject({
       id: '1',
       name: 'Redwood Parts Ltd',
-      locale: 'en-US',
+      country: 'GB',
       setup: 'done',
       metadata: { setup: 'done' },
     })
@@ -141,11 +141,11 @@ describe('toWorkspace', () => {
 
   it('falls back for values the model does not know', () => {
     const organization = redwoodParts()
-    organization.locale = 'fr-FR'
+    organization.country = 'CA'
     organization.members[0].user = { id: '4', name: '', email: 'sarah.collins@redwoodparts.com' }
     const result = toWorkspace(organization)
 
-    expect(result.locale).toBe('en-US')
+    expect(result.country).toBeNull()
     expect(result.members[0]).toMatchObject({ name: 'sarah.collins@redwoodparts.com', image: null })
   })
 

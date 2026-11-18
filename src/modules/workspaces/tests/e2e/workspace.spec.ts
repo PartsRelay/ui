@@ -200,6 +200,7 @@ test.describe('as an admin', () => {
       page.getByRole('heading', { level: 1, name: "You don't have access to this page." })
     ).toBeVisible()
     await expect(page.getByText('Ask Mark Reed, your company owner, for help.')).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveCount(0)
   })
 })
 
@@ -226,5 +227,13 @@ test.describe('as a viewer', () => {
     ).toBeVisible()
     await page.getByRole('link', { name: 'Back to home' }).click()
     await expect(page).toHaveURL('/lookups')
+  })
+
+  test('the company page is not available', async ({ page }) => {
+    await page.goto('/company')
+    await expect(
+      page.getByRole('heading', { level: 1, name: "You don't have access to this page." })
+    ).toBeVisible()
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveCount(0)
   })
 })

@@ -9,6 +9,7 @@ import { lookupsQuery } from '@/modules/lookups/core/lookups.query'
 import { LookupFilters } from '@/modules/lookups/ui/lookup-filters'
 import { LookupsTable } from '@/modules/lookups/ui/lookups-table'
 import { NewLookupButton } from '@/modules/lookups/ui/new-lookup-button'
+import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { CardHeading } from '@/ui/components/card-heading'
 import { EmptyState } from '@/ui/components/empty-state'
@@ -68,12 +69,13 @@ function NoMatches() {
 }
 
 export function LookupQueue() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
+  const locale = useFormatLocale()
   const search = route.useSearch()
   const list = useQuery(lookupsQuery(lookupListParams(search)))
   const narrowed = filtered(search)
   const info = usePageInfo(list.data?.metadata)
-  const rows = list.data?.data.map((lookup) => lookupRow(lookup, i18n.language))
+  const rows = list.data?.data.map((lookup) => lookupRow(lookup, locale))
   const [first] = rows ?? []
   const retry = () => void list.refetch()
 

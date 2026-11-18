@@ -427,3 +427,25 @@ test.describe('on a phone', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
   })
 })
+
+test.describe('in an American browser', () => {
+  test.use({ locale: 'en-US', timezoneId: 'America/New_York' })
+
+  test('dates follow the country of the company, the words stay English', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-11-17T20:04:00Z'))
+    await page.goto('/lookups')
+
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Good afternoon, Mark Reed.' })
+    ).toBeVisible()
+    await expect(queue(page).getByRole('row').nth(1)).toContainText('17 Nov 2026, 15:03')
+
+    await page.goto('/company')
+    await page.getByRole('combobox', { name: 'Country' }).click()
+    await page.getByRole('option', { name: 'United States' }).click()
+    await expect(page.getByText('Country set to United States.')).toBeVisible()
+
+    await page.goto('/lookups')
+    await expect(queue(page).getByRole('row').nth(1)).toContainText(/Nov 17, 2026, 3:03\sPM/)
+  })
+})

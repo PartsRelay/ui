@@ -1,16 +1,16 @@
 {
   "title": "Azienda",
-  "description": "Nome, lingua di WhatsApp ed eliminazione della tua azienda. Solo il proprietario vede questa pagina.",
+  "description": "Nome, Paese ed eliminazione della tua azienda. Solo il proprietario vede questa pagina.",
   "name": {
     "title": "Nome dell'azienda",
     "description": "È il nome che vede il tuo team.",
     "label": "Nome",
     "save": "Salva il nome"
   },
-  "language": {
-    "title": "Lingua di WhatsApp",
-    "description": "Parts Relay risponde ai tuoi contatti su WhatsApp in questa lingua.",
-    "label": "Lingua delle risposte"
+  "country": {
+    "title": "Paese",
+    "description": "Le targhe vengono cercate in questo Paese, e date e numeri ne seguono i formati.",
+    "label": "Paese"
   },
   "delete": {
     "title": "Elimina l'azienda",
@@ -29,7 +29,7 @@
   },
   "notices": {
     "renamed": "Nome dell'azienda salvato.",
-    "language": "Lingua di WhatsApp impostata su {language}.",
+    "country": "Paese impostato su {country}.",
     "deleted": "L'azienda e tutti gli account sono stati eliminati. Accedendo di nuovo ne crei una nuova."
   }
 }

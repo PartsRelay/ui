@@ -80,3 +80,26 @@ test('tells when the link is expired or missing', async ({ page }) => {
     ).toBeVisible()
   }
 })
+
+test('opens in the language of the link', async ({ page }) => {
+  const request = page.waitForRequest('**/api/v1/checkouts/demo')
+  await page.goto('/checkout?token=demo&lng=it-IT')
+
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Ordina da Redwood Parts Ltd' })
+  ).toBeVisible()
+  await expect(page.getByText('Kit pastiglie freno anteriori')).toBeVisible()
+  await expect(page.getByRole('button', { name: "Conferma l'ordine" })).toBeDisabled()
+  expect((await request).headers()['accept-language']).toBe('it-IT')
+})
+
+test('keeps the language of the browser when the link asks for one the app lacks', async ({
+  page,
+}) => {
+  await page.goto('/checkout?token=demo&lng=fr-FR')
+
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Order from Redwood Parts Ltd' })
+  ).toBeVisible()
+  await expect(page.getByText('Front brake pad set')).toBeVisible()
+})

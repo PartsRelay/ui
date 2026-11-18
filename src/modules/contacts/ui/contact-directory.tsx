@@ -4,7 +4,6 @@ import { cn } from 'cn'
 import { BookUserIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatLocale } from '@/core/format-locale'
 import { type ContactRow, contactRow } from '@/modules/contacts/core/contact-row'
 import { type ContactTab, contactTabs, tabStatus } from '@/modules/contacts/core/contacts'
 import { contactListParams, contactsQuery } from '@/modules/contacts/core/contacts.query'
@@ -12,6 +11,7 @@ import { AddContactDialog } from '@/modules/contacts/ui/add-contact-dialog'
 import { BlockContactDialog } from '@/modules/contacts/ui/block-contact-dialog'
 import { ContactsTable } from '@/modules/contacts/ui/contacts-table'
 import { RemoveContactDialog } from '@/modules/contacts/ui/remove-contact-dialog'
+import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { EmptyState } from '@/ui/components/empty-state'
 import { ListSkeleton } from '@/ui/components/list-skeleton'
@@ -42,16 +42,15 @@ function NoContacts({ tab, searched }: { tab: ContactTab; searched: boolean }) {
 }
 
 export function ContactDirectory() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { me } = useMe()
+  const locale = useFormatLocale()
   const search = route.useSearch()
   const navigate = route.useNavigate()
   const list = useQuery(contactsQuery(contactListParams(search)))
   const info = usePageInfo(list.data?.metadata)
   const tab: ContactTab = search.status ?? 'all'
-  const rows = list.data?.data.map((contact) =>
-    contactRow(contact, me, formatLocale(i18n.language))
-  )
+  const rows = list.data?.data.map((contact) => contactRow(contact, me, locale))
   const heading = useRef<HTMLHeadingElement>(null)
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const [confirming, setConfirming] = useState(false)

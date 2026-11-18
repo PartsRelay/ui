@@ -1,6 +1,6 @@
 {
   "title": "Company",
-  "description": "Name, country, WhatsApp language and deletion of your company. Only the owner sees this page.",
+  "description": "Name, country and deletion of your company. Only the owner sees this page.",
   "name": {
     "title": "Company name",
     "description": "Your team sees this name.",
@@ -11,11 +11,6 @@
     "title": "Country",
     "description": "The country where your company is based.",
     "label": "Country"
-  },
-  "language": {
-    "title": "WhatsApp language",
-    "description": "Parts Relay replies to your contacts on WhatsApp in this language.",
-    "label": "Reply language"
   },
   "delete": {
     "title": "Delete company",
@@ -35,7 +30,6 @@
   "notices": {
     "renamed": "Company name saved.",
     "country": "Country set to {country}.",
-    "language": "WhatsApp language set to {language}.",
     "deleted": "The company and every account were deleted. Signing in again starts a new company."
   }
 }

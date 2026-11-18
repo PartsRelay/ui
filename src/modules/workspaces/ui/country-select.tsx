@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { type Country, countryOptions } from '@/modules/workspaces/core/country'
+import { type Country, countryFlag, countryOptions } from '@/modules/workspaces/core/country'
 import { TextField } from '@/ui/components/text-field'
 import {
   Select,
@@ -49,8 +49,8 @@ export function CountrySelect({
       <SelectContent>
         <SelectGroup>
           {countryOptions(i18n.language).map((country) => (
-            <SelectItem key={country.value} value={country.value}>
-              {country.label}
+            <SelectItem key={country.value} value={country.value} textValue={country.label}>
+              <span aria-hidden>{countryFlag(country.value)}</span> {country.label}
             </SelectItem>
           ))}
         </SelectGroup>

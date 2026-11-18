@@ -5,14 +5,12 @@ import { authClient } from '@/modules/auth/core/auth.client'
 import { sessionQuery } from '@/modules/auth/core/session.query'
 import { countryOf } from '@/modules/workspaces/core/country'
 import { setupDefaults, setupSchemas } from '@/modules/workspaces/core/setup'
-import { toLocale } from '@/modules/workspaces/core/locale'
 import type { Workspace } from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
 import { CardHeading } from '@/ui/components/card-heading'
 import { AccountActions } from '@/modules/workspaces/ui/account-actions'
 import { CountrySelect } from '@/modules/workspaces/ui/country-select'
 import { InvitationHint } from '@/modules/workspaces/ui/invitation-hint'
-import { LocaleSelect } from '@/ui/components/locale-select'
 import { Form } from '@/ui/components/form'
 import { InputField } from '@/ui/components/input-field'
 import { SubmitButton } from '@/ui/components/submit-button'
@@ -23,27 +21,22 @@ import { Field, FieldGroup } from '@/ui/components/ui/field'
 type WorkspaceFormProps = { workspace: Workspace; askName: boolean }
 
 export function WorkspaceForm({ workspace, askName }: WorkspaceFormProps) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { client, run } = useBetterAuthAction()
   const form = useForm({
-    defaultValues: setupDefaults(
-      workspace,
-      toLocale(i18n.resolvedLanguage),
-      countryOf(navigator.language)
-    ),
+    defaultValues: setupDefaults(workspace, countryOf(navigator.language)),
     onSubmit: async ({ value }) => {
       const name = value.name.trim()
-      const { locale, country } = value
+      const { country } = value
       const metadata = { ...workspace.metadata, setup: 'done' }
 
       await run(async () => {
         if (askName) await authClient.updateUser({ name: value.userName.trim() })
-        await authClient.organization.update({ data: { name, locale, country, metadata } })
+        await authClient.organization.update({ data: { name, country, metadata } })
         client.setQueryData(
           workspaceKey,
-          (current) =>
-            current && { ...current, name, locale, country, metadata: JSON.stringify(metadata) }
+          (current) => current && { ...current, name, country, metadata: JSON.stringify(metadata) }
         )
         await Promise.all([
           client.invalidateQueries({ queryKey: workspaceKey }),
@@ -83,16 +76,6 @@ export function WorkspaceForm({ workspace, askName }: WorkspaceFormProps) {
                   description={t('setup.form.country-hint')}
                   required
                   error={field.state.meta.errors[0]?.message}
-                  value={field.state.value}
-                  onValueChange={field.handleChange}
-                />
-              )}
-            </form.Field>
-            <form.Field name="locale">
-              {(field) => (
-                <LocaleSelect
-                  label={t('setup.form.language')}
-                  description={t('setup.form.language-hint')}
                   value={field.state.value}
                   onValueChange={field.handleChange}
                 />

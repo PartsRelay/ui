@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test'
 import {
   countries,
+  countryFlag,
   countryName,
   countryOf,
   countryOptions,
@@ -32,6 +33,14 @@ describe('countryOf', () => {
     expect(countryOf('it-IT')).toBe('IT')
     expect(countryOf('en-CA')).toBeNull()
     expect(countryOf('en')).toBeNull()
+  })
+})
+
+describe('countryFlag', () => {
+  it('builds the flag emoji from the code', () => {
+    expect(countryFlag('IT')).toBe('🇮🇹')
+    expect(countryFlag('GB')).toBe('🇬🇧')
+    expect(countryFlag('US')).toBe('🇺🇸')
   })
 })
 

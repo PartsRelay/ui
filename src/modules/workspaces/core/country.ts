@@ -48,6 +48,14 @@ export function countryOf(language: string) {
   return toCountry(new Intl.Locale(language).region)
 }
 
+const REGIONAL_INDICATOR_OFFSET = 0x1f1e6 - 'A'.charCodeAt(0)
+
+export function countryFlag(country: Country) {
+  return String.fromCodePoint(
+    ...[...country].map((letter) => letter.charCodeAt(0) + REGIONAL_INDICATOR_OFFSET)
+  )
+}
+
 export function countryName(country: Country, locale: string) {
   return new Intl.DisplayNames([locale], { type: 'region' }).of(country) ?? country
 }

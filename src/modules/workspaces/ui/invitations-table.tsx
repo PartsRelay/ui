@@ -1,11 +1,11 @@
 import { MailIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatLocale } from '@/core/format-locale'
 import { authClient } from '@/modules/auth/core/auth.client'
 import { type InvitationRow, invitationRows } from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
 import { RevokeInvitationDialog } from '@/modules/workspaces/ui/revoke-invitation-dialog'
+import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { CopyButton } from '@/ui/components/copy-button'
 import { EmptyState } from '@/ui/components/empty-state'
@@ -20,15 +20,10 @@ import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/com
 const columns = ['invitation', 'role', 'sent', 'actions']
 
 export function InvitationsTable() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { workspace, me } = useMe()
-  const rows = invitationRows(
-    workspace,
-    me,
-    new Date(),
-    window.location.origin,
-    formatLocale(i18n.language)
-  )
+  const locale = useFormatLocale()
+  const rows = invitationRows(workspace, me, new Date(), window.location.origin, locale)
   const heading = useRef<HTMLHeadingElement>(null)
   const [revoking, setRevoking] = useState<InvitationRow | null>(null)
   const [confirming, setConfirming] = useState(false)

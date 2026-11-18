@@ -8,11 +8,11 @@ test.describe('as a newcomer', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Set up your company' })).toBeVisible()
   })
 
-  test('the setup starts empty, in the browser language and country', async ({ page }) => {
+  test('the setup starts empty, in the browser country', async ({ page }) => {
     await expect(page.getByRole('textbox', { name: 'Company name' })).toBeEmpty()
     await expect(page.getByRole('textbox', { name: 'Your name' })).toBeEmpty()
-    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('United States')
-    await expect(page.getByRole('combobox', { name: 'WhatsApp language' })).toHaveText('English')
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('🇺🇸 United States')
+    await expect(page.getByRole('combobox')).toHaveCount(1)
     await expect(page.getByText('Signed in as north.garage@gmail.com')).toBeVisible()
   })
 
@@ -33,8 +33,6 @@ test.describe('as a newcomer', () => {
     await page.getByRole('textbox', { name: 'Your name' }).fill('Anna North')
     await page.getByRole('combobox', { name: 'Country' }).click()
     await page.getByRole('option', { name: 'Ireland' }).click()
-    await page.getByRole('combobox', { name: 'WhatsApp language' }).click()
-    await page.getByRole('option', { name: 'Italian' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
     await expect(page).toHaveURL('/lookups')
@@ -63,8 +61,7 @@ test.describe('as a newcomer', () => {
     await expect(page.getByRole('row', { name: /Anna North \(you\)/ })).toContainText('Owner')
 
     await page.goto('/company')
-    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('Ireland')
-    await expect(page.getByRole('combobox', { name: 'Reply language' })).toHaveText('Italian')
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('🇮🇪 Ireland')
 
     await page.goto('/')
     await expect(page).toHaveURL('/lookups')

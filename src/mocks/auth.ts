@@ -230,12 +230,7 @@ export const authMocks = [
   }),
   post('/organization/update', async ({ request }) => {
     const { data } = await body<{
-      data: {
-        name?: string
-        locale?: string | null
-        country?: string | null
-        metadata?: object
-      }
+      data: { name?: string; country?: string | null; metadata?: object }
     }>(request)
 
     return world((state) => {
@@ -245,9 +240,6 @@ export const authMocks = [
         'you-are-not-allowed-to-update-this-organization',
         'You are not allowed to update this organization'
       )
-      if (data.locale != null && data.locale !== 'en-US' && data.locale !== 'it-IT') {
-        fail(400, 'locale-not-supported', 'The locale is not supported')
-      }
       if (data.country !== undefined && !isCountry(data.country)) {
         fail(400, 'country-not-supported', 'The country is not supported')
       }
@@ -256,7 +248,6 @@ export const authMocks = [
       }
 
       if (data.name !== undefined) company.name = data.name
-      if (data.locale != null) company.locale = data.locale
       if (data.country !== undefined) company.country = data.country
       if (data.metadata !== undefined) company.metadata = JSON.stringify(data.metadata)
       const { members: _members, invitations: _invitations, ...organization } = company

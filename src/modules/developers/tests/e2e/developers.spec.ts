@@ -43,7 +43,7 @@ test.describe('as the owner', () => {
     await expect(page.getByText(start(key))).toBeVisible()
     await expect(
       page.getByText(
-        await page.evaluate(() => new Date().toLocaleDateString('en-US', { dateStyle: 'medium' }))
+        await page.evaluate(() => new Date().toLocaleDateString('en-GB', { dateStyle: 'medium' }))
       )
     ).toBeVisible()
     expect(

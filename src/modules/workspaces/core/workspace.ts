@@ -4,7 +4,6 @@ import { type Message, message } from '@/core/message'
 import { requiredText } from '@/core/schemas'
 import type { authClient } from '@/modules/auth/core/auth.client'
 import { type Country, toCountry } from '@/modules/workspaces/core/country'
-import { type Locale, toLocale } from '@/modules/workspaces/core/locale'
 import {
   canManageRole,
   type Permissions,
@@ -38,7 +37,6 @@ type Metadata = Record<string, unknown>
 export type Workspace = {
   id: string
   name: string
-  locale: Locale
   country: Country | null
   setup: 'pending' | 'done'
   metadata: Metadata
@@ -68,7 +66,6 @@ export function toWorkspace(organization: FullOrganization): Workspace {
   return {
     id: organization.id,
     name: organization.name,
-    locale: toLocale(organization.locale),
     country: toCountry(organization.country),
     setup: metadata.setup === 'pending' ? 'pending' : 'done',
     metadata,

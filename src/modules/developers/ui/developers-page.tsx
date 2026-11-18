@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { formatLocale } from '@/core/format-locale'
 import { apiKeyViews } from '@/modules/developers/core/api-keys'
 import { apiKeysQuery } from '@/modules/developers/core/api-keys.query'
 import { ApiKeyCard } from '@/modules/developers/ui/api-key-card'
+import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { ListSkeleton } from '@/ui/components/list-skeleton'
 import { LoadError, RefetchError } from '@/ui/components/load-error'
 import { PageHeader } from '@/ui/components/page-header'
 
 export function DevelopersPage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { workspace } = useMe()
+  const locale = useFormatLocale()
   const keys = useQuery(apiKeysQuery(workspace.id))
   const retry = () => void keys.refetch()
 
@@ -24,9 +25,7 @@ export function DevelopersPage() {
         </RefetchError>
       )}
       {keys.data ? (
-        apiKeyViews(keys.data, formatLocale(i18n.language)).map((view) => (
-          <ApiKeyCard key={view.mode} view={view} />
-        ))
+        apiKeyViews(keys.data, locale).map((view) => <ApiKeyCard key={view.mode} view={view} />)
       ) : keys.isLoadingError ? (
         <LoadError error={keys.error} onRetry={retry} />
       ) : (

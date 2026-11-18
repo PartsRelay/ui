@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatLocale } from '@/core/format-locale'
 import { statsView } from '@/modules/lookups/core/lookup-stats'
 import { lookupStatsQuery } from '@/modules/lookups/core/lookups.query'
+import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { CardHeading } from '@/ui/components/card-heading'
 import { LoadError } from '@/ui/components/load-error'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/components/ui/card'
@@ -45,9 +45,10 @@ function StatsSkeleton() {
 }
 
 export function LookupStats() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
+  const locale = useFormatLocale()
   const stats = useQuery(lookupStatsQuery)
-  const count = (value: number) => value.toLocaleString(formatLocale(i18n.language))
+  const count = (value: number) => value.toLocaleString(locale)
 
   if (stats.isLoadingError) {
     return <LoadError error={stats.error} onRetry={() => void stats.refetch()} />

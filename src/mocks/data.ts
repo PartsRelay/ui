@@ -38,7 +38,6 @@ export type Company = {
   name: string
   slug: string
   metadata: string
-  locale: string
   country: string
   createdAt: string
   members: Member[]
@@ -114,7 +113,6 @@ export const redwoodParts = (): Company => ({
   name: 'Redwood Parts Ltd',
   slug: 'redwood-parts',
   metadata: '{"setup":"done"}',
-  locale: 'en-US',
   country: 'GB',
   createdAt: daysAgo(400),
   members: [
@@ -141,7 +139,6 @@ export function newCompany(owner: Person): Company {
     name: owner.name || owner.email,
     slug: crypto.randomUUID(),
     metadata: '{"setup":"pending"}',
-    locale: 'en-US',
     country: 'US',
     createdAt,
     members: [member('2', '10', owner, 'owner', createdAt)],
@@ -155,7 +152,6 @@ export function ironworksGarage(newMember: Person, role: Role): Company {
     name: 'Ironworks Garage Ltd',
     slug: 'ironworks-garage',
     metadata: '{"setup":"done"}',
-    locale: 'en-US',
     country: 'GB',
     createdAt: daysAgo(700),
     members: [

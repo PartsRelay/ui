@@ -26,7 +26,6 @@
   "workspace-not-releasable": "Fai parte di un'azienda con altri membri, quindi non puoi entrare in un'altra.",
   "workspace-role-not-managed": "Non puoi gestire questo ruolo.",
   "workspace-owner": "Il proprietario non può eliminare l'account: cedi l'azienda o eliminala.",
-  "locale-not-supported": "Questa lingua non è disponibile.",
   "country-not-supported": "Questo Paese non è disponibile.",
   "country-required": "Scegli il Paese della tua azienda.",
   "workspace-name-not-allowed": "Il nome dell'azienda non può contenere < o >.",

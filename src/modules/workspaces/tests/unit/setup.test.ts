@@ -4,12 +4,7 @@ import { pendingInvitation, setupDefaults, setupSchemas } from '@/modules/worksp
 
 const now = new Date('2026-10-21T10:00:00Z')
 
-const redwoodParts = {
-  name: 'Redwood Parts Ltd',
-  locale: 'en-US',
-  country: 'GB',
-  setup: 'done',
-} as const
+const redwoodParts = { name: 'Redwood Parts Ltd', country: 'GB', setup: 'done' } as const
 
 const offer = (id: string, status: string, expiresInDays: number) => ({
   id,
@@ -45,25 +40,17 @@ describe('pendingInvitation', () => {
 describe('setupDefaults', () => {
   const pending = { ...redwoodParts, country: 'US', setup: 'pending' as const }
 
-  it('starts a pending company empty, in the browser language and country', () => {
-    expect(setupDefaults(pending, 'it-IT', 'IT')).toEqual({
-      name: '',
-      locale: 'it-IT',
-      country: 'IT',
-      userName: '',
-    })
+  it('starts a pending company empty, in the browser country', () => {
+    expect(setupDefaults(pending, 'IT')).toEqual({ name: '', country: 'IT', userName: '' })
   })
 
   it('leaves the country empty when the browser has none of the list', () => {
-    expect(setupDefaults(pending, 'en-US', null).country).toBe('')
+    expect(setupDefaults(pending, null).country).toBe('')
   })
 
-  it('keeps the name, language and country of a company already set up', () => {
-    const company = { ...redwoodParts, locale: 'it-IT' as const }
-
-    expect(setupDefaults(company, 'en-US', 'US')).toEqual({
+  it('keeps the name and country of a company already set up', () => {
+    expect(setupDefaults(redwoodParts, 'US')).toEqual({
       name: 'Redwood Parts Ltd',
-      locale: 'it-IT',
       country: 'GB',
       userName: '',
     })

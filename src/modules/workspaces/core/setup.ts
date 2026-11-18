@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { requiredText } from '@/core/schemas'
-import type { Locale } from '@/modules/workspaces/core/locale'
+import type { Country } from '@/modules/workspaces/core/country'
 import type { Workspace } from '@/modules/workspaces/core/workspace'
 
 type UserInvitation = {
@@ -10,7 +10,7 @@ type UserInvitation = {
   expiresAt: Date | string
 }
 
-export type SetupValues = { name: string; locale: Locale; userName: string }
+export type SetupValues = { name: string; country: Country; userName: string }
 
 export function pendingInvitation(invitations: UserInvitation[] | undefined, now: Date) {
   return (
@@ -21,19 +21,20 @@ export function pendingInvitation(invitations: UserInvitation[] | undefined, now
 }
 
 export function setupDefaults(
-  workspace: Pick<Workspace, 'name' | 'locale' | 'setup'>,
-  browserLocale: Locale
+  workspace: Pick<Workspace, 'name' | 'country' | 'setup'>,
+  browserCountry: Country | null
 ): SetupValues {
   const pending = workspace.setup === 'pending'
 
   return {
     name: pending ? '' : workspace.name,
-    locale: pending ? browserLocale : workspace.locale,
+    country: (pending ? browserCountry : workspace.country) ?? '',
     userName: '',
   }
 }
 
 export const setupSchemas = {
   name: requiredText('setup.errors.name-required'),
+  country: requiredText('setup.errors.country-required'),
   userName: requiredText('setup.errors.user-name-required'),
 }

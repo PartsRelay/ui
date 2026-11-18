@@ -40,7 +40,7 @@ export const authClient = createAuthClient({
       roles,
       schema: inferOrgAdditionalFields({
         organization: {
-          additionalFields: { locale: { type: 'string', required: false, input: true } },
+          additionalFields: { country: { type: 'string', required: false, input: true } },
         },
       }),
     }),

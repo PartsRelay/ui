@@ -30,7 +30,7 @@ const redwoodParts = (): FullOrganization => ({
   slug: 'redwood-parts',
   logo: null,
   metadata: '{"setup":"done"}',
-  locale: 'en-US',
+  country: 'GB',
   createdAt: now,
   members: [member(people.mark, 'owner'), member(people.julia, 'admin')],
   invitations: [],

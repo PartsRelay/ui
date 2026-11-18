@@ -9,7 +9,7 @@
   },
   "country": {
     "title": "Country",
-    "description": "The country where your company is based.",
+    "description": "Plates are searched in this country, and dates and numbers follow its formats.",
     "label": "Country"
   },
   "delete": {

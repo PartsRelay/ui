@@ -5,7 +5,7 @@
     "name": "Company name",
     "name-hint": "Your team sees this name.",
     "country": "Country",
-    "country-hint": "The country where your company is based.",
+    "country-hint": "Plates are searched in this country, and dates and numbers follow its formats.",
     "user-name": "Your name",
     "user-name-hint": "Your team sees it next to your email.",
     "submit": "Continue"

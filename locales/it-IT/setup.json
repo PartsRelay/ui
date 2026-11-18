@@ -5,7 +5,7 @@
     "name": "Nome dell'azienda",
     "name-hint": "È il nome che vedrà il tuo team.",
     "country": "Paese",
-    "country-hint": "Il Paese in cui ha sede la tua azienda.",
+    "country-hint": "Le targhe vengono cercate in questo Paese, e date e numeri ne seguono i formati.",
     "user-name": "Il tuo nome",
     "user-name-hint": "Il tuo team lo vede accanto alla tua email.",
     "submit": "Continua"

@@ -9,7 +9,7 @@
   },
   "country": {
     "title": "Paese",
-    "description": "Il Paese in cui ha sede la tua azienda.",
+    "description": "Le targhe vengono cercate in questo Paese, e date e numeri ne seguono i formati.",
     "label": "Paese"
   },
   "delete": {

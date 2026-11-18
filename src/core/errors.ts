@@ -9,9 +9,9 @@ export type { ErrorBody, FieldError }
 
 export const NO_STATUS = 0
 
-const SESSION_CODES = ['unauthorized', 'unauthorized-access']
+const SESSION_CODES = ['unauthorized', 'unauthorized-access', 'unauthorized-session']
 
-const GONE_CODES = ['row-not-found', 'member-not-found', 'invitation-not-found']
+const GONE_CODES = ['row-not-found', 'member-not-found', 'invitation-not-found', 'key-not-found']
 
 const NETWORK_ERROR: ErrorBody = {
   code: 'network-error',

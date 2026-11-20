@@ -17,6 +17,8 @@ export interface Lookup {
   vin: string | null;
   /** @nullable */
   query: string | null;
+  /** @nullable */
+  country: string | null;
   nodeIds: string[];
   status: LookupStatus;
   source: LookupSource;

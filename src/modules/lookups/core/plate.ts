@@ -1,4 +1,4 @@
-import type { Country } from '@/modules/workspaces/core/country'
+import { type Country, toCountry } from '@/modules/workspaces/core/country'
 
 type PlateFormat = {
   example: string
@@ -66,4 +66,15 @@ export function formatPlate(plate: string, country: Country | null) {
 
 export function plateExample(country: Country | null) {
   return (country && PLATES[country]?.example) || null
+}
+
+// The search country with contact-country on, else the company one
+export function plateCountry(
+  { country }: { country?: string | null },
+  company: Country | null,
+  searchCountry: boolean
+) {
+  if (!company) return null
+
+  return (searchCountry && toCountry(country)) || company
 }

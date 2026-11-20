@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { message } from '@/core/message'
-import { contactName, contactRow } from '@/modules/contacts/core/contact-row'
+import { contactName, contactRow, numberCountry } from '@/modules/contacts/core/contact-row'
 import { contactFixture, meAs } from '@/modules/contacts/tests/unit/fixtures'
 
 const owner = meAs('owner')
@@ -88,5 +88,14 @@ describe('contact rows', () => {
     })
     expect(Object.values(contactRow(oakfield, viewer, 'en-US').actions)).not.toContain(true)
     expect(Object.values(contactRow(blocked, viewer, 'en-US').actions)).not.toContain(true)
+  })
+})
+
+describe('number country', () => {
+  it('is the country of a valid number of the list, like the core reads it', () => {
+    expect(numberCountry('393331234567')).toBe('IT')
+    expect(numberCountry('12025550106')).toBe('US')
+    expect(numberCountry('819012345678')).toBeNull()
+    expect(numberCountry('12')).toBeNull()
   })
 })

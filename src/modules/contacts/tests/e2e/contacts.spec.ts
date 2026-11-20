@@ -73,25 +73,83 @@ test('a number in 3 companies explains why under the field', async ({ page }) =>
   )
 })
 
-test('the number keeps its plus whatever I type, delete or paste', async ({ page }) => {
+test('the number starts empty with a number of the country of the company', async ({ page }) => {
   await page.getByRole('button', { name: 'Add contact' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add a contact' })
   const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
-  await expect(phone).toHaveValue('+')
 
+  await expect(phone).toHaveValue('')
+  await expect(phone).toHaveAttribute('placeholder', '+447400123456')
+  await expect(phone).toHaveAccessibleDescription('With the international prefix, for example +44.')
+})
+
+test('a first digit gets a plus and a plus typed first stays alone', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+
+  await phone.pressSequentially('3')
+  await expect(phone).toHaveValue('+3')
+  await phone.fill('')
+  await phone.pressSequentially('+')
+  await expect(phone).toHaveValue('+')
+  await phone.pressSequentially('39')
+  await expect(phone).toHaveValue('+39')
+  await phone.pressSequentially('+')
+  await expect(phone).toHaveValue('+39')
+})
+
+test('the number takes only digits', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+
+  await phone.pressSequentially('ab')
+  await expect(phone).toHaveValue('')
+  await phone.pressSequentially('3a9 3-38')
+  await expect(phone).toHaveValue('+39338')
+})
+
+test('deleting the whole number leaves it empty', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+
+  await phone.pressSequentially('39')
+  await phone.press('Backspace')
   await phone.press('Backspace')
   await expect(phone).toHaveValue('+')
+  await phone.press('Backspace')
+  await expect(phone).toHaveValue('')
   await phone.pressSequentially('39 338')
-  await expect(phone).toHaveValue('+39 338')
-  await phone.fill('')
-  await expect(phone).toHaveValue('+')
-  await page.keyboard.insertText('+39 300 000 0000')
-  await expect(phone).toHaveValue('+39 300 000 0000')
+  await phone.press('ControlOrMeta+a')
+  await phone.press('Delete')
+  await expect(phone).toHaveValue('')
 
+  await phone.pressSequentially('39')
   await dialog.getByRole('button', { name: 'Cancel' }).click()
   await expect(dialog).toBeHidden()
   await page.getByRole('button', { name: 'Add contact' }).click()
-  await expect(phone).toHaveValue('+')
+  await expect(phone).toHaveValue('')
+})
+
+test('a pasted number keeps its digits after one plus', async ({ page }) => {
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add a contact' })
+  const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
+  await expect(phone).toBeFocused()
+
+  await page.keyboard.insertText('+39 300 000 0000')
+  await expect(phone).toHaveValue('+393000000000')
+  await phone.fill('')
+  await page.keyboard.insertText('0039 300 000 0000')
+  await expect(phone).toHaveValue('+00393000000000')
+  await phone.fill('')
+  await page.keyboard.insertText('39 300 000 0000')
+  await expect(phone).toHaveValue('+393000000000')
+  await phone.fill('')
+  await page.keyboard.insertText('Tel. 300 000 0000')
+  await expect(phone).toHaveValue('+3000000000')
 })
 
 test('the caret stays where I edit the number', async ({ page }) => {
@@ -106,16 +164,25 @@ test('the caret stays where I edit the number', async ({ page }) => {
   await page.keyboard.press('ArrowLeft')
   await page.keyboard.press('Backspace')
   await expect(phone).toHaveValue('+338')
-  await page.keyboard.type('39 ')
-  await expect(phone).toHaveValue('+39 338')
+  await page.keyboard.type('3a9 ')
+  await expect(phone).toHaveValue('+39338')
 })
 
-test('a number with only the plus is still missing', async ({ page }) => {
+test('an empty number or only the plus is missing', async ({ page }) => {
   await page.getByRole('button', { name: 'Add contact' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add a contact' })
   const phone = dialog.getByRole('textbox', { name: 'WhatsApp number' })
   await dialog.getByRole('button', { name: 'Add contact' }).click()
 
+  await expect(phone).toHaveAccessibleDescription('Enter the WhatsApp number.')
+  await expect(phone).toHaveValue('')
+
+  await dialog.getByRole('button', { name: 'Cancel' }).click()
+  await expect(dialog).toBeHidden()
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  await expect(phone).toHaveAccessibleDescription('With the international prefix, for example +44.')
+  await phone.pressSequentially('+')
+  await dialog.getByRole('button', { name: 'Add contact' }).click()
   await expect(phone).toHaveAccessibleDescription('Enter the WhatsApp number.')
   await expect(phone).toHaveValue('+')
 })

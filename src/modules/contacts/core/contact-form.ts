@@ -7,9 +7,13 @@ export const MAX_COMPANIES = 3
 
 export type ContactValues = { phone: string; name: string }
 
-export const emptyContact: ContactValues = { phone: '+', name: '' }
+export const emptyContact: ContactValues = { phone: '', name: '' }
 
-export const withPlus = (value: string) => `+${value.replace(/^\P{Nd}+|\+/gu, '')}`
+export function withPlus(value: string) {
+  const digits = value.replace(/\P{Nd}/gu, '')
+
+  return digits || value.includes('+') ? `+${digits}` : ''
+}
 
 export function newContact({ phone, name }: ContactValues): PostApiV1WorkspaceContactsBody {
   const trimmed = name.trim()

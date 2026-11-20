@@ -81,6 +81,7 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               type="tel"
               autoFocus
               autoComplete="off"
+              placeholder={t('contacts.add.phone-placeholder')}
               onInput={({ currentTarget: input }) => {
                 const value = withPlus(input.value)
                 if (value === input.value) return

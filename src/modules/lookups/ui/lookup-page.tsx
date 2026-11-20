@@ -8,6 +8,7 @@ import { lookupQuery } from '@/modules/lookups/core/lookups.query'
 import { LookupOutcome } from '@/modules/lookups/ui/lookup-outcome'
 import { LookupResults, LookupResultsSkeleton } from '@/modules/lookups/ui/lookup-results'
 import { LookupVehicle, LookupVehicleSkeleton } from '@/modules/lookups/ui/lookup-vehicle'
+import { usePlateCountry } from '@/modules/lookups/ui/hooks/use-plate-country'
 import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { Callout } from '@/ui/components/callout'
 import { LoadError, RefetchError } from '@/ui/components/load-error'
@@ -32,11 +33,12 @@ function NotFound() {
 export function LookupPage() {
   const { t } = useTranslation()
   const locale = useFormatLocale()
+  const plateCountry = usePlateCountry()
   const router = useRouter()
   const canGoBack = useCanGoBack()
   const { lookupId } = route.useParams()
   const lookup = useQuery(lookupQuery(Number(lookupId)))
-  const detail = lookup.data && lookupDetail(lookup.data, locale)
+  const detail = lookup.data && lookupDetail(lookup.data, locale, plateCountry)
   const retry = () => void lookup.refetch()
 
   return (

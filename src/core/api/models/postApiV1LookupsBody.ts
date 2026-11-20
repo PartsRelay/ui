@@ -11,4 +11,11 @@ export type PostApiV1LookupsBody = {
   vin?: string;
   /** @minLength 2 */
   query: string;
+  /**
+     * @minItems 1
+     * @maxItems 25
+     * @items.minLength 1
+     * @items.maxLength 64
+     */
+  nodeIds?: string[];
 };

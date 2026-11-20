@@ -90,7 +90,8 @@
     },
     "vin": "Telaio (VIN)",
     "vin-hint": "17 lettere e cifre, senza I, O e Q.",
-    "vin-placeholder": "WVWZZZAUZHW204411"
+    "vin-placeholder": "WVWZZZAUZHW204411",
+    "check": "Controlla i ricambi"
   },
   "fitment": "I risultati aiutano a identificare il ricambio. Verifica sempre la compatibilità con il veicolo prima dell'acquisto.",
   "detail": {
@@ -155,6 +156,30 @@
     "top": {
       "title": "Chi cerca di più",
       "description": "Ultimi {days} giorni · Solo il proprietario lo vede"
+    }
+  },
+  "preview": {
+    "eyebrow": "Nuova richiesta · Controllo",
+    "title": "Controlla i ricambi.",
+    "description": "Questi sono i ricambi letti nella richiesta, con le categorie del catalogo in cui verranno cercati. Se qualcosa non va, modifica la richiesta.",
+    "vehicle": "Veicolo",
+    "parts": "Ricambi letti nella richiesta",
+    "found": "Cercato in {categories}",
+    "missing": "Non disponibile per questo veicolo",
+    "some-missing": "I ricambi non disponibili per questo veicolo restano fuori dalla ricerca.",
+    "none": {
+      "title": "Nessun ricambio disponibile",
+      "body": "Nessuno dei ricambi della richiesta è nel catalogo di questo veicolo. Modifica la richiesta."
+    },
+    "unread": {
+      "title": "Nessun ricambio letto",
+      "body": "La richiesta non nomina un ricambio che possiamo cercare. Modificala, per esempio pastiglie freno anteriori."
+    },
+    "edit": "Modifica la richiesta",
+    "start": "Avvia la ricerca",
+    "errors": {
+      "plate-not-found": "Nessun veicolo trovato con questa targa. Controllala.",
+      "vin-not-found": "Nessun veicolo trovato con questo telaio. Controllalo."
     }
   }
 }

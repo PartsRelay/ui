@@ -2,6 +2,7 @@ import { subDays, subMinutes } from 'date-fns'
 import {
   getGetApiV1LookupsLookupIdMockHandler,
   getPostApiV1LookupsMockHandler,
+  getPostApiV1LookupsPreviewMockHandler,
 } from '@/core/api/endpoints/lookups/lookups.msw'
 import {
   getGetApiV1WorkspaceLookupsMockHandler,
@@ -21,6 +22,7 @@ import { checkedPage, page, people, type Person } from '@/mocks/data'
 import { apiBody, fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
+import { flagEnabled } from '@/core/flags'
 
 type Text = [en: string, it: string]
 
@@ -383,12 +385,34 @@ function matching(query: string) {
     .map(([id]) => id)
 }
 
+// Like the core model: each part of the request with its categories
+function partsOf(query: string, language: Language) {
+  return query
+    .split(/,|\+|\band\b|\be\b/i)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((name) => ({
+      name,
+      categories: matching(name).map((id) => ({ id, name: CATALOG[id]!.name[language] })),
+    }))
+}
+
+function chosenNodes(nodeIds: unknown) {
+  if (nodeIds === undefined || !flagEnabled('parts-preview')) return []
+  if (!Array.isArray(nodeIds) || nodeIds.length === 0) return rejected('nodeIds', 'array')
+
+  return nodeIds.map(String)
+}
+
 function settled(lookup: Stored): Stored {
   const vehicle = vehicleOf(lookup)
   if (lookup.plate === FAILING_PLATE) return { ...lookup, status: 'failed' }
   if (!vehicle) return { ...lookup, status: 'vehicle_not_found' }
 
-  const nodeIds = matching(lookup.query ?? '')
+  const nodeIds =
+    lookup.nodeIds.length > 0
+      ? lookup.nodeIds.filter((id) => id in CATALOG)
+      : matching(lookup.query ?? '')
   const status = nodeIds.length === 0 ? 'not_matched' : 'done'
 
   return { ...lookup, vin: vehicle.vin, nodeIds, status }
@@ -475,6 +499,7 @@ export const lookupMocks = [
       ])
     }
     const query = checkedQuery(body.query)
+    const nodeIds = chosenNodes(body.nodeIds)
 
     return archive((state) => {
       const running: Stored = {
@@ -483,7 +508,7 @@ export const lookupMocks = [
         plate,
         vin,
         query,
-        nodeIds: [],
+        nodeIds,
         status: 'running',
         source: 'web',
         searcher: user(me),
@@ -494,6 +519,40 @@ export const lookupMocks = [
 
       return { data: lookupOf(running, languageOf(request)) }
     })
+  }),
+  getPostApiV1LookupsPreviewMockHandler(async ({ request }) => {
+    if (!flagEnabled('parts-preview'))
+      fail(404, 'route-not-found', 'Cannot POST:/api/v1/lookups/preview')
+
+    const body = await apiBody<PostApiV1LookupsBody>(request)
+    member()
+    const plate = checkedPlate(body.plate)
+    const vin = checkedVin(body.vin)
+    if (!plate && !vin) {
+      invalid([
+        { field: 'plate', rule: 'required' },
+        { field: 'vin', rule: 'required' },
+      ])
+    }
+    const query = checkedQuery(body.query)
+    if (plate === FAILING_PLATE) fail(502, 'oem-request-failed', 'The parts catalog is unavailable')
+    const vehicle =
+      vehicleOf({ plate: vin ? null : plate, vin }) ??
+      (vin
+        ? fail(404, 'oem-vin-not-found', 'The vehicle with this VIN was not found')
+        : fail(
+            404,
+            'oem-plate-not-found',
+            'The vehicle with this registration plate was not found'
+          ))
+
+    return {
+      data: {
+        vin: vehicle.vin,
+        vehicleDescription: vehicle.description,
+        parts: partsOf(query, languageOf(request)),
+      },
+    }
   }),
   getGetApiV1WorkspaceLookupsStatsMockHandler(async ({ request }) => {
     const { company, role } = member()

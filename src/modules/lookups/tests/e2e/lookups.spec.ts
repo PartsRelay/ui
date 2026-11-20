@@ -449,3 +449,78 @@ test.describe('in an American browser', () => {
     await expect(queue(page).getByRole('row').nth(1)).toContainText(/Nov 17, 2026, 3:03\sPM/)
   })
 })
+
+test.describe('with the parts-preview flag', () => {
+  const review = (page: Page) => page.getByRole('dialog', { name: 'Check the parts.' })
+
+  async function checkParts(page: Page, plate: string, part: string) {
+    await page.getByRole('link', { name: 'New search' }).first().click()
+    await sheet(page).getByRole('textbox', { name: 'Registration plate' }).fill(plate)
+    await sheet(page).getByRole('textbox', { name: 'Part needed' }).fill(part)
+    await sheet(page).getByRole('button', { name: 'Check the parts' }).click()
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'parts-preview'))
+    await page.goto('/lookups')
+    await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+  })
+
+  test('a new search shows the parts read and which ones the vehicle has not, then starts', async ({
+    page,
+  }) => {
+    await checkParts(page, 'gh 482 kl', 'Oil filter, wipers')
+
+    await expect(review(page).getByRole('heading', { name: 'Check the parts.' })).toBeFocused()
+    await expect(review(page)).toContainText('Fiat Panda 1.2 8V')
+    await expect(
+      review(page).getByRole('listitem').filter({ hasText: 'Oil filter' })
+    ).toContainText('Searched in Oil filter')
+    await expect(review(page).getByRole('listitem').filter({ hasText: 'wipers' })).toContainText(
+      'Not available for this vehicle'
+    )
+    await expect(
+      review(page).getByText('The parts not available for this vehicle are left out of the search.')
+    ).toBeVisible()
+
+    await review(page).getByRole('button', { name: 'Start search' }).click()
+
+    await expect(page).toHaveURL(/\/lookups\/\d+$/)
+    await expect(page.getByRole('heading', { level: 2, name: 'GH482KL' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2, name: 'Oil filter' })).toBeVisible()
+  })
+
+  test('changing the request goes back to it as typed', async ({ page }) => {
+    await checkParts(page, 'GH482KL', 'wipers')
+    await review(page).getByRole('button', { name: 'Change the request' }).click()
+
+    await expect(sheet(page).getByRole('textbox', { name: 'Part needed' })).toHaveValue('wipers')
+    await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveValue(
+      'GH482KL'
+    )
+    await expect(sheet(page).getByRole('button', { name: 'Check the parts' })).toBeVisible()
+  })
+
+  test('a request with no part of the vehicle cannot start', async ({ page }) => {
+    await checkParts(page, 'GH482KL', 'wipers')
+
+    await expect(review(page).getByRole('alert')).toContainText('No part available')
+    await expect(review(page).getByRole('button', { name: 'Start search' })).toBeDisabled()
+  })
+
+  test('an unknown plate is said on its field', async ({ page }) => {
+    await checkParts(page, 'ZZ999ZZ', 'Oil filter')
+
+    await expect(
+      sheet(page).getByRole('textbox', { name: 'Registration plate' })
+    ).toHaveAccessibleDescription('No vehicle found with this plate. Check it.')
+  })
+})
+
+test('without the parts-preview flag a new search starts at once', async ({ page }) => {
+  await page.goto('/lookups')
+  await page.getByRole('link', { name: 'New search' }).first().click()
+
+  await expect(sheet(page).getByRole('button', { name: 'Start search' })).toBeVisible()
+  await expect(sheet(page).getByRole('button', { name: 'Check the parts' })).toHaveCount(0)
+})

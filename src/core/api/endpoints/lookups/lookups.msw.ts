@@ -21,11 +21,15 @@ import type {
 import type {
   GetApiV1LookupsLookupId200,
   PostApiV1Lookups202,
-  PostApiV1LookupsBody
+  PostApiV1LookupsBody,
+  PostApiV1LookupsPreview200,
+  PostApiV1LookupsPreviewBody
 } from '../../models';
 
 
 export const getPostApiV1LookupsResponseMock = (overrideResponse: Partial<Extract<PostApiV1Lookups202, object>> = {}): PostApiV1Lookups202 => ({data: {id: faker.number.int(), plate: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), vin: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), query: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), nodeIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), status: faker.helpers.arrayElement(['running','done','vehicle_not_found','not_matched','failed'] as const), source: faker.helpers.arrayElement(['web','whatsapp'] as const), searcher: faker.helpers.arrayElement([{type: faker.helpers.arrayElement(['user','contact'] as const), id: faker.number.int(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])},null,]), vehicleDescription: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), categories: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), units: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), imageUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), thumbnailUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), original: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), position: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), aftermarket: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), brand: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}))}))}))})), undefined]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, ...overrideResponse})
+
+export const getPostApiV1LookupsPreviewResponseMock = (overrideResponse: Partial<Extract<PostApiV1LookupsPreview200, object>> = {}): PostApiV1LookupsPreview200 => ({data: {vin: faker.string.alpha({length: {min: 10, max: 20}}), vehicleDescription: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), parts: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({name: faker.string.alpha({length: {min: 10, max: 20}}), categories: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}))}))}, ...overrideResponse})
 
 export const getGetApiV1LookupsLookupIdResponseMock = (overrideResponse: Partial<Extract<GetApiV1LookupsLookupId200, object>> = {}): GetApiV1LookupsLookupId200 => ({data: {id: faker.number.int(), plate: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), vin: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), query: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), nodeIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), status: faker.helpers.arrayElement(['running','done','vehicle_not_found','not_matched','failed'] as const), source: faker.helpers.arrayElement(['web','whatsapp'] as const), searcher: faker.helpers.arrayElement([{type: faker.helpers.arrayElement(['user','contact'] as const), id: faker.number.int(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])},null,]), vehicleDescription: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), categories: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), units: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), imageUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), thumbnailUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), original: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), position: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), aftermarket: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), brand: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}))}))}))})), undefined]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, ...overrideResponse})
 
@@ -38,6 +42,18 @@ export const getPostApiV1LookupsMockHandler = (overrideResponse?: PostApiV1Looku
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getPostApiV1LookupsResponseMock(),
       { status: 202
+      })
+  }, options)
+}
+
+export const getPostApiV1LookupsPreviewMockHandler = (overrideResponse?: PostApiV1LookupsPreview200 | ((info: Parameters<HttpResponseResolver<PathParams, PostApiV1LookupsPreviewBody>>[0]) => Promise<PostApiV1LookupsPreview200> | PostApiV1LookupsPreview200), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, PostApiV1LookupsPreviewBody>('*/api/v1/lookups/preview', async (info: Parameters<HttpResponseResolver<PathParams, PostApiV1LookupsPreviewBody>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPostApiV1LookupsPreviewResponseMock(),
+      { status: 200
       })
   }, options)
 }
@@ -55,5 +71,6 @@ export const getGetApiV1LookupsLookupIdMockHandler = (overrideResponse?: GetApiV
 }
 export const getLookupsMock = () => [
   getPostApiV1LookupsMockHandler(),
+  getPostApiV1LookupsPreviewMockHandler(),
   getGetApiV1LookupsLookupIdMockHandler()
 ]

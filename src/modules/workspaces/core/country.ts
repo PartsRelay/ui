@@ -44,6 +44,10 @@ export function toCountry(value: unknown): Country | null {
   return isCountry(value) ? value : null
 }
 
+export function memberCountry(company: Country | null, personal: unknown, enabled: boolean) {
+  return (enabled && toCountry(personal)) || company
+}
+
 export function countryOf(language: string) {
   return toCountry(new Intl.Locale(language).region)
 }

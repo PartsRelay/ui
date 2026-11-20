@@ -45,6 +45,16 @@ describe('flags', () => {
     expect(posthog.init).not.toHaveBeenCalled()
   })
 
+  it('reads the flags of mock.flags with the mocks', async () => {
+    env.MOCKS = true
+    vi.stubGlobal('localStorage', { getItem: () => 'new-search,personal-country' })
+
+    const { flagEnabled } = await signIn('7')
+
+    expect(flagEnabled('personal-country')).toBe(true)
+    expect(flagEnabled('personal')).toBe(false)
+  })
+
   it('asks PostHog once, for the signed in user and without analytics', async () => {
     const { loadFlags } = await signIn('7')
     loadFlags('7')

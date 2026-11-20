@@ -216,10 +216,15 @@ export const authMocks = [
   ),
   get('/organization/get-full-organization', () => world((state) => signedIn(state).company)),
   post('/update-user', async ({ request }) => {
-    const { name } = await body<{ name?: string }>(request)
+    const { name, country } = await body<{ name?: string; country?: string | null }>(request)
 
     return world((state) => {
       const { me, company } = signedIn(state)
+      if (country !== undefined && country !== null && !isCountry(country)) {
+        fail(400, 'country-not-supported', 'The country is not supported')
+      }
+
+      if (country !== undefined) me.country = country
       if (name === undefined) return { status: true }
 
       me.name = name

@@ -9,6 +9,7 @@ export type Person = {
   email: string
   emailVerified: boolean
   image?: string | null
+  country: string | null
   createdAt: string
   updatedAt: string
 }
@@ -54,6 +55,7 @@ const person = (id: string, name: string, email: string): Person => ({
   name,
   email,
   emailVerified: true,
+  country: null,
   createdAt: daysAgo(400),
   updatedAt: daysAgo(1),
 })

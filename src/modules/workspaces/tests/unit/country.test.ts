@@ -6,6 +6,7 @@ import {
   countryOf,
   countryOptions,
   isCountry,
+  memberCountry,
   toCountry,
 } from '@/modules/workspaces/core/country'
 
@@ -24,6 +25,20 @@ describe('toCountry', () => {
     expect(toCountry('GB')).toBe('GB')
     expect(toCountry('RU')).toBeNull()
     expect(toCountry(undefined)).toBeNull()
+  })
+})
+
+describe('memberCountry', () => {
+  it('takes my country when the flag is on and I chose one of the list', () => {
+    expect(memberCountry('GB', 'IT', true)).toBe('IT')
+  })
+
+  it('takes the country of the company otherwise', () => {
+    expect(memberCountry('GB', 'IT', false)).toBe('GB')
+    expect(memberCountry('GB', null, true)).toBe('GB')
+    expect(memberCountry('GB', undefined, true)).toBe('GB')
+    expect(memberCountry('GB', 'CA', true)).toBe('GB')
+    expect(memberCountry(null, null, true)).toBeNull()
   })
 })
 

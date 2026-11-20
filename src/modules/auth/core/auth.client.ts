@@ -1,6 +1,7 @@
 import { apiKeyClient } from '@better-auth/api-key/client'
 import { createAuthClient } from 'better-auth/client'
 import {
+  inferAdditionalFields,
   inferOrgAdditionalFields,
   magicLinkClient,
   oneTapClient,
@@ -27,6 +28,9 @@ export const authClient = createAuthClient({
     },
   },
   plugins: [
+    inferAdditionalFields({
+      user: { country: { type: 'string', required: false, input: true } },
+    }),
     magicLinkClient(),
     oneTimeTokenClient(),
     oneTapClient({

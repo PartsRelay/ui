@@ -2,11 +2,20 @@ import { expect, type Page, test } from '@playwright/test'
 
 const notices = (page: Page) => page.getByRole('region', { name: /Notifications/ })
 
+const firstSearch = (page: Page) =>
+  page
+    .getByRole('table')
+    .filter({ has: page.getByRole('columnheader', { name: 'Plate' }) })
+    .getByRole('row')
+    .nth(1)
+
+async function openProfile(page: Page) {
+  await page.goto('/profile')
+  await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible()
+}
+
 test.describe('as the owner', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/profile')
-    await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible()
-  })
+  test.beforeEach(({ page }) => openProfile(page))
 
   test('renaming me updates the whole app', async ({ page }) => {
     const name = page.getByRole('textbox', { name: 'Name' })
@@ -43,6 +52,12 @@ test.describe('as the owner', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Profilo' })).toBeVisible()
     await page.reload()
     await expect(page.getByRole('combobox', { name: 'Lingua' })).toHaveText('Italiano')
+  })
+
+  test('without the flag the country is the one of the company', async ({ page }) => {
+    await expect(page.getByRole('heading', { level: 2, name: 'Country' })).toHaveCount(0)
+    await expect(page.getByRole('combobox')).toHaveCount(1)
+    await expect(page.getByRole('combobox', { name: 'Language' })).toBeVisible()
   })
 
   test('signing out of this device opens the login', async ({ page }) => {
@@ -85,5 +100,46 @@ test.describe('as a viewer', () => {
     await expect(
       notices(page).getByText('You left Redwood Parts Ltd and your account was deleted.')
     ).toBeVisible()
+  })
+})
+
+test.describe('with my own country, in an American browser', () => {
+  test.use({ locale: 'en-US', timezoneId: 'America/New_York' })
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'personal-country'))
+    await page.clock.setFixedTime(new Date('2026-11-17T20:04:00Z'))
+  })
+
+  test('dates follow my country until I go back to the one of the company', async ({ page }) => {
+    await page.goto('/lookups')
+    await expect(firstSearch(page)).toContainText('17 Nov 2026, 15:03')
+
+    await openProfile(page)
+    const country = page.getByRole('combobox', { name: 'Country' })
+    await expect(country).toHaveText('Same as the company (🇬🇧 United Kingdom)')
+    await country.click()
+    await page.getByRole('option', { name: 'United States' }).click()
+
+    await expect(notices(page).getByText('Country set to United States.')).toBeVisible()
+    await expect(country).toHaveText('🇺🇸 United States')
+    await page.reload()
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText('🇺🇸 United States')
+
+    await page.goto('/lookups')
+    await expect(firstSearch(page)).toContainText(/Nov 17, 2026, 3:03\sPM/)
+
+    await openProfile(page)
+    await page.getByRole('combobox', { name: 'Country' }).click()
+    await page.getByRole('option', { name: /^Same as the company/ }).click()
+
+    await expect(notices(page).getByText('You now use the country of the company.')).toBeVisible()
+    await page.reload()
+    await expect(page.getByRole('combobox', { name: 'Country' })).toHaveText(
+      'Same as the company (🇬🇧 United Kingdom)'
+    )
+
+    await page.goto('/lookups')
+    await expect(firstSearch(page)).toContainText('17 Nov 2026, 15:03')
   })
 })

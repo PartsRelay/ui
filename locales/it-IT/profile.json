@@ -34,12 +34,20 @@
   },
   "notices": {
     "name-saved": "Nome salvato.",
-    "left": "Hai lasciato {company} e il tuo account è stato eliminato."
+    "left": "Hai lasciato {company} e il tuo account è stato eliminato.",
+    "country": "Paese impostato su {country}.",
+    "company-country": "Ora usi il Paese dell'azienda."
   },
   "preferences": {
     "title": "Preferenze",
     "description": "La lingua di Parts Relay su questo dispositivo.",
     "language": "Lingua"
+  },
+  "country": {
+    "title": "Paese",
+    "description": "Le ricerche che avvii cercano targhe e ricambi in questo Paese, e date e numeri ne seguono i formati.",
+    "label": "Paese",
+    "company": "Come l'azienda ({country})"
   },
   "session": {
     "title": "Sessione",

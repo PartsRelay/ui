@@ -19,6 +19,7 @@ type CountrySelectProps = {
   error?: string
   value: string
   disabled?: boolean
+  children?: ReactNode
   onValueChange: (country: Country) => void
 }
 
@@ -30,6 +31,7 @@ export function CountrySelect({
   error,
   value,
   disabled,
+  children,
   onValueChange,
 }: CountrySelectProps) {
   const { t, i18n } = useTranslation()
@@ -48,6 +50,7 @@ export function CountrySelect({
       </TextField>
       <SelectContent>
         <SelectGroup>
+          {children}
           {countryOptions(i18n.language).map((country) => (
             <SelectItem key={country.value} value={country.value} textValue={country.label}>
               <span aria-hidden>{countryFlag(country.value)}</span> {country.label}

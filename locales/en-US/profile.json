@@ -34,12 +34,20 @@
   },
   "notices": {
     "name-saved": "Name saved.",
-    "left": "You left {company} and your account was deleted."
+    "left": "You left {company} and your account was deleted.",
+    "country": "Country set to {country}.",
+    "company-country": "You now use the country of the company."
   },
   "preferences": {
     "title": "Preferences",
     "description": "The language of Parts Relay on this device.",
     "language": "Language"
+  },
+  "country": {
+    "title": "Country",
+    "description": "The searches you start look for plates and parts in this country, and dates and numbers follow its formats.",
+    "label": "Country",
+    "company": "Same as the company ({country})"
   },
   "session": {
     "title": "Session",

@@ -1,0 +1,31 @@
+{
+  "title": "Order",
+  "heading": "Order from {company}",
+  "description": "Choose the parts you need and confirm. {company} receives the order and you get the confirmation on WhatsApp.",
+  "original": "Original",
+  "decrease": "One less of {name}",
+  "increase": "One more of {name}",
+  "selected": "{count, plural, =0 {No parts chosen} one {# part chosen} other {# parts chosen}}",
+  "confirm": "Confirm order",
+  "cancel": "Don't order",
+  "ordered": "Ordered parts",
+  "item": "{quantity} × {name}",
+  "back": "Back to WhatsApp",
+  "close": "You can close this page.",
+  "confirmed": {
+    "title": "Order sent",
+    "description": "{company} received your order. The confirmation is in your WhatsApp chat."
+  },
+  "cancelled": {
+    "title": "Order cancelled",
+    "description": "Nothing was sent to {company}. Search again on WhatsApp to order."
+  },
+  "unavailable": {
+    "title": "This link is no longer valid",
+    "description": "It has expired or the search is no longer available. Search again on WhatsApp to get a new link."
+  },
+  "decline": {
+    "title": "Close without ordering?",
+    "description": "The link closes and nothing is sent to {company}. To order later, search again on WhatsApp."
+  }
+}

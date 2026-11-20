@@ -10,11 +10,7 @@ export const MAX_COMPANIES = 3
 
 export type ContactValues = { phone: string; name: string }
 
-export function emptyContact(phoneInput: boolean): ContactValues {
-  return { phone: phoneInput ? '' : '+', name: '' }
-}
-
-export const withFixedPlus = (value: string) => `+${value.replace(/^\P{Nd}+|\+/gu, '')}`
+export const emptyContact: ContactValues = { phone: '', name: '' }
 
 export function withPlus(value: string) {
   const digits = value.replace(/\P{Nd}/gu, '')

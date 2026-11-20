@@ -9,7 +9,6 @@ import {
   newContact,
   phoneExample,
   phoneSchema,
-  withFixedPlus,
   withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { useAddContact } from '@/modules/contacts/ui/hooks/use-add-contact'
@@ -29,7 +28,6 @@ import {
   DialogTrigger,
 } from '@/ui/components/ui/dialog'
 import { FieldGroup } from '@/ui/components/ui/field'
-import { useFlag } from '@/ui/hooks/use-flag'
 
 export function AddContactDialog() {
   const { t } = useTranslation()
@@ -54,11 +52,9 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation()
   const add = useAddContact()
   const { workspace } = useMe()
-  const phoneInput = useFlag('phone-input')
-  const typed = phoneInput ? withPlus : withFixedPlus
-  const example = phoneInput ? phoneExample(workspace.country) : null
+  const example = phoneExample(workspace.country)
   const form = useForm({
-    defaultValues: emptyContact(phoneInput),
+    defaultValues: emptyContact,
     onSubmit: async ({ value, formApi }) => {
       try {
         await add.mutateAsync(newContact(value))
@@ -95,9 +91,9 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               autoComplete="off"
               placeholder={example?.number ?? undefined}
               onInput={({ currentTarget: input }) => {
-                const value = typed(input.value)
+                const value = withPlus(input.value)
                 if (value === input.value) return
-                const caret = typed(input.value.slice(0, input.selectionStart ?? 0)).length
+                const caret = withPlus(input.value.slice(0, input.selectionStart ?? 0)).length
                 input.value = value
                 input.setSelectionRange(caret, caret)
               }}

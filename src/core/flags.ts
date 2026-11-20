@@ -2,7 +2,7 @@ import type { PostHog } from 'posthog-js'
 import { env } from '@/env'
 import { mocksEnabled } from '@/mocks/enabled'
 
-export type Flag = 'phone-input'
+export type Flag = never
 
 const listeners = new Set<() => void>()
 
@@ -33,7 +33,5 @@ export function onFlags(listener: () => void) {
 }
 
 export function flagEnabled(flag: string) {
-  if (mocksEnabled) return localStorage.getItem('mock.flags')?.split(',').includes(flag) === true
-
   return posthog?.isFeatureEnabled(flag) === true
 }

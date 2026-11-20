@@ -6,36 +6,15 @@ import {
   phoneExample,
   phoneSchema,
   renameChange,
-  withFixedPlus,
   withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { contactFixture, coreError } from '@/modules/contacts/tests/unit/fixtures'
 
 const phoneError = (value: string) => phoneSchema.safeParse(value).error?.issues[0]?.message
 
-describe('new contact without the phone-input flag', () => {
-  it('starts the number with a plus that cannot be removed', () => {
-    expect(emptyContact(false).phone).toBe('+')
-    expect(withFixedPlus('')).toBe('+')
-    expect(withFixedPlus('39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withFixedPlus('3+9 300 000 0000')).toBe('+39 300 000 0000')
-  })
-
-  it('keeps one plus when a pasted number brings its own', () => {
-    expect(withFixedPlus('+39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withFixedPlus('++39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withFixedPlus('+39 300 000 0000+')).toBe('+39 300 000 0000')
-  })
-
-  it('drops what a pasted number has before its first digit', () => {
-    expect(withFixedPlus(' +39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withFixedPlus('Tel. +39 300 000 0000')).toBe('+39 300 000 0000')
-  })
-})
-
-describe('new contact with the phone-input flag', () => {
+describe('new contact', () => {
   it('starts the number empty and puts a plus before a first digit', () => {
-    expect(emptyContact(true).phone).toBe('')
+    expect(emptyContact.phone).toBe('')
     expect(withPlus('')).toBe('')
     expect(withPlus('3')).toBe('+3')
     expect(withPlus('39 300 000 0000')).toBe('+393000000000')

@@ -12,7 +12,7 @@ import {
   withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { useAddContact } from '@/modules/contacts/ui/hooks/use-add-contact'
-import { useRegionalCountry } from '@/modules/workspaces/ui/hooks/use-regional-country'
+import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { Form } from '@/ui/components/form'
 import { InputField } from '@/ui/components/input-field'
 import { SubmitButton } from '@/ui/components/submit-button'
@@ -50,9 +50,9 @@ export function AddContactDialog() {
 
 function AddContactForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation()
-  const country = useRegionalCountry()
-  const example = country && phoneExample(country)
   const add = useAddContact()
+  const { workspace } = useMe()
+  const example = phoneExample(workspace.country)
   const form = useForm({
     defaultValues: emptyContact,
     onSubmit: async ({ value, formApi }) => {
@@ -83,12 +83,13 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               required
               description={
                 example
-                  ? t('contacts.add.phone-hint-country', { example })
+                  ? t('contacts.add.phone-prefix-hint', { prefix: example.prefix })
                   : t('contacts.add.phone-hint')
               }
               type="tel"
               autoFocus
               autoComplete="off"
+              placeholder={example?.number ?? undefined}
               onInput={({ currentTarget: input }) => {
                 const value = withPlus(input.value)
                 if (value === input.value) return

@@ -1,4 +1,4 @@
-import { type CountryCode, getCountryCallingCode, getExampleNumber } from 'libphonenumber-js'
+import { getCountryCallingCode, getExampleNumber, isSupportedCountry } from 'libphonenumber-js'
 import examples from 'libphonenumber-js/mobile/examples'
 import { z } from 'zod'
 import type { ContactObject, PostApiV1WorkspaceContactsBody } from '@/core/api/models'
@@ -10,9 +10,22 @@ export const MAX_COMPANIES = 3
 
 export type ContactValues = { phone: string; name: string }
 
-export const emptyContact: ContactValues = { phone: '+', name: '' }
+export const emptyContact: ContactValues = { phone: '', name: '' }
 
-export const withPlus = (value: string) => `+${value.replace(/^\P{Nd}+|\+/gu, '')}`
+export function withPlus(value: string) {
+  const digits = value.replace(/\P{Nd}/gu, '')
+
+  return digits || value.includes('+') ? `+${digits}` : ''
+}
+
+export function phoneExample(country: Country | null) {
+  if (!country || !isSupportedCountry(country)) return null
+
+  return {
+    number: getExampleNumber(country, examples)?.number ?? null,
+    prefix: `+${getCountryCallingCode(country)}`,
+  }
+}
 
 export function newContact({ phone, name }: ContactValues): PostApiV1WorkspaceContactsBody {
   const trimmed = name.trim()
@@ -35,11 +48,3 @@ export function renameChange(value: string, contact: ContactObject): ContactChan
 }
 
 export const phoneSchema = z.string().regex(/[^+\s]/, 'contacts.add.errors.phone-required')
-
-export function phoneExample(country: Country) {
-  const code = country as CountryCode
-
-  return (
-    getExampleNumber(code, examples)?.formatInternational() ?? `+${getCountryCallingCode(code)}`
-  )
-}

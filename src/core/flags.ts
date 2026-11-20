@@ -2,7 +2,7 @@ import type { PostHog } from 'posthog-js'
 import { env } from '@/env'
 import { mocksEnabled } from '@/mocks/enabled'
 
-export type Flag = 'regional-plates'
+export type Flag = 'regional-format'
 
 const listeners = new Set<() => void>()
 

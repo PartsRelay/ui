@@ -47,11 +47,11 @@ describe('flags', () => {
 
   it('reads the flags of mock.flags with the mocks', async () => {
     env.MOCKS = true
-    vi.stubGlobal('localStorage', { getItem: () => 'new-search,regional-plates' })
+    vi.stubGlobal('localStorage', { getItem: () => 'new-search,regional-format' })
 
     const { flagEnabled } = await signIn('7')
 
-    expect(flagEnabled('regional-plates')).toBe(true)
+    expect(flagEnabled('regional-format')).toBe(true)
     expect(flagEnabled('regional')).toBe(false)
   })
 

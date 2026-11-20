@@ -9,7 +9,7 @@ import { lookupsQuery } from '@/modules/lookups/core/lookups.query'
 import { LookupFilters } from '@/modules/lookups/ui/lookup-filters'
 import { LookupsTable } from '@/modules/lookups/ui/lookups-table'
 import { NewLookupButton } from '@/modules/lookups/ui/new-lookup-button'
-import { usePlateCountry } from '@/modules/lookups/ui/hooks/use-plate-country'
+import { useRegionalCountry } from '@/modules/workspaces/ui/hooks/use-regional-country'
 import { useFormatLocale } from '@/modules/workspaces/ui/hooks/use-format-locale'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { CardHeading } from '@/ui/components/card-heading'
@@ -72,7 +72,7 @@ function NoMatches() {
 export function LookupQueue() {
   const { t } = useTranslation()
   const locale = useFormatLocale()
-  const plateCountry = usePlateCountry()
+  const plateCountry = useRegionalCountry()
   const search = route.useSearch()
   const list = useQuery(lookupsQuery(lookupListParams(search)))
   const narrowed = filtered(search)

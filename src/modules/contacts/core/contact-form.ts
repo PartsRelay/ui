@@ -1,7 +1,10 @@
+import { type CountryCode, getCountryCallingCode, getExampleNumber } from 'libphonenumber-js'
+import examples from 'libphonenumber-js/mobile/examples'
 import { z } from 'zod'
 import type { ContactObject, PostApiV1WorkspaceContactsBody } from '@/core/api/models'
 import { fieldErrors, toErrorBody } from '@/core/errors'
 import type { ContactChange } from '@/modules/contacts/core/contacts.mutation'
+import type { Country } from '@/modules/workspaces/core/country'
 
 export const MAX_COMPANIES = 3
 
@@ -32,3 +35,11 @@ export function renameChange(value: string, contact: ContactObject): ContactChan
 }
 
 export const phoneSchema = z.string().regex(/[^+\s]/, 'contacts.add.errors.phone-required')
+
+export function phoneExample(country: Country) {
+  const code = country as CountryCode
+
+  return (
+    getExampleNumber(code, examples)?.formatInternational() ?? `+${getCountryCallingCode(code)}`
+  )
+}

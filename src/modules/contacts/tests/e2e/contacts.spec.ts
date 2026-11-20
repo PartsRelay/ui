@@ -119,3 +119,42 @@ test('a number with only the plus is still missing', async ({ page }) => {
   await expect(phone).toHaveAccessibleDescription('Enter the WhatsApp number.')
   await expect(phone).toHaveValue('+')
 })
+
+test('without the regional-format flag every number keeps its prefix', async ({ page }) => {
+  await page.getByRole('searchbox', { name: 'Search' }).fill('oak')
+  await expect(page.getByRole('row', { name: /Oakfield Garage/ })).toContainText('+44 7700 900101')
+
+  await page.getByRole('button', { name: 'Add contact' }).click()
+  await expect(
+    page.getByRole('dialog').getByRole('textbox', { name: 'WhatsApp number' })
+  ).toHaveAccessibleDescription('With the international prefix, for example +1.')
+})
+
+test.describe('with the regional-format flag in a British company', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-format'))
+    await page.goto('/contacts')
+    await expect(page.getByRole('heading', { level: 1, name: 'Contacts' })).toBeVisible()
+  })
+
+  test('a British number is written as in the UK, another one with its prefix', async ({
+    page,
+  }) => {
+    const search = page.getByRole('searchbox', { name: 'Search' })
+
+    await search.fill('oak')
+    await expect(page.getByRole('row', { name: /Oakfield Garage/ })).toContainText('07700 900101')
+    await search.fill('capitol')
+    await expect(page.getByRole('row', { name: /Capitol Auto Care/ })).toContainText(
+      '+1 202 555 0106'
+    )
+  })
+
+  test('a new number shows a British example', async ({ page }) => {
+    await page.getByRole('button', { name: 'Add contact' }).click()
+
+    await expect(
+      page.getByRole('dialog').getByRole('textbox', { name: 'WhatsApp number' })
+    ).toHaveAccessibleDescription('With the international prefix, for example +44 7400 123456.')
+  })
+})

@@ -460,7 +460,7 @@ async function chooseItaly(page: Page) {
 }
 
 test.describe('in an Italian company', () => {
-  test('without the regional-plates flag the plates stay as the core keeps them', async ({
+  test('without the regional-format flag the plates stay as the core keeps them', async ({
     page,
   }) => {
     await chooseItaly(page)
@@ -475,9 +475,9 @@ test.describe('in an Italian company', () => {
     )
   })
 
-  test.describe('with the regional-plates flag', () => {
+  test.describe('with the regional-format flag', () => {
     test.beforeEach(async ({ page }) => {
-      await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-plates'))
+      await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-format'))
       await chooseItaly(page)
     })
 

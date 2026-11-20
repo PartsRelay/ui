@@ -38,6 +38,20 @@ describe('contact rows', () => {
     ).toBeNull()
   })
 
+  it('writes a number of the given country as there, another one with its prefix', () => {
+    const italian = contactFixture(7, { name: null, profileName: null, waId: '393331234567' })
+    const american = contactFixture(8, { name: null, profileName: null, waId: '12025550106' })
+
+    expect(contactRow(italian, owner, 'en-US', 'IT')).toMatchObject({
+      name: '333 123 4567',
+      phone: '333 123 4567',
+    })
+    expect(contactRow(american, owner, 'en-US', 'IT').phone).toBe('+1 202 555 0106')
+    expect(contactRow(american, owner, 'en-US', 'US').phone).toBe('(202) 555-0106')
+    expect(contactRow(italian, owner, 'en-US').phone).toBe('+39 333 123 4567')
+    expect(contactRow(oakfield, owner, 'en-US', 'GB').phone).toBe('07700 900101')
+  })
+
   it('groups the number by country and keeps unknown ones', () => {
     expect(contactName(contactFixture(5, { profileName: null, waId: '12025550106' }))).toBe(
       '+1 202 555 0106'

@@ -3,6 +3,7 @@ import {
   contactFieldErrors,
   emptyContact,
   newContact,
+  phoneExample,
   phoneSchema,
   renameChange,
   withPlus,
@@ -72,5 +73,13 @@ describe('rename', () => {
     expect(renameChange('   ', contact)).toEqual({ name: null })
     expect(renameChange(' Westfield Motors', contact)).toEqual({ name: 'Westfield Motors' })
     expect(renameChange('', contactFixture(5))).toBeNull()
+  })
+})
+
+describe('phone example', () => {
+  it('is a mobile number of the country with its prefix', () => {
+    expect(phoneExample('IT')).toBe('+39 312 345 6789')
+    expect(phoneExample('US')).toBe('+1 201 555 0123')
+    expect(phoneExample('DE')).toBe('+49 1512 3456789')
   })
 })

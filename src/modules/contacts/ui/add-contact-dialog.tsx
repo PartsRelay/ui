@@ -7,10 +7,12 @@ import {
   emptyContact,
   MAX_COMPANIES,
   newContact,
+  phoneExample,
   phoneSchema,
   withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { useAddContact } from '@/modules/contacts/ui/hooks/use-add-contact'
+import { useRegionalCountry } from '@/modules/workspaces/ui/hooks/use-regional-country'
 import { Form } from '@/ui/components/form'
 import { InputField } from '@/ui/components/input-field'
 import { SubmitButton } from '@/ui/components/submit-button'
@@ -48,6 +50,8 @@ export function AddContactDialog() {
 
 function AddContactForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation()
+  const country = useRegionalCountry()
+  const example = country && phoneExample(country)
   const add = useAddContact()
   const form = useForm({
     defaultValues: emptyContact,
@@ -77,7 +81,11 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               field={field}
               label={t('contacts.add.phone')}
               required
-              description={t('contacts.add.phone-hint')}
+              description={
+                example
+                  ? t('contacts.add.phone-hint-country', { example })
+                  : t('contacts.add.phone-hint')
+              }
               type="tel"
               autoFocus
               autoComplete="off"

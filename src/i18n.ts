@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import ICU from 'i18next-icu'
 import { initReactI18next } from 'react-i18next'
+import { formatLocale } from '@/core/format-locale'
 
 const files = import.meta.glob<Record<string, unknown>>('../locales/*/*.json', {
   eager: true,
@@ -17,12 +18,25 @@ for (const [path, messages] of Object.entries(files)) {
 
 export const locales = Object.keys(resources)
 
+let textCountry: string | null = null
+
+const icu = new ICU({ parseLngForICU: (language) => formatLocale(language, textCountry) })
+
+// Numbers in texts follow this country, else the language
+export function setTextCountry(country: string | null) {
+  if (country === textCountry) return
+
+  textCountry = country
+  icu.clearCache()
+  i18n.emit('languageChanged', i18n.language)
+}
+
 i18n.on('languageChanged', (language) =>
   globalThis.document?.documentElement.setAttribute('lang', language)
 )
 
 void i18n
-  .use(ICU)
+  .use(icu)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({

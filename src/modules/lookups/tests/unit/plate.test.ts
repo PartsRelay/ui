@@ -39,8 +39,12 @@ describe('plateExample', () => {
     expect(plateExample('GB')).toBe('AB12 CDE')
   })
 
-  it('has none for a country without a format or without a country', () => {
-    expect(plateExample('US')).toBeNull()
+  it('shows a plate as the core keeps it for a country without a format', () => {
+    expect(plateExample('US')).toBe('7ABC123')
+    expect(plateExample('AT')).toBe('G123AB')
+  })
+
+  it('has none without a country', () => {
     expect(plateExample(null)).toBeNull()
   })
 })

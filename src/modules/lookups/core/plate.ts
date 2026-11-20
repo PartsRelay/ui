@@ -12,6 +12,7 @@ const halves = (group: string) =>
   group.length === 4 ? [group.slice(0, 2), group.slice(2)] : [group]
 
 const PLATES: Partial<Record<Country, PlateFormat>> = {
+  AT: { example: 'G123AB' },
   BE: { example: '1-ABC-234', pattern: /^(\d)([A-Z]{3})(\d{3})$/, format: '$1-$2-$3' },
   BG: { example: 'CA 1234 AB', pattern: /^([A-Z]{1,2})(\d{4})([A-Z]{2})$/, format: '$1 $2 $3' },
   CH: { example: 'ZH 123456', pattern: /^([A-Z]{2})(\d{1,6})$/, format: '$1 $2' },
@@ -26,7 +27,9 @@ const PLATES: Partial<Record<Country, PlateFormat>> = {
   GB: { example: 'AB12 CDE', pattern: /^([A-Z]{2}\d{2})([A-Z]{3})$/, format: '$1 $2' },
   GR: { example: 'ABE-1234', pattern: /^([A-Z]{3})(\d{4})$/, format: '$1-$2' },
   HR: { example: 'ZG 1234-AB', pattern: /^([A-Z]{2})(\d{3,4})([A-Z]{1,2})$/, format: '$1 $2-$3' },
+  HU: { example: 'ABCD123' },
   IE: { example: '12-D-12345', pattern: /^(\d{2,3})([A-Z]{1,2})(\d{1,6})$/, format: '$1-$2-$3' },
+  IS: { example: 'AB123' },
   IT: { example: 'AB 123 CD', pattern: /^([A-Z]{2})(\d{3})([A-Z]{2})$/, format: '$1 $2 $3' },
   LI: { example: 'FL 12345', pattern: /^(FL)(\d{1,5})$/, format: '$1 $2' },
   LT: { example: 'ABC 123', pattern: /^([A-Z]{3})(\d{3})$/, format: '$1 $2' },
@@ -47,7 +50,9 @@ const PLATES: Partial<Record<Country, PlateFormat>> = {
   },
   RO: { example: 'B 123 ABC', pattern: /^([A-Z]{1,2})(\d{2,3})([A-Z]{3})$/, format: '$1 $2 $3' },
   SE: { example: 'ABC 123', pattern: /^([A-Z]{3})(\d{2}[A-Z0-9])$/, format: '$1 $2' },
+  SI: { example: 'LJAB123' },
   SK: { example: 'BA-123AB', pattern: /^([A-Z]{2})(\d{3}[A-Z]{2})$/, format: '$1-$2' },
+  US: { example: '7ABC123' },
 }
 
 export function formatPlate(plate: string, country: Country | null) {

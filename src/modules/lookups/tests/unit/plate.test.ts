@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { formatPlate, plateExample } from '@/modules/lookups/core/plate'
+import { formatPlate, plateCountry, plateExample } from '@/modules/lookups/core/plate'
 
 describe('formatPlate', () => {
   it('writes a plate as the country of the company does', () => {
@@ -46,5 +46,18 @@ describe('plateExample', () => {
 
   it('has none without a country', () => {
     expect(plateExample(null)).toBeNull()
+  })
+})
+
+describe('plateCountry', () => {
+  it('is the country of the search with contact-country on, else of the company', () => {
+    expect(plateCountry({ country: 'US' }, 'IT', true)).toBe('US')
+    expect(plateCountry({ country: 'US' }, 'IT', false)).toBe('IT')
+    expect(plateCountry({ country: null }, 'IT', true)).toBe('IT')
+    expect(plateCountry({ country: 'JP' }, 'IT', true)).toBe('IT')
+  })
+
+  it('is none without the regional-format country', () => {
+    expect(plateCountry({ country: 'US' }, null, true)).toBeNull()
   })
 })

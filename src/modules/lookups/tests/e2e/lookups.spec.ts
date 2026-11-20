@@ -502,4 +502,41 @@ test.describe('in an Italian company', () => {
       await expect(queue(page).getByRole('row').filter({ hasNotText: 'DK 318 MP' })).toHaveCount(1)
     })
   })
+
+  test.describe('with the contact-country flag too', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() =>
+        localStorage.setItem('mock.flags', 'regional-format,contact-country')
+      )
+      await chooseItaly(page)
+    })
+
+    test('the plate of a contact search is written as the country of its number', async ({
+      page,
+    }) => {
+      const search = page.getByRole('searchbox', { name: 'Plate or VIN' })
+
+      await search.fill('DK318MP')
+      await expect(queue(page).getByRole('row', { name: /Capitol Auto Care/ })).toContainText(
+        'DK318MP'
+      )
+      await expect(
+        queue(page)
+          .getByRole('row', { name: /Baker and Sons Motors/ })
+          .first()
+      ).toContainText('DK 318 MP')
+    })
+  })
+
+  test('without the contact-country flag every plate is written as the company country', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-format'))
+    await chooseItaly(page)
+    await page.getByRole('searchbox', { name: 'Plate or VIN' }).fill('DK318MP')
+
+    await expect(queue(page).getByRole('row', { name: /Capitol Auto Care/ })).toContainText(
+      'DK 318 MP'
+    )
+  })
 })

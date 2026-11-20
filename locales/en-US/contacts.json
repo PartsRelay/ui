@@ -60,7 +60,7 @@
     "description": "The number can search parts on WhatsApp right away. A number can belong to up to {max} companies, and picks one for each search.",
     "phone": "WhatsApp number",
     "phone-hint": "With the international prefix, for example +1.",
-    "phone-placeholder": "+12025550123",
+    "phone-prefix-hint": "With the international prefix, for example {prefix}.",
     "name": "Name",
     "name-hint": "Optional. Shown instead of the WhatsApp name.",
     "submit": "Add contact",

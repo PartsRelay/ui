@@ -1,18 +1,34 @@
+import { getCountryCallingCode, getExampleNumber, isSupportedCountry } from 'libphonenumber-js'
+import examples from 'libphonenumber-js/mobile/examples'
 import { z } from 'zod'
 import type { ContactObject, PostApiV1WorkspaceContactsBody } from '@/core/api/models'
 import { fieldErrors, toErrorBody } from '@/core/errors'
 import type { ContactChange } from '@/modules/contacts/core/contacts.mutation'
+import type { Country } from '@/modules/workspaces/core/country'
 
 export const MAX_COMPANIES = 3
 
 export type ContactValues = { phone: string; name: string }
 
-export const emptyContact: ContactValues = { phone: '', name: '' }
+export function emptyContact(phoneInput: boolean): ContactValues {
+  return { phone: phoneInput ? '' : '+', name: '' }
+}
+
+export const withFixedPlus = (value: string) => `+${value.replace(/^\P{Nd}+|\+/gu, '')}`
 
 export function withPlus(value: string) {
   const digits = value.replace(/\P{Nd}/gu, '')
 
   return digits || value.includes('+') ? `+${digits}` : ''
+}
+
+export function phoneExample(country: Country | null) {
+  if (!country || !isSupportedCountry(country)) return null
+
+  return {
+    number: getExampleNumber(country, examples)?.number ?? null,
+    prefix: `+${getCountryCallingCode(country)}`,
+  }
 }
 
 export function newContact({ phone, name }: ContactValues): PostApiV1WorkspaceContactsBody {

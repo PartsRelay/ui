@@ -7,10 +7,13 @@ import {
   emptyContact,
   MAX_COMPANIES,
   newContact,
+  phoneExample,
   phoneSchema,
+  withFixedPlus,
   withPlus,
 } from '@/modules/contacts/core/contact-form'
 import { useAddContact } from '@/modules/contacts/ui/hooks/use-add-contact'
+import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { Form } from '@/ui/components/form'
 import { InputField } from '@/ui/components/input-field'
 import { SubmitButton } from '@/ui/components/submit-button'
@@ -26,6 +29,7 @@ import {
   DialogTrigger,
 } from '@/ui/components/ui/dialog'
 import { FieldGroup } from '@/ui/components/ui/field'
+import { useFlag } from '@/ui/hooks/use-flag'
 
 export function AddContactDialog() {
   const { t } = useTranslation()
@@ -49,8 +53,12 @@ export function AddContactDialog() {
 function AddContactForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation()
   const add = useAddContact()
+  const { workspace } = useMe()
+  const phoneInput = useFlag('phone-input')
+  const typed = phoneInput ? withPlus : withFixedPlus
+  const example = phoneInput ? phoneExample(workspace.country) : null
   const form = useForm({
-    defaultValues: emptyContact,
+    defaultValues: emptyContact(phoneInput),
     onSubmit: async ({ value, formApi }) => {
       try {
         await add.mutateAsync(newContact(value))
@@ -77,15 +85,19 @@ function AddContactForm({ onDone }: { onDone: () => void }) {
               field={field}
               label={t('contacts.add.phone')}
               required
-              description={t('contacts.add.phone-hint')}
+              description={
+                example
+                  ? t('contacts.add.phone-prefix-hint', { prefix: example.prefix })
+                  : t('contacts.add.phone-hint')
+              }
               type="tel"
               autoFocus
               autoComplete="off"
-              placeholder={t('contacts.add.phone-placeholder')}
+              placeholder={example?.number ?? undefined}
               onInput={({ currentTarget: input }) => {
-                const value = withPlus(input.value)
+                const value = typed(input.value)
                 if (value === input.value) return
-                const caret = withPlus(input.value.slice(0, input.selectionStart ?? 0)).length
+                const caret = typed(input.value.slice(0, input.selectionStart ?? 0)).length
                 input.value = value
                 input.setSelectionRange(caret, caret)
               }}

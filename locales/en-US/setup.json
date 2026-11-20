@@ -1,17 +1,18 @@
 {
   "title": "Set up your company",
-  "description": "Name your company and choose the language of its WhatsApp replies. The owner can change both later.",
+  "description": "Name your company and choose its country. The owner can change both later.",
   "form": {
     "name": "Company name",
     "name-hint": "Your team sees this name.",
-    "language": "WhatsApp language",
-    "language-hint": "Parts Relay replies to your contacts on WhatsApp in this language.",
+    "country": "Country",
+    "country-hint": "Plates are searched in this country, and dates and numbers follow its formats.",
     "user-name": "Your name",
     "user-name-hint": "Your team sees it next to your email.",
     "submit": "Continue"
   },
   "errors": {
     "name-required": "Enter your company name.",
+    "country-required": "Choose the country of your company.",
     "user-name-required": "Enter your name."
   },
   "invitation": {

@@ -24,7 +24,7 @@ const member = (id: string, role: Role, name: string): Member => ({
 const workspace = (): Workspace => ({
   id: '1',
   name: 'Redwood Parts Ltd',
-  locale: 'en-US',
+  country: 'GB',
   setup: 'done',
   metadata: { setup: 'done' },
   members: [member('2', 'admin', 'Julia Bennett'), member('1', 'owner', 'Mark Reed')],

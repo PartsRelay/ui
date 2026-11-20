@@ -14,7 +14,7 @@ const redwoodParts = (): FullOrganization => ({
   slug: 'redwood-parts',
   logo: null,
   metadata: '{"setup":"done"}',
-  locale: 'en-US',
+  country: 'GB',
   createdAt: new Date('2025-09-16T10:00:00Z'),
   members: [],
   invitations: [],
@@ -40,10 +40,10 @@ describe('updateCompany', () => {
     expect(update).toHaveBeenCalledWith({ data: { name: 'Redwood Motors Ltd' } })
   })
 
-  it('restores the language when the core refuses', async () => {
+  it('restores the country when the core refuses', async () => {
     update.mockRejectedValue(new Error('Refused'))
 
-    await expect(updateCompany(client, { locale: 'it-IT' })).rejects.toThrow('Refused')
-    expect(client.getQueryData(workspaceKey)?.locale).toBe('en-US')
+    await expect(updateCompany(client, { country: 'IE' })).rejects.toThrow('Refused')
+    expect(client.getQueryData(workspaceKey)?.country).toBe('GB')
   })
 })

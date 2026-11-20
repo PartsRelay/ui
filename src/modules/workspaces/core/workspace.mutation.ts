@@ -4,7 +4,7 @@ import { authClient } from '@/modules/auth/core/auth.client'
 import type { FullOrganization } from '@/modules/workspaces/core/workspace'
 import { workspaceKey } from '@/modules/workspaces/core/workspace.query'
 
-type CompanyChange = Partial<Pick<FullOrganization, 'name' | 'locale'>>
+type CompanyChange = Partial<Pick<FullOrganization, 'name' | 'country'>>
 
 export function updateCompany(client: QueryClient, change: CompanyChange) {
   return optimistic<FullOrganization>(

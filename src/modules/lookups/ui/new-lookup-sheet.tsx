@@ -1,17 +1,23 @@
 import { useForm } from '@tanstack/react-form'
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowRightIcon } from 'lucide-react'
+import { ArrowRightIcon, ListChecksIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { LookupPreviewObject } from '@/core/api/models'
 import {
   emptyLookup,
   identifierSchemas,
   identifiers,
   type LookupPrefill,
+  type LookupValues,
   lookupFieldErrors,
   newLookup,
   querySchema,
   toIdentifier,
 } from '@/modules/lookups/core/lookup-form'
+import { previewFieldErrors } from '@/modules/lookups/core/parts-preview'
+import { PartsReview } from '@/modules/lookups/ui/parts-review'
+import { usePreviewLookup } from '@/modules/lookups/ui/hooks/use-preview-lookup'
 import { useStartLookup } from '@/modules/lookups/ui/hooks/use-start-lookup'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { Callout } from '@/ui/components/callout'
@@ -30,6 +36,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/ui/components/ui/sheet'
+import { useFlag } from '@/ui/hooks/use-flag'
 import { useReturnFocus } from '@/ui/hooks/use-return-focus'
 
 type NewLookupSheetProps = { open: boolean; prefill: LookupPrefill; onClose: () => void }
@@ -43,20 +50,66 @@ export function NewLookupSheet({ open, prefill, onClose }: NewLookupSheetProps) 
         onCloseAutoFocus={returnFocus}
         className="gap-0 overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-lg"
       >
-        <NewLookupForm prefill={prefill} />
+        <NewLookup prefill={prefill} />
       </SheetContent>
     </Sheet>
   )
 }
 
-function NewLookupForm({ prefill }: { prefill: LookupPrefill }) {
+type Preview = { values: LookupValues; result: LookupPreviewObject }
+
+function NewLookup({ prefill }: { prefill: LookupPrefill }) {
+  const checkParts = useFlag('parts-preview')
+  const [values, setValues] = useState(() => emptyLookup(prefill))
+  const [preview, setPreview] = useState<Preview | null>(null)
+
+  if (preview) {
+    return (
+      <PartsReview
+        values={preview.values}
+        preview={preview.result}
+        onEdit={() => setPreview(null)}
+      />
+    )
+  }
+
+  return (
+    <NewLookupForm
+      values={values}
+      checkParts={checkParts}
+      onPreview={(next) => {
+        setValues(next.values)
+        setPreview(next)
+      }}
+    />
+  )
+}
+
+type NewLookupFormProps = {
+  values: LookupValues
+  checkParts: boolean
+  onPreview: (preview: Preview) => void
+}
+
+function NewLookupForm({ values, checkParts, onPreview }: NewLookupFormProps) {
   const { t } = useTranslation()
   const { me } = useMe()
   const navigate = useNavigate()
   const start = useStartLookup()
+  const check = usePreviewLookup()
   const form = useForm({
-    defaultValues: emptyLookup(prefill),
+    defaultValues: values,
     onSubmit: async ({ value, formApi }) => {
+      if (checkParts) {
+        try {
+          onPreview({ values: value, result: await check.mutateAsync(newLookup(value)) })
+        } catch (error) {
+          const fields = previewFieldErrors(error)
+          if (fields) formApi.setErrorMap({ onSubmit: { fields } })
+        }
+        return
+      }
+
       try {
         const { id } = await start.mutateAsync(newLookup(value))
         await navigate({
@@ -138,8 +191,12 @@ function NewLookupForm({ prefill }: { prefill: LookupPrefill }) {
           <Button variant="outline">{t('confirm.cancel')}</Button>
         </SheetClose>
         <SubmitButton form={form}>
-          {t('lookups.new.submit')}
-          <ArrowRightIcon data-icon="inline-end" />
+          {checkParts ? t('lookups.new.check') : t('lookups.new.submit')}
+          {checkParts ? (
+            <ListChecksIcon data-icon="inline-end" />
+          ) : (
+            <ArrowRightIcon data-icon="inline-end" />
+          )}
         </SubmitButton>
       </SheetFooter>
     </Form>

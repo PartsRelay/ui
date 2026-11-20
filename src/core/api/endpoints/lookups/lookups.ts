@@ -31,7 +31,9 @@ import type {
   ErrorBody,
   GetApiV1LookupsLookupId200,
   PostApiV1Lookups202,
-  PostApiV1LookupsBody
+  PostApiV1LookupsBody,
+  PostApiV1LookupsPreview200,
+  PostApiV1LookupsPreviewBody
 } from '../../models';
 
 import { http } from '../../../http/client';
@@ -118,6 +120,67 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPostApiV1LookupsMutationOptions(options), queryClient);
     }
+    export const postApiV1LookupsPreview = (
+    postApiV1LookupsPreviewBody?: BodyType<PostApiV1LookupsPreviewBody>,
+ options?: SecondParameter<typeof http>,signal?: AbortSignal
+) => {
+
+
+      return http<PostApiV1LookupsPreview200>(
+      {url: `/api/v1/lookups/preview`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postApiV1LookupsPreviewBody, signal
+    },
+      options);
+    }
+
+
+
+
+export const getPostApiV1LookupsPreviewMutationKey = () => ['postApiV1LookupsPreview'] as const;
+
+export const getPostApiV1LookupsPreviewMutationOptions = <TError = ErrorType<ErrorBody>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1LookupsPreview>>, TError,PostApiV1LookupsPreviewMutationVariables, TContext>, request?: SecondParameter<typeof http>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1LookupsPreview>>, TError,PostApiV1LookupsPreviewMutationVariables, TContext> => {
+
+const mutationKey = getPostApiV1LookupsPreviewMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1LookupsPreview>>, PostApiV1LookupsPreviewMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiV1LookupsPreview(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiV1LookupsPreviewMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1LookupsPreview>>>
+    export type PostApiV1LookupsPreviewMutationBody = BodyType<PostApiV1LookupsPreviewBody> | undefined
+    export type PostApiV1LookupsPreviewMutationError = ErrorType<ErrorBody>
+    export type PostApiV1LookupsPreviewMutationVariables = {data?: BodyType<PostApiV1LookupsPreviewBody>}
+
+    export const usePostApiV1LookupsPreview = <TError = ErrorType<ErrorBody>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1LookupsPreview>>, TError,PostApiV1LookupsPreviewMutationVariables, TContext>, request?: SecondParameter<typeof http>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiV1LookupsPreview>>,
+        TError,
+        PostApiV1LookupsPreviewMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostApiV1LookupsPreviewMutationOptions(options), queryClient);
+    }
     export const getApiV1LookupsLookupId = (
     lookupId: string,
  options?: SecondParameter<typeof http>,signal?: AbortSignal
@@ -186,7 +249,6 @@ export function useGetApiV1LookupsLookupId<TData = Awaited<ReturnType<typeof get
  lookupId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1LookupsLookupId<TData = Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError = ErrorType<ErrorBody>>(
  lookupId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -238,7 +300,6 @@ export function useGetApiV1LookupsLookupIdSuspense<TData = Awaited<ReturnType<ty
  lookupId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1LookupsLookupIdSuspense<TData = Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError = ErrorType<ErrorBody>>(
  lookupId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient

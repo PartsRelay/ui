@@ -90,7 +90,8 @@
     },
     "vin": "VIN",
     "vin-hint": "17 letters and digits, without I, O and Q.",
-    "vin-placeholder": "WVWZZZAUZHW204411"
+    "vin-placeholder": "WVWZZZAUZHW204411",
+    "check": "Check the parts"
   },
   "fitment": "Results are identification guidance. Always confirm vehicle fitment before purchase.",
   "detail": {
@@ -155,6 +156,30 @@
     "top": {
       "title": "Top searchers",
       "description": "Last {days} days · Only the owner sees this"
+    }
+  },
+  "preview": {
+    "eyebrow": "New request · Check",
+    "title": "Check the parts.",
+    "description": "These are the parts read in your request, with the catalog categories they will be searched in. If something is wrong, change the request.",
+    "vehicle": "Vehicle",
+    "parts": "Parts read in the request",
+    "found": "Searched in {categories}",
+    "missing": "Not available for this vehicle",
+    "some-missing": "The parts not available for this vehicle are left out of the search.",
+    "none": {
+      "title": "No part available",
+      "body": "None of the parts of the request is in the catalog of this vehicle. Change the request."
+    },
+    "unread": {
+      "title": "No part read",
+      "body": "The request names no part we can search. Change the request, for example front brake pads."
+    },
+    "edit": "Change the request",
+    "start": "Start search",
+    "errors": {
+      "plate-not-found": "No vehicle found with this plate. Check it.",
+      "vin-not-found": "No vehicle found with this VIN. Check it."
     }
   }
 }

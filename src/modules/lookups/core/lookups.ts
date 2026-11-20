@@ -95,7 +95,14 @@ export function lookupListParams({
 }: LookupsSearch): GetApiV1WorkspaceLookupsParams {
   const requester = searcherType && searcherId ? { searcherType, searcherId } : {}
 
-  return { page, ...requester, search, status, source, days }
+  return {
+    page,
+    ...requester,
+    search: search?.replace(/[\s.-]/g, '') || undefined,
+    status,
+    source,
+    days,
+  }
 }
 
 export function requesterValue({ searcherType, searcherId }: Requester) {

@@ -2,7 +2,7 @@ import type { PostHog } from 'posthog-js'
 import { env } from '@/env'
 import { mocksEnabled } from '@/mocks/enabled'
 
-export type Flag = never
+export type Flag = 'regional-format'
 
 const listeners = new Set<() => void>()
 
@@ -33,5 +33,7 @@ export function onFlags(listener: () => void) {
 }
 
 export function flagEnabled(flag: string) {
+  if (mocksEnabled) return localStorage.getItem('mock.flags')?.split(',').includes(flag) === true
+
   return posthog?.isFeatureEnabled(flag) === true
 }

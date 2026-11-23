@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
+import { Route as checkoutCheckoutRouteImport } from './routes/(checkout)/checkout'
 import { Route as workspacesSetupRouteImport } from './routes/(workspaces)/setup'
 import { Route as authAuthCallbackRouteImport } from './routes/(auth)/auth.callback'
 import { Route as authInvitationsInvitationIdRouteImport } from './routes/(auth)/invitations.$invitationId'
@@ -36,6 +37,11 @@ const authLoginRoute = authLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => authRouteRoute,
+} as any)
+const checkoutCheckoutRoute = checkoutCheckoutRouteImport.update({
+  id: '/(checkout)/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const workspacesSetupRoute = workspacesSetupRouteImport.update({
   id: '/(workspaces)/setup',
@@ -98,6 +104,7 @@ const ApplookupsLookupsLookupIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AppworkspacesIndexRoute
   '/login': typeof authLoginRoute
+  '/checkout': typeof checkoutCheckoutRoute
   '/setup': typeof workspacesSetupRoute
   '/auth/callback': typeof authAuthCallbackRoute
   '/invitations/$invitationId': typeof authInvitationsInvitationIdRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof AppworkspacesIndexRoute
   '/login': typeof authLoginRoute
+  '/checkout': typeof checkoutCheckoutRoute
   '/setup': typeof workspacesSetupRoute
   '/auth/callback': typeof authAuthCallbackRoute
   '/invitations/$invitationId': typeof authInvitationsInvitationIdRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/(auth)': typeof authRouteRouteWithChildren
   '/_app': typeof AppRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
+  '/(checkout)/checkout': typeof checkoutCheckoutRoute
   '/(workspaces)/setup': typeof workspacesSetupRoute
   '/(auth)/auth/callback': typeof authAuthCallbackRoute
   '/(auth)/invitations/$invitationId': typeof authInvitationsInvitationIdRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/checkout'
     | '/setup'
     | '/auth/callback'
     | '/invitations/$invitationId'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/checkout'
     | '/setup'
     | '/auth/callback'
     | '/invitations/$invitationId'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/(auth)'
     | '/_app'
     | '/(auth)/login'
+    | '/(checkout)/checkout'
     | '/(workspaces)/setup'
     | '/(auth)/auth/callback'
     | '/(auth)/invitations/$invitationId'
@@ -190,6 +202,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  checkoutCheckoutRoute: typeof checkoutCheckoutRoute
   workspacesSetupRoute: typeof workspacesSetupRoute
 }
 
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof authLoginRouteImport
       parentRoute: typeof authRouteRoute
+    }
+    '/(checkout)/checkout': {
+      id: '/(checkout)/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof checkoutCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(workspaces)/setup': {
       id: '/(workspaces)/setup'
@@ -341,6 +361,7 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
   AppRouteRoute: AppRouteRouteWithChildren,
+  checkoutCheckoutRoute: checkoutCheckoutRoute,
   workspacesSetupRoute: workspacesSetupRoute,
 }
 export const routeTree = rootRouteImport

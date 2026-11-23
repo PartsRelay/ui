@@ -16,6 +16,7 @@ import {
   type Role,
 } from '@/mocks/data'
 import { fail } from '@/mocks/errors'
+import { flagEnabled } from '@/core/flags'
 import { isCountry } from '@/modules/workspaces/core/country'
 
 type ApiKey = ReturnType<typeof apiKey>
@@ -206,7 +207,11 @@ export const authMocks = [
   get('/get-session', () => world((state) => (state.signedIn ? sessionOf(state) : null))),
   signIn('/one-time-token/verify', sessionOf),
   signIn('/one-tap/callback', ({ me }) => ({ token: 'mock', user: me })),
-  post('/sign-in/magic-link', () => ({ status: true })),
+  post('/sign-in/magic-link', () =>
+    flagEnabled('magic-link')
+      ? { status: true }
+      : fail(404, 'route-not-found', 'Cannot POST:/api/auth/sign-in/magic-link')
+  ),
   post('/sign-out', () =>
     world((state) => {
       state.signedIn = false

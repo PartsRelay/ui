@@ -44,7 +44,7 @@ void i18n
     supportedLngs: locales,
     load: 'currentOnly',
     fallbackLng: 'en-US',
-    detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'] },
+    detection: { order: ['querystring', 'localStorage', 'navigator'], caches: ['localStorage'] },
     parseMissingKeyHandler: (key) =>
       key.startsWith('errors.') ? i18n.t('errors.unknown-error') : key,
   })

@@ -4,11 +4,16 @@ import { message } from '@/core/message'
 import { coreError } from '@/modules/contacts/tests/unit/fixtures'
 import {
   addImages,
+  assistantReply,
   MAX_IMAGE_BYTES,
+  MAX_MESSAGE_LENGTH,
   messageError,
   messageOf,
   readOfLookup,
+  requestOfLookup,
+  retryable,
   searchTrace,
+  threadRequest,
 } from '@/modules/lookups/core/message-search'
 import { lookupFixture } from '@/modules/lookups/tests/unit/fixtures'
 
@@ -116,5 +121,94 @@ describe('message search', () => {
       missing: [],
       lookup,
     })
+  })
+
+  it('shows a search kept in the address as the request it stands for', () => {
+    expect(requestOfLookup(lookupFixture(7))).toBe('AB12CDE Oil filter change')
+    expect(requestOfLookup(lookupFixture(7, { plate: null }))).toBe(
+      'WF0FXXGCDFKA12345 Oil filter change'
+    )
+  })
+
+  it('sends the messages since the last search as one request', () => {
+    const plate = photo('libretto.jpg')
+
+    expect(
+      threadRequest([
+        { text: 'Brake pads for AB 123 CD', images: [], started: true },
+        { text: 'Oil filter', images: [plate] },
+        { text: 'Down, try later', images: [], failed: true },
+        { text: ' GH 482 KL ', images: [] },
+      ])
+    ).toEqual({ message: 'Oil filter\nGH 482 KL', images: [plate] })
+    expect(threadRequest([{ text: '  ', images: [] }])).toEqual({})
+  })
+
+  it('keeps the newest photos and words of a long thread', () => {
+    const photos = ['1', '2', '3', '4', '5'].map((name) => photo(`${name}.jpg`))
+    const body = threadRequest([
+      { text: 'a'.repeat(1500), images: photos.slice(0, 3) },
+      { text: 'b'.repeat(1000), images: photos.slice(3) },
+    ])
+
+    expect(body.images).toEqual(photos.slice(1))
+    expect(body.message).toHaveLength(MAX_MESSAGE_LENGTH)
+    expect(body.message?.endsWith('b'.repeat(1000))).toBe(true)
+  })
+
+  it('asks in words for what is missing', () => {
+    const answer = (said: LookupMessageObject) =>
+      assistantReply({ error: null, read: said, lookup: undefined })
+
+    expect(assistantReply({ error: null, read: undefined, lookup: undefined })).toBeNull()
+    expect(answer(read({ plate: null, parts: null, missing: ['vehicle', 'parts'] }))).toEqual(
+      message('lookups.ai.reply.missing-both')
+    )
+    expect(answer(read({ plate: null, missing: ['vehicle'] }))).toEqual(
+      message('lookups.ai.reply.missing-vehicle')
+    )
+    expect(answer(read({ parts: null, missing: ['parts'] }))).toEqual(
+      message('lookups.ai.reply.missing-parts', { vehicle: 'AB123CD' })
+    )
+  })
+
+  it('tells the outcome of the search once it ends', () => {
+    const running = lookupFixture(7, { status: 'running', categories: undefined })
+    const answer = (lookup: Parameters<typeof lookupFixture>[1]) =>
+      assistantReply({
+        error: null,
+        read: read({ lookup: running }),
+        lookup: lookupFixture(7, lookup),
+      })
+
+    expect(answer({ status: 'running', categories: undefined })).toBeNull()
+    expect(answer({})).toEqual(
+      message('lookups.ai.reply.found', {
+        count: 1,
+        vehicle: 'Ford Fiesta 1.0',
+        categories: 'Oil filter',
+      })
+    )
+    expect(answer({ categories: [] })).toEqual(message('lookups.ai.reply.done'))
+    expect(answer({ status: 'not_matched', categories: [] })).toEqual(
+      message('lookups.ai.reply.not-matched', {
+        vehicle: 'Ford Fiesta 1.0',
+        parts: 'Oil filter change',
+      })
+    )
+    expect(answer({ status: 'vehicle_not_found', vehicleDescription: null })).toEqual(
+      message('lookups.ai.reply.vehicle-not-found', { identifier: 'WF0FXXGCDFKA12345' })
+    )
+    expect(answer({ status: 'failed' })).toEqual(message('lookups.ai.reply.failed'))
+  })
+
+  it('answers a refused request with its reason, and offers to send again the others', () => {
+    const refused = coreError(422, 'validation-error', [{ field: 'message', rule: 'maxLength' }])
+
+    expect(assistantReply({ error: refused, read: undefined, lookup: undefined })).toEqual(
+      message('lookups.ai.errors.message')
+    )
+    expect(retryable(refused)).toBe(false)
+    expect(retryable(coreError(503, 'service-unavailable'))).toBe(true)
   })
 })

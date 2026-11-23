@@ -56,6 +56,11 @@ const TOP_SEARCHERS = 5
 const FAILED: LookupObjectStatus[] = ['failed', 'vehicle_not_found', 'not_matched']
 const FAILING_PLATE = 'ER500ER'
 
+// For this plate the reader is busy once per load
+const BUSY_PLATE = /\bER\s?503\s?ER\b/i
+
+let readerBusy = true
+
 const VEHICLES: Record<string, { vin: string; description: string }> = {
   AB123CD: { vin: 'ZFA31200003456789', description: 'Fiat Panda 1.2' },
   GH482KL: { vin: 'ZFA31200007712345', description: 'Fiat Panda 1.2 8V' },
@@ -526,6 +531,10 @@ export const lookupMocks = [
     const images = form.getAll('images').filter((value): value is File => value instanceof File)
     if (!text && images.length === 0) invalid([{ field: 'message', rule: 'requiredIfMissing' }])
     if (images.length > 4) invalid([{ field: 'images', rule: 'array.maxLength' }])
+    if (readerBusy && BUSY_PLATE.test(text)) {
+      readerBusy = false
+      fail(503, 'service-unavailable', 'Service unavailable')
+    }
 
     const read = readMessage(text, images)
     const missing = [

@@ -158,29 +158,28 @@
     }
   },
   "ai": {
-    "title": "Trova il ricambio.",
-    "description": "Scrivi la targa o il telaio e i ricambi che ti servono, oppure allega una foto del libretto. L'assistente legge e cerca.",
+    "title": "Che ricambio ti serve?",
+    "description": "Scrivi la targa o il telaio e i ricambi, oppure allega una foto del libretto.",
     "message": "Richiesta",
-    "message-hint": "Per esempio: pastiglie freno anteriori per AB 123 CD. Il telaio vale più della targa.",
-    "message-placeholder": "Pastiglie freno anteriori per AB 123 CD",
+    "message-hint": "Invio per mandare, Maiusc+Invio per andare a capo. Il telaio vale più della targa.",
+    "message-placeholder": "Targa o telaio, e i ricambi che ti servono",
     "attach": "Allega foto",
     "remove": "Rimuovi {name}",
     "send": "Cerca",
     "open": "Apri il risultato",
-    "trace-label": "Cosa ha fatto l'assistente",
     "refused": "{count, plural, one {# foto è stata scartata: al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.} other {# foto sono state scartate: al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.}}",
     "trace": {
       "reading": "Leggo la richiesta",
       "read": "Richiesta letta",
-      "read-failed": "Non sono riuscito a leggere la richiesta. Riprova.",
-      "missing-vehicle": "Manca la targa o il telaio: aggiungili, o una foto del libretto",
-      "missing-parts": "Manca il ricambio: scrivi i ricambi che ti servono",
+      "read-failed": "Non sono riuscito a leggere la richiesta",
+      "missing-vehicle": "Manca la targa o il telaio",
+      "missing-parts": "Manca il ricambio",
       "searching": "Identifico il veicolo e cerco i ricambi",
       "vehicle": "Veicolo identificato",
-      "vehicle-not-found": "Veicolo non trovato: controlla la targa o il telaio",
-      "not-matched": "Nessuna categoria di questo veicolo contiene questi ricambi",
+      "vehicle-not-found": "Veicolo non trovato",
+      "not-matched": "Nessuna categoria per questi ricambi",
       "found": "Ricambi trovati",
-      "failed": "La ricerca non è riuscita. Riprova."
+      "failed": "La ricerca non è riuscita"
     },
     "errors": {
       "message": "Scrivi la richiesta in al massimo 2000 caratteri, o allega una foto.",
@@ -188,6 +187,26 @@
       "empty": "Scrivi la richiesta, o allega una foto."
     },
     "head": "Nuova ricerca",
-    "trace-empty": "Scrivi la richiesta e premi Cerca: qui vedi ogni passo dell'assistente."
+    "examples-label": "Prova con",
+    "examples": {
+      "brakes": "Pastiglie freno anteriori per AB 123 CD",
+      "filters": "Filtro olio e filtro aria per GH 482 KL",
+      "clutch": "Kit frizione, telaio WVWZZZAUZHW204411"
+    },
+    "conversation": "Conversazione",
+    "you": "Tu",
+    "assistant": "Assistente",
+    "reply": {
+      "missing-both": "Dimmi la targa o il telaio e i ricambi che ti servono, oppure allega una foto del libretto.",
+      "missing-vehicle": "Mi serve la targa o il telaio del veicolo: scrivili qui, oppure allega una foto del libretto.",
+      "missing-parts": "Quali ricambi ti servono per {vehicle}?",
+      "found": "{count, plural, one {Ho trovato # categoria} other {Ho trovato # categorie}} per {vehicle}: {categories}.",
+      "done": "La ricerca è finita: apri il risultato per vederla.",
+      "vehicle-not-found": "Non ho trovato un veicolo per {identifier}. Controlla la targa, oppure scrivi il telaio.",
+      "not-matched": "Nel catalogo di {vehicle} non c'è una categoria per {parts}. Prova con altre parole.",
+      "failed": "La ricerca non è riuscita. Riprova tra poco."
+    },
+    "reply-placeholder": "Rispondi all'assistente",
+    "retry": "Riprova"
   }
 }

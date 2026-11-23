@@ -1,9 +1,15 @@
-import type { LookupMessageObject, LookupObject } from '@/core/api/models'
+import type {
+  LookupMessageObject,
+  LookupObject,
+  PostApiV1LookupsMessageBody,
+} from '@/core/api/models'
 import { errorMessage, fieldErrors } from '@/core/errors'
 import { type Message, message } from '@/core/message'
 import type { LookupPrefill } from '@/modules/lookups/core/lookup-form'
 
 export const MAX_IMAGES = 4
+
+export const MAX_MESSAGE_LENGTH = 2000
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
@@ -31,6 +37,11 @@ export function readOfLookup(lookup: LookupObject): LookupMessageObject {
 // The message a failed search offers to send again
 export function messageOf({ plate, vin, query }: LookupPrefill) {
   return [vin ?? plate, query].filter(Boolean).join(' ')
+}
+
+// Plate first: the core adds the VIN it finds
+export function requestOfLookup({ plate, vin, query }: LookupObject) {
+  return [plate ?? vin, query].filter(Boolean).join(' ')
 }
 
 export function addImages(current: File[], added: File[]) {
@@ -126,4 +137,77 @@ export function messageError(error: unknown): Message | null {
   if (fields?.images) return message(fields.images)
 
   return error ? errorMessage(error) : null
+}
+
+// Sending again helps unless the request itself was refused
+export function retryable(error: unknown) {
+  return fieldErrors(error, { message: '', images: '' }) === null
+}
+
+export type Said = { text: string; images: File[]; started?: boolean; failed?: boolean }
+
+// Messages since the last search, sent as one request
+export function threadRequest(turns: Said[]): PostApiV1LookupsMessageBody {
+  const thread = turns
+    .slice(turns.findLastIndex(({ started }) => started) + 1)
+    .filter(({ failed }) => !failed)
+  const text = thread
+    .map((said) => said.text.trim())
+    .filter(Boolean)
+    .join('\n')
+    .slice(-MAX_MESSAGE_LENGTH)
+  const images = thread.flatMap((said) => said.images).slice(-MAX_IMAGES)
+
+  return { ...(text && { message: text }), ...(images.length > 0 && { images }) }
+}
+
+function vehicleOf(lookup: LookupObject) {
+  return lookup.vehicleDescription ?? lookup.vin ?? lookup.plate ?? ''
+}
+
+function outcome(lookup: LookupObject): Message | null {
+  const categories = (lookup.categories ?? []).map(({ id, name }) => name ?? id)
+
+  switch (lookup.status) {
+    case 'running':
+      return null
+    case 'done':
+      return categories.length > 0
+        ? message('lookups.ai.reply.found', {
+            count: categories.length,
+            vehicle: vehicleOf(lookup),
+            categories: categories.join(', '),
+          })
+        : message('lookups.ai.reply.done')
+    case 'vehicle_not_found':
+      return message('lookups.ai.reply.vehicle-not-found', {
+        identifier: lookup.vin ?? lookup.plate ?? '',
+      })
+    case 'not_matched':
+      return message('lookups.ai.reply.not-matched', {
+        vehicle: vehicleOf(lookup),
+        parts: lookup.query ?? '',
+      })
+    case 'failed':
+      return message('lookups.ai.reply.failed')
+  }
+}
+
+// What the assistant answers in words, under its steps
+export function assistantReply({ error, read, lookup }: Omit<Search, 'sending'>): Message | null {
+  if (error) return messageError(error)
+  if (!read) return null
+
+  const vehicle = !read.missing.includes('vehicle')
+  const parts = !read.missing.includes('parts')
+  if (!vehicle) {
+    return message(`lookups.ai.reply.${parts ? 'missing-vehicle' : 'missing-both'}`)
+  }
+  if (!parts) {
+    return message('lookups.ai.reply.missing-parts', { vehicle: read.vin ?? read.plate ?? '' })
+  }
+
+  const started = lookup ?? read.lookup
+
+  return started ? outcome(started) : null
 }

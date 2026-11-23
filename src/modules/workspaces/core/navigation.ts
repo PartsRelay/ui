@@ -19,12 +19,12 @@ const pagePaths = {
   profile: '/profile',
 } as const satisfies Record<Page, string>
 
-export type CrumbId = Page | 'lookup' | 'new-search'
+export type CrumbId = Page | 'lookup' | 'new-lookup'
 
 const CRUMB_PARENTS = {
   'lookups': null,
   'lookup': 'lookups',
-  'new-search': 'lookups',
+  'new-lookup': 'lookups',
   'contacts': null,
   'workspace': null,
   'company': 'workspace',

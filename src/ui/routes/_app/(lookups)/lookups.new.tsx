@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { pageHead } from '@/core/head'
-import { newSearchSchema } from '@/modules/lookups/core/lookups'
-import { NewSearchPage } from '@/modules/lookups/ui/new-search-page'
+import { newLookupSchema } from '@/modules/lookups/core/lookups'
+import { NewLookupPage } from '@/modules/lookups/ui/new-lookup-page'
 
 export const Route = createFileRoute('/_app/(lookups)/lookups/new')({
-  validateSearch: newSearchSchema,
-  staticData: { crumb: 'new-search' },
+  validateSearch: newLookupSchema,
+  staticData: { crumb: 'new-lookup' },
   head: pageHead('lookups.ai.head'),
-  component: NewSearchPage,
+  component: NewLookupPage,
 })

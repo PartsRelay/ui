@@ -41,14 +41,14 @@ export type LookupPrefill = { plate?: string; vin?: string; query?: string }
 
 export type LookupsSearch = z.infer<typeof lookupsSearchSchema>
 
-export const newSearchSchema = z.object({
+export const newLookupSchema = z.object({
   plate: optionalText,
   vin: optionalText,
   query: optionalText,
   lookupId: z.number().int().positive().optional().catch(undefined),
 })
 
-export type NewSearch = z.infer<typeof newSearchSchema>
+export type NewLookup = z.infer<typeof newLookupSchema>
 
 export type LookupFilters = z.infer<typeof filtersSchema>
 

@@ -258,7 +258,7 @@ function KeptSkeleton() {
   )
 }
 
-export function NewSearchPage() {
+export function NewLookupPage() {
   const { t } = useTranslation()
   const id = useId()
   const navigate = route.useNavigate()

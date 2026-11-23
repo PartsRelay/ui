@@ -1,5 +1,6 @@
 import { hashKey, type QueryClient } from '@tanstack/query-core'
 import { getGlobalBroadcastChannel } from 'better-auth/client'
+import { loadFlags } from '@/core/flags'
 import { type Session, sessionQuery } from '@/modules/auth/core/session.query'
 import { findMe, toWorkspace, type Workspace } from '@/modules/workspaces/core/workspace'
 import { workspaceQuery } from '@/modules/workspaces/core/workspace.query'
@@ -16,6 +17,8 @@ export async function loadAccount(client: QueryClient, userId: string) {
     accountIn(toWorkspace(cached), userId) ??
     accountIn(toWorkspace(await client.fetchQuery({ ...workspaceQuery, staleTime: 0 })), userId)
   if (!account) throw new Error('Missing membership')
+
+  loadFlags(userId, account.workspace.id)
 
   return account
 }

@@ -2,19 +2,23 @@ import type { PostHog } from 'posthog-js'
 import { env } from '@/env'
 import { mocksEnabled } from '@/mocks/enabled'
 
-export type Flag = never
+export type Flag = 'magic-link'
 
 // PostHog group type of a company, as the core sends it
 export const WORKSPACE_GROUP = 'workspace'
+
+// Distinct id of the visitor before sign in, as the core sends it
+export const SIGNED_OUT = 'signed-out'
 
 const listeners = new Set<() => void>()
 
 let posthog: PostHog | undefined
 let loading: Promise<PostHog> | undefined
+let current: string | undefined
 
 const notify = () => listeners.forEach((listener) => listener())
 
-function client(userId: string) {
+function client(distinctId: string) {
   const token = env.POSTHOG_PROJECT_TOKEN
   if (!token || mocksEnabled) return undefined
 
@@ -24,18 +28,24 @@ function client(userId: string) {
       persistence: 'memory',
       opt_out_capturing_by_default: true,
       disable_external_dependency_loading: true,
-      bootstrap: { distinctID: userId, isIdentifiedID: true },
+      bootstrap: { distinctID: distinctId, isIdentifiedID: true },
     })
     instance.onFeatureFlags(notify)
     posthog = instance
+    current = distinctId
 
     return instance
   }))
 }
 
-export function loadFlags(userId: string, workspaceId?: string) {
-  void client(userId)?.then((instance) => {
-    if (instance.get_distinct_id() !== userId) instance.identify(userId)
+// The user id, or SIGNED_OUT before sign in
+export function loadFlags(distinctId: string, workspaceId?: string) {
+  void client(distinctId)?.then((instance) => {
+    if (current !== distinctId) {
+      if (current !== undefined) instance.reset()
+      instance.identify(distinctId)
+      current = distinctId
+    }
     if (workspaceId) instance.group(WORKSPACE_GROUP, workspaceId)
   })
 }
@@ -45,6 +55,7 @@ export function resetFlags() {
   if (!posthog) return
 
   posthog.reset()
+  current = undefined
   notify()
 }
 
@@ -55,5 +66,7 @@ export function onFlags(listener: () => void) {
 }
 
 export function flagEnabled(flag: string) {
+  if (mocksEnabled) return localStorage.getItem('mock.flags')?.split(',').includes(flag) === true
+
   return posthog?.isFeatureEnabled(flag) === true
 }

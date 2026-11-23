@@ -5,9 +5,10 @@ import type { z } from 'zod'
 import { env } from '@/env'
 import { notify } from '@/core/notify'
 import { redirectSignedIn } from '@/modules/auth/core/session.query'
-import { googleEnabled, loginError, type loginSearchSchema } from '@/modules/auth/core/sign-in'
+import { loginError, type loginSearchSchema, signInDescription } from '@/modules/auth/core/sign-in'
 import { CardHeading } from '@/ui/components/card-heading'
 import { SignInOptions } from '@/modules/auth/ui/sign-in-options'
+import { useMagicLink } from '@/modules/auth/ui/hooks/use-magic-link'
 import { Callout } from '@/ui/components/callout'
 import { ExternalLink } from '@/ui/components/external-link'
 import { Card, CardContent, CardDescription, CardHeader } from '@/ui/components/ui/card'
@@ -32,6 +33,7 @@ export function LoginPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const { next, error } = route.useSearch()
+  const magicLink = useMagicLink()
   const failure = loginError(error)
   const login = (signedIn?: true) =>
     router.buildLocation({ to: '/login', search: { next, signedIn } }).href
@@ -40,9 +42,7 @@ export function LoginPage() {
     <Card>
       <CardHeader>
         <CardHeading level={1}>{t('login.title')}</CardHeading>
-        <CardDescription>
-          {t(googleEnabled ? 'login.description' : 'login.magic-link.description')}
-        </CardDescription>
+        <CardDescription>{t(signInDescription(magicLink))}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
         {failure && <Callout tone="danger">{t(...failure)}</Callout>}

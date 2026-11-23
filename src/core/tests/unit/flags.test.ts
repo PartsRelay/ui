@@ -10,7 +10,6 @@ const { env, posthog } = vi.hoisted(() => ({
     init: vi.fn(),
     onFeatureFlags: vi.fn(),
     isFeatureEnabled: vi.fn(),
-    get_distinct_id: vi.fn(),
     identify: vi.fn(),
     group: vi.fn(),
     reset: vi.fn(),
@@ -33,9 +32,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   env.POSTHOG_PROJECT_TOKEN = 'phc_test'
   env.MOCKS = false
-  posthog.get_distinct_id.mockImplementation(
-    () => posthog.init.mock.calls[0]?.[1].bootstrap.distinctID
-  )
+  vi.unstubAllGlobals()
 })
 
 describe('flags', () => {
@@ -48,12 +45,15 @@ describe('flags', () => {
     expect(flagEnabled('new-search')).toBe(false)
   })
 
-  it('leaves PostHog out with the mocks', async () => {
+  it('leaves PostHog out with the mocks, and reads mock.flags instead', async () => {
     env.MOCKS = true
+    vi.stubGlobal('localStorage', { getItem: () => 'magic-link,other' })
 
-    await signIn('7')
+    const { flagEnabled } = await signIn('7')
 
     expect(posthog.init).not.toHaveBeenCalled()
+    expect(flagEnabled('magic-link')).toBe(true)
+    expect(flagEnabled('magic')).toBe(false)
   })
 
   it('asks PostHog once, for the signed in user and without analytics', async () => {
@@ -109,7 +109,6 @@ describe('flags', () => {
     onFlags(listener)
 
     resetFlags()
-    posthog.get_distinct_id.mockReturnValue('anonymous-after-reset')
     loadFlags('8', 'globex')
     await vi.dynamicImportSettled()
 
@@ -126,5 +125,24 @@ describe('flags', () => {
     resetFlags()
 
     expect(posthog.reset).not.toHaveBeenCalled()
+  })
+
+  it('reads the flags of the signed out visitor, then of the user who signs in', async () => {
+    const { loadFlags, SIGNED_OUT } = await import('@/core/flags')
+
+    loadFlags(SIGNED_OUT)
+    await vi.dynamicImportSettled()
+    loadFlags('7', 'acme')
+    await vi.dynamicImportSettled()
+
+    expect(posthog.init).toHaveBeenCalledExactlyOnceWith(
+      'phc_test',
+      expect.objectContaining({ bootstrap: { distinctID: 'signed-out', isIdentifiedID: true } })
+    )
+    expect(posthog.reset).toHaveBeenCalledOnce()
+    expect(posthog.identify).toHaveBeenCalledExactlyOnceWith('7')
+    expect(posthog.reset.mock.invocationCallOrder[0]).toBeLessThan(
+      posthog.identify.mock.invocationCallOrder[0]
+    )
   })
 })

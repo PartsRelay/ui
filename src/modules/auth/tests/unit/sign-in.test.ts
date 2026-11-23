@@ -6,7 +6,9 @@ import {
   invitationFlow,
   loginError,
   loginSearchSchema,
+  magicLinkShown,
   magicLinkSignIn,
+  signInDescription,
 } from '@/modules/auth/core/sign-in'
 
 const { verify } = vi.hoisted(() => ({ verify: vi.fn() }))
@@ -134,5 +136,19 @@ describe('loginSearchSchema', () => {
 
   it('drops search params of the wrong type instead of failing', () => {
     expect(loginSearchSchema.parse({ next: 42, signedIn: 'yes', error: ['x'] })).toEqual({})
+  })
+})
+
+describe('magic link', () => {
+  it('shows with magic-link on, or as the only way in without Google', () => {
+    expect(magicLinkShown(true, true)).toBe(true)
+    expect(magicLinkShown(false, true)).toBe(false)
+    expect(magicLinkShown(false, false)).toBe(true)
+  })
+
+  it('describes the ways in that are shown', () => {
+    expect(signInDescription(true, true)).toBe('login.description')
+    expect(signInDescription(false, true)).toBe('login.google-description')
+    expect(signInDescription(true, false)).toBe('login.magic-link.description')
   })
 })

@@ -9,6 +9,17 @@ import { message } from '@/core/message'
 
 export const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID) || mocksEnabled
 
+// Magic link with magic-link on, or as the only way in without Google
+export function magicLinkShown(flagOn: boolean, google = googleEnabled) {
+  return flagOn || !google
+}
+
+export function signInDescription(magicLink: boolean, google = googleEnabled) {
+  if (!google) return 'login.magic-link.description'
+
+  return magicLink ? 'login.description' : 'login.google-description'
+}
+
 const optionalString = z.string().optional().catch(undefined)
 
 export const signInErrorSearchSchema = z.object({ error: optionalString })

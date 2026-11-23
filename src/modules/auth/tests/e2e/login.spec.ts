@@ -18,7 +18,12 @@ test('signing out lands on the login page', async ({ page }) => {
   await expect(notices(page).getByText('You signed out.')).toBeVisible()
   await expect(page.getByRole('heading', { level: 1, name: /^Sign in to / })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled()
-  await expect(page.getByRole('textbox', { name: 'Email' })).toBeEmpty()
+})
+
+test('without the magic-link flag only Google signs in', async ({ page }) => {
+  await expect(page.getByText('Continue with your Google account.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled()
+  await expect(page.getByRole('textbox', { name: 'Email' })).toHaveCount(0)
 })
 
 test('only the login page is open to search engines', async ({ page }) => {
@@ -37,49 +42,65 @@ test('only the login page is open to search engines', async ({ page }) => {
   await expect(canonical).toHaveAttribute('href', /\/nowhere$/)
 })
 
-test('the magic link form rejects an invalid email', async ({ page }) => {
-  const email = page.getByRole('textbox', { name: 'Email' })
+test.describe('with the magic-link flag', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'magic-link'))
+    await page.reload()
+    await expect(page.getByRole('heading', { level: 1, name: /^Sign in to / })).toBeVisible()
+  })
 
-  await email.fill('mark.reed@')
-  await page.getByRole('button', { name: 'Email me a sign-in link' }).click()
+  test('the login page offers Google and the email link', async ({ page }) => {
+    await expect(
+      page.getByText('Continue with Google or get a sign-in link by email.')
+    ).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled()
+    await expect(page.getByRole('textbox', { name: 'Email' })).toBeEmpty()
+  })
 
-  await expect(email).toBeFocused()
-  await expect(email).toHaveAttribute('aria-invalid', 'true')
-  await expect(email).toHaveAccessibleDescription('Enter a valid email address.')
-  await expect(page.getByRole('status')).toHaveCount(0)
-})
+  test('the magic link form rejects an invalid email', async ({ page }) => {
+    const email = page.getByRole('textbox', { name: 'Email' })
 
-test('the magic link form sends a link and waits before sending another', async ({ page }) => {
-  await page.getByRole('textbox', { name: 'Email' }).fill('  Mark.Reed@RedwoodParts.com ')
-  await page.getByRole('button', { name: 'Email me a sign-in link' }).click()
+    await email.fill('mark.reed@')
+    await page.getByRole('button', { name: 'Email me a sign-in link' }).click()
 
-  const sent = page.getByRole('status').filter({ hasText: 'Check your email' })
-  await expect(sent).toBeFocused()
-  await expect(sent).toContainText(
-    'We sent a sign-in link to mark.reed@redwoodparts.com. It works once and expires in 10 minutes.'
-  )
-  await expect(page.getByRole('button', { name: /^Send again in \d+ s$/ })).toHaveAttribute(
-    'aria-disabled',
-    'true'
-  )
+    await expect(email).toBeFocused()
+    await expect(email).toHaveAttribute('aria-invalid', 'true')
+    await expect(email).toHaveAccessibleDescription('Enter a valid email address.')
+    await expect(page.getByRole('status')).toHaveCount(0)
+  })
 
-  await page.getByRole('button', { name: 'Use another email' }).click()
-  await expect(page.getByRole('textbox', { name: 'Email' })).toBeFocused()
-})
+  test('the magic link form sends a link and waits before sending another', async ({ page }) => {
+    await page.getByRole('textbox', { name: 'Email' }).fill('  Mark.Reed@RedwoodParts.com ')
+    await page.getByRole('button', { name: 'Email me a sign-in link' }).click()
 
-test('a new sign-in link clears the error of the previous one', async ({ page }) => {
-  await page.goto('/login?next=%2Fcompany&error=invalid-token')
-  const expired = page.getByText(
-    'This sign-in link has expired or was already used. Ask for a new one.'
-  )
-  await expect(expired).toBeVisible()
+    const sent = page.getByRole('status').filter({ hasText: 'Check your email' })
+    await expect(sent).toBeFocused()
+    await expect(sent).toContainText(
+      'We sent a sign-in link to mark.reed@redwoodparts.com. It works once and expires in 10 minutes.'
+    )
+    await expect(page.getByRole('button', { name: /^Send again in \d+ s$/ })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
 
-  await page.getByRole('textbox', { name: 'Email' }).fill('mark.reed@redwoodparts.com')
-  await page.getByRole('button', { name: 'Email me a sign-in link' }).click()
+    await page.getByRole('button', { name: 'Use another email' }).click()
+    await expect(page.getByRole('textbox', { name: 'Email' })).toBeFocused()
+  })
 
-  await expect(page.getByRole('status').filter({ hasText: 'Check your email' })).toBeFocused()
-  await expect(expired).toBeHidden()
-  await expect(page).toHaveURL('/login?next=%2Fcompany')
+  test('a new sign-in link clears the error of the previous one', async ({ page }) => {
+    await page.goto('/login?next=%2Fcompany&error=invalid-token')
+    const expired = page.getByText(
+      'This sign-in link has expired or was already used. Ask for a new one.'
+    )
+    await expect(expired).toBeVisible()
+
+    await page.getByRole('textbox', { name: 'Email' }).fill('mark.reed@redwoodparts.com')
+    await page.getByRole('button', { name: 'Email me a sign-in link' }).click()
+
+    await expect(page.getByRole('status').filter({ hasText: 'Check your email' })).toBeFocused()
+    await expect(expired).toBeHidden()
+    await expect(page).toHaveURL('/login?next=%2Fcompany')
+  })
 })
 
 test('a failed Google sign in explains the codes it knows', async ({ page }) => {

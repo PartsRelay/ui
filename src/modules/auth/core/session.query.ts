@@ -3,7 +3,7 @@ import { authClient } from '@/modules/auth/core/auth.client'
 import { authToken } from '@/modules/auth/core/auth-token'
 import { redirectPath } from '@/modules/auth/core/redirect-path'
 import { errorNotice, sessionEnded } from '@/core/errors'
-import { loadFlags } from '@/core/flags'
+import { loadFlags, resetFlags } from '@/core/flags'
 import { message } from '@/core/message'
 
 export type Session = typeof authClient.$Infer.Session | null
@@ -45,6 +45,7 @@ export function failureNotice(client: QueryClient, error: unknown, silent = fals
   const ended = sessionEnded(error)
   if (ended) {
     authToken.clear()
+    resetFlags()
     client.setQueryData(sessionQuery.queryKey, null)
   }
 
@@ -53,6 +54,7 @@ export function failureNotice(client: QueryClient, error: unknown, silent = fals
 
 export function endSession(client: QueryClient) {
   authToken.clear()
+  resetFlags()
   client.clear()
   client.setQueryData(sessionQuery.queryKey, null)
 }

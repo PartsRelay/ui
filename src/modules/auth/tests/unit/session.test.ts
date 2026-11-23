@@ -9,10 +9,14 @@ import {
   sessionQuery,
 } from '@/modules/auth/core/session.query'
 
-const { getSession, loadFlags } = vi.hoisted(() => ({ getSession: vi.fn(), loadFlags: vi.fn() }))
+const { getSession, loadFlags, resetFlags } = vi.hoisted(() => ({
+  getSession: vi.fn(),
+  loadFlags: vi.fn(),
+  resetFlags: vi.fn(),
+}))
 
 vi.mock('@/modules/auth/core/auth.client', () => ({ authClient: { getSession } }))
-vi.mock('@/core/flags', () => ({ loadFlags }))
+vi.mock('@/core/flags', () => ({ loadFlags, resetFlags }))
 
 const authError = (status: number, code: string) => ({
   status,
@@ -46,6 +50,7 @@ beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   getSession.mockReset()
   loadFlags.mockReset()
+  resetFlags.mockReset()
 })
 
 describe('requireSession', () => {
@@ -103,6 +108,7 @@ describe('failureNotice', () => {
       'errors.unauthorized-access',
     ])
     expect(client.getQueryData(sessionQuery.queryKey)).toBeNull()
+    expect(resetFlags).toHaveBeenCalledOnce()
   })
 
   it('ends a session the API keys find expired', () => {
@@ -146,7 +152,7 @@ describe('failureNotice', () => {
 })
 
 describe('endSession', () => {
-  it('forgets every cached query and the session', () => {
+  it('forgets every cached query, the session and the user in PostHog', () => {
     client.setQueryData(sessionQuery.queryKey, session)
     client.setQueryData(['workspace'], { name: 'Redwood Parts Ltd' })
 
@@ -154,5 +160,6 @@ describe('endSession', () => {
 
     expect(client.getQueryData(['workspace'])).toBeUndefined()
     expect(client.getQueryData(sessionQuery.queryKey)).toBeNull()
+    expect(resetFlags).toHaveBeenCalledOnce()
   })
 })

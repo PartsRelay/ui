@@ -3,6 +3,7 @@ import {
   contactFieldErrors,
   emptyContact,
   newContact,
+  phoneExample,
   phoneSchema,
   renameChange,
   withPlus,
@@ -12,30 +13,43 @@ import { contactFixture, coreError } from '@/modules/contacts/tests/unit/fixture
 const phoneError = (value: string) => phoneSchema.safeParse(value).error?.issues[0]?.message
 
 describe('new contact', () => {
-  it('starts the number with a plus that cannot be removed', () => {
-    expect(emptyContact.phone).toBe('+')
-    expect(withPlus('')).toBe('+')
-    expect(withPlus('39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withPlus('3+9 300 000 0000')).toBe('+39 300 000 0000')
+  it('starts the number empty and puts a plus before a first digit', () => {
+    expect(emptyContact.phone).toBe('')
+    expect(withPlus('')).toBe('')
+    expect(withPlus('3')).toBe('+3')
+    expect(withPlus('39 300 000 0000')).toBe('+393000000000')
+    expect(withPlus('0039 300 000 0000')).toBe('+00393000000000')
   })
 
-  it('keeps one plus when a pasted number brings its own', () => {
-    expect(withPlus('+39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withPlus('++39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withPlus('+39 300 000 0000+')).toBe('+39 300 000 0000')
+  it('keeps a plus typed first and drops any other', () => {
+    expect(withPlus('+')).toBe('+')
+    expect(withPlus('+39 300 000 0000')).toBe('+393000000000')
+    expect(withPlus('++39')).toBe('+39')
+    expect(withPlus('3+9')).toBe('+39')
+    expect(withPlus('+39+')).toBe('+39')
   })
 
-  it('drops what a pasted number has before its first digit', () => {
-    expect(withPlus(' +39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withPlus('‭+39 300 000 0000')).toBe('+39 300 000 0000')
-    expect(withPlus('Tel. +39 300 000 0000')).toBe('+39 300 000 0000')
+  it('keeps only the digits of the number', () => {
+    expect(withPlus('abc')).toBe('')
+    expect(withPlus('Tel. +39 300 000 0000')).toBe('+393000000000')
+    expect(withPlus('(300) 000-0000')).toBe('+3000000000')
+    expect(withPlus('‭+39 300 000 0000')).toBe('+393000000000')
     expect(withPlus('+٣٩٣٠٠٠٠٠٠٠٠٠')).toBe('+٣٩٣٠٠٠٠٠٠٠٠٠')
   })
 
-  it('asks for the number when only the plus is there', () => {
+  it('shows a mobile number and the prefix of the country of the company', () => {
+    expect(phoneExample('GB')).toEqual({ number: '+447400123456', prefix: '+44' })
+    expect(phoneExample('IT')).toEqual({ number: '+393123456789', prefix: '+39' })
+    expect(phoneExample(null)).toBeNull()
+    expect(phoneExample('XX')).toBeNull()
+  })
+})
+
+describe('contact form', () => {
+  it('asks for the number when it is empty or only the plus', () => {
+    expect(phoneError('')).toBe('contacts.add.errors.phone-required')
     expect(phoneError('+')).toBe('contacts.add.errors.phone-required')
-    expect(phoneError('+ ')).toBe('contacts.add.errors.phone-required')
-    expect(phoneError('+39 300 000 0000')).toBeUndefined()
+    expect(phoneError('+393000000000')).toBeUndefined()
   })
 
   it('sends the number as typed and a trimmed optional name', () => {

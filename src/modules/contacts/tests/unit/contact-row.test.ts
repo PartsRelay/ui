@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 import { message } from '@/core/message'
-import { contactName, contactRow } from '@/modules/contacts/core/contact-row'
+import { contactName, contactRow, numberCountry } from '@/modules/contacts/core/contact-row'
 import { contactFixture, meAs } from '@/modules/contacts/tests/unit/fixtures'
 
 const owner = meAs('owner')
@@ -36,6 +36,20 @@ describe('contact rows', () => {
         'en-US'
       ).whatsappName
     ).toBeNull()
+  })
+
+  it('writes a number of the given country as there, another one with its prefix', () => {
+    const italian = contactFixture(7, { name: null, profileName: null, waId: '393331234567' })
+    const american = contactFixture(8, { name: null, profileName: null, waId: '12025550106' })
+
+    expect(contactRow(italian, owner, 'en-US', 'IT')).toMatchObject({
+      name: '333 123 4567',
+      phone: '333 123 4567',
+    })
+    expect(contactRow(american, owner, 'en-US', 'IT').phone).toBe('+1 202 555 0106')
+    expect(contactRow(american, owner, 'en-US', 'US').phone).toBe('(202) 555-0106')
+    expect(contactRow(italian, owner, 'en-US').phone).toBe('+39 333 123 4567')
+    expect(contactRow(oakfield, owner, 'en-US', 'GB').phone).toBe('07700 900101')
   })
 
   it('groups the number by country and keeps unknown ones', () => {
@@ -74,5 +88,14 @@ describe('contact rows', () => {
     })
     expect(Object.values(contactRow(oakfield, viewer, 'en-US').actions)).not.toContain(true)
     expect(Object.values(contactRow(blocked, viewer, 'en-US').actions)).not.toContain(true)
+  })
+})
+
+describe('number country', () => {
+  it('is the country of a valid number of the list, like the core reads it', () => {
+    expect(numberCountry('393331234567')).toBe('IT')
+    expect(numberCountry('12025550106')).toBe('US')
+    expect(numberCountry('819012345678')).toBeNull()
+    expect(numberCountry('12')).toBeNull()
   })
 })

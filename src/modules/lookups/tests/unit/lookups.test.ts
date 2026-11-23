@@ -97,6 +97,14 @@ describe('searches address', () => {
       })
     ).toEqual({ page: 1, search: 'CA7', status: 'done', source: 'web', days: 7 })
   })
+
+  it('searches a plate without its spaces, dots and dashes, as the core keeps it', () => {
+    expect(lookupListParams({ page: 1, search: 'AB 123-C.D' })).toEqual({
+      page: 1,
+      search: 'AB123CD',
+    })
+    expect(lookupListParams({ page: 1, search: ' - ' })).toEqual({ page: 1 })
+  })
 })
 
 describe('queue filters', () => {

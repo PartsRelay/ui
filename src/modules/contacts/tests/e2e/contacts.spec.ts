@@ -186,3 +186,48 @@ test('an empty number or only the plus is missing', async ({ page }) => {
   await expect(phone).toHaveAccessibleDescription('Enter the WhatsApp number.')
   await expect(phone).toHaveValue('+')
 })
+
+test('without the regional-format flag every number keeps its prefix', async ({ page }) => {
+  await page.getByRole('searchbox', { name: 'Search' }).fill('oak')
+  await expect(page.getByRole('row', { name: /Oakfield Garage/ })).toContainText('+44 7700 900101')
+})
+
+test.describe('with the regional-format flag in a British company', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-format'))
+    await page.goto('/contacts')
+    await expect(page.getByRole('heading', { level: 1, name: 'Contacts' })).toBeVisible()
+  })
+
+  test('a British number is written as in the UK, another one with its prefix', async ({
+    page,
+  }) => {
+    const search = page.getByRole('searchbox', { name: 'Search' })
+
+    await search.fill('oak')
+    await expect(page.getByRole('row', { name: /Oakfield Garage/ })).toContainText('07700 900101')
+    await search.fill('capitol')
+    await expect(page.getByRole('row', { name: /Capitol Auto Care/ })).toContainText(
+      '+1 202 555 0106'
+    )
+  })
+})
+
+test('with the contact-country flag a number shows its country', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('mock.flags', 'contact-country'))
+  await page.goto('/contacts')
+  const search = page.getByRole('searchbox', { name: 'Search' })
+
+  await search.fill('capitol')
+  await expect(
+    page.getByRole('row', { name: /Capitol Auto Care/ }).getByRole('img', { name: 'United States' })
+  ).toBeVisible()
+  await search.fill('oak')
+  await expect(page.getByRole('row', { name: /Oakfield Garage/ }).getByRole('img')).toHaveCount(0)
+})
+
+test('without the contact-country flag no number shows a country', async ({ page }) => {
+  await page.getByRole('searchbox', { name: 'Search' }).fill('capitol')
+
+  await expect(page.getByRole('row', { name: /Capitol Auto Care/ }).getByRole('img')).toHaveCount(0)
+})

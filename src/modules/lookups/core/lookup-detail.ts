@@ -8,6 +8,7 @@ import type {
 import { type Message, message } from '@/core/message'
 import type { LookupPrefill } from '@/modules/lookups/core/lookups'
 import { type LookupRow, lookupRow, textKey } from '@/modules/lookups/core/lookup-row'
+import type { Country } from '@/modules/workspaces/core/country'
 
 export type LookupState = Exclude<LookupObjectStatus, 'done'> | 'results' | 'unavailable'
 
@@ -73,11 +74,15 @@ function retryOf({ plate, vin, query }: LookupObject): LookupPrefill {
   return { ...identifier, query: query ?? undefined }
 }
 
-export function lookupDetail(lookup: LookupObject, locale: string): LookupDetail {
+export function lookupDetail(
+  lookup: LookupObject,
+  locale: string,
+  plateCountry: Country | null = null
+): LookupDetail {
   const state = lookupState(lookup)
 
   return {
-    ...lookupRow(lookup, locale),
+    ...lookupRow(lookup, locale, plateCountry),
     vin: lookup.vin,
     retry: retryOf(lookup),
     state,

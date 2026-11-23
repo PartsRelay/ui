@@ -2,6 +2,8 @@ import { kebabCase } from 'change-case'
 import { intlFormat } from 'date-fns'
 import type { LookupObject, LookupObjectStatus, Searcher } from '@/core/api/models'
 import { type Message, message } from '@/core/message'
+import { formatPlate } from '@/modules/lookups/core/plate'
+import type { Country } from '@/modules/workspaces/core/country'
 
 type LookupTone = 'success' | 'warning' | 'danger'
 
@@ -37,10 +39,14 @@ function partsFound({ categories = [] }: LookupObject) {
   return categories.map(({ id, name }) => name ?? id).join(', ') || null
 }
 
-export function lookupRow(lookup: LookupObject, locale: string): LookupRow {
+export function lookupRow(
+  lookup: LookupObject,
+  locale: string,
+  plateCountry: Country | null = null
+): LookupRow {
   return {
     lookup,
-    identifier: lookup.plate ?? lookup.vin ?? '',
+    identifier: lookup.plate ? formatPlate(lookup.plate, plateCountry) : (lookup.vin ?? ''),
     part: lookup.query ?? partsFound(lookup),
     vehicle: lookup.vehicleDescription ?? null,
     statusLabel: message(`lookups.status.${textKey(lookup.status)}`),

@@ -59,38 +59,7 @@
     "connect": "Connect workshops"
   },
   "new": {
-    "open": "New search",
-    "eyebrow": "New request · Web",
-    "title": "Find the part.",
-    "description": "Enter the registration plate or the VIN and the part you need. The result stays in the company search queue.",
-    "plate": "Registration plate",
-    "plate-hint": "Spaces, dots and dashes are fine.",
-    "plate-placeholder": "AB123CD",
-    "query": "Part needed",
-    "query-hint": "Be specific: part name and position, if known.",
-    "query-placeholder": "Front brake pads",
-    "tips": {
-      "title": "Search tips",
-      "body": "Check the registration plate, and include the position of the part, such as front or rear."
-    },
-    "requester": "Requested by {name} · Web",
-    "submit": "Start search",
-    "errors": {
-      "plate-required": "Enter the registration plate.",
-      "plate": "Check the plate: 4 to 8 letters and digits.",
-      "query-required": "Enter the part you need, such as front brake pads.",
-      "query": "Describe the part in at least 2 characters.",
-      "vin-required": "Enter the VIN.",
-      "vin": "Check the VIN: 17 letters and digits, without I, O and Q."
-    },
-    "identify": "Identify the vehicle by",
-    "by": {
-      "plate": "Plate",
-      "vin": "VIN"
-    },
-    "vin": "VIN",
-    "vin-hint": "17 letters and digits, without I, O and Q.",
-    "vin-placeholder": "WVWZZZAUZHW204411"
+    "open": "New search"
   },
   "fitment": "Results are identification guidance. Always confirm vehicle fitment before purchase.",
   "detail": {
@@ -156,5 +125,57 @@
       "title": "Top searchers",
       "description": "Last {days} days · Only the owner sees this"
     }
+  },
+  "ai": {
+    "title": "What part do you need?",
+    "description": "Write the plate or the VIN and the parts, or attach a photo of the registration document.",
+    "message": "Request",
+    "message-hint": "Enter sends, Shift+Enter starts a new line. A VIN is used before the plate.",
+    "message-placeholder": "Plate or VIN, and the parts you need",
+    "attach": "Attach photos",
+    "remove": "Remove {name}",
+    "send": "Search",
+    "open": "Open the result",
+    "refused": "{count, plural, one {# photo was left out: up to 4 photos, JPG, PNG or WebP, 5 MB each.} other {# photos were left out: up to 4 photos, JPG, PNG or WebP, 5 MB each.}}",
+    "trace": {
+      "reading": "Reading the request",
+      "read": "Read the request",
+      "read-failed": "Could not read the request",
+      "missing-vehicle": "No plate or VIN",
+      "missing-parts": "No part named",
+      "searching": "Identifying the vehicle and searching the parts",
+      "vehicle": "Identified the vehicle",
+      "vehicle-not-found": "Vehicle not found",
+      "not-matched": "No category matches these parts",
+      "found": "Found the parts",
+      "failed": "The search failed"
+    },
+    "errors": {
+      "message": "Write the request in at most 2000 characters, or attach a photo.",
+      "images": "Attach up to 4 photos, JPG, PNG or WebP, 5 MB each.",
+      "empty": "Write the request, or attach a photo."
+    },
+    "head": "New search",
+    "examples-label": "Try",
+    "examples": {
+      "brakes": "Front brake pads for AB 123 CD",
+      "filters": "Oil filter and air filter for GH 482 KL",
+      "clutch": "Clutch kit, VIN WVWZZZAUZHW204411"
+    },
+    "conversation": "Conversation",
+    "you": "You",
+    "assistant": "Assistant",
+    "reply": {
+      "missing-both": "Tell me the plate or the VIN and the parts you need, or attach a photo of the registration document.",
+      "missing-vehicle": "I need the plate or the VIN of the vehicle: write it here, or attach a photo of the registration document.",
+      "missing-parts": "Which parts do you need for {vehicle}?",
+      "found": "{count, plural, one {I found # category} other {I found # categories}} for {vehicle}: {categories}.",
+      "done": "The search is done: open the result to see it.",
+      "vehicle-not-found": "I found no vehicle for {identifier}. Check the plate, or write the VIN.",
+      "not-matched": "The catalog of {vehicle} has no category for {parts}. Try other words.",
+      "failed": "The search failed. Try again in a moment."
+    },
+    "reply-placeholder": "Reply to the assistant",
+    "retry": "Try again"
   }
 }

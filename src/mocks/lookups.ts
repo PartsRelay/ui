@@ -1,7 +1,7 @@
 import { subDays, subMinutes } from 'date-fns'
 import {
   getGetApiV1LookupsLookupIdMockHandler,
-  getPostApiV1LookupsMockHandler,
+  getPostApiV1LookupsMessageMockHandler,
 } from '@/core/api/endpoints/lookups/lookups.msw'
 import {
   getGetApiV1WorkspaceLookupsMockHandler,
@@ -11,14 +11,13 @@ import {
   type LookupObject,
   LookupObjectSource,
   LookupObjectStatus,
-  type PostApiV1LookupsBody,
   type Searcher,
   SearcherType,
   type TopSearcher,
 } from '@/core/api/models'
 import { member } from '@/mocks/auth'
 import { checkedPage, page, people, type Person } from '@/mocks/data'
-import { apiBody, fail, invalid, rejected } from '@/mocks/errors'
+import { fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
 import { flagEnabled } from '@/core/flags'
@@ -47,13 +46,17 @@ type Stored = Omit<LookupObject, 'searcher' | 'vehicleDescription' | 'categories
 
 type Archive = { lookups: Stored[]; nextId: number }
 
-const PLATE = /^[A-Z0-9]{4,8}$/
 const VIN = /^[A-HJ-NPR-Z0-9]{17}$/
 const STALE_MINUTES = 15
 const STATS_DAYS = 30
 const TOP_SEARCHERS = 5
 const FAILED: LookupObjectStatus[] = ['failed', 'vehicle_not_found', 'not_matched']
 const FAILING_PLATE = 'ER500ER'
+
+// For this plate the reader is busy once per load
+const BUSY_PLATE = /\bER\s?503\s?ER\b/i
+
+let readerBusy = true
 
 const VEHICLES: Record<string, { vin: string; description: string }> = {
   AB123CD: { vin: 'ZFA31200003456789', description: 'Fiat Panda 1.2' },
@@ -261,8 +264,10 @@ const OLDER: Seed[] = [
   ['DK318MP', 'done', workshops.oakfield, ['g1'], 'Oil filter'],
 ]
 
+// The VIN first, like the core
 const vehicleOf = ({ plate, vin }: Pick<LookupObject, 'plate' | 'vin'>) =>
-  (plate && VEHICLES[plate]) || Object.values(VEHICLES).find((vehicle) => vehicle.vin === vin)
+  (vin && Object.values(VEHICLES).find((vehicle) => vehicle.vin === vin)) ||
+  (plate ? VEHICLES[plate] : undefined)
 
 function seed(): Stored[] {
   const now = new Date()
@@ -351,32 +356,6 @@ function lookupOf(stored: Stored, language: Language): LookupObject {
   }
 }
 
-function checkedPlate(plate: unknown) {
-  if (plate === undefined || plate === null) return null
-  if (typeof plate !== 'string') return rejected('plate', 'string')
-
-  const compact = plate.toUpperCase().replace(/[\s.-]/g, '')
-
-  return PLATE.test(compact) ? compact : rejected('plate', 'plate')
-}
-
-function checkedVin(vin: unknown) {
-  if (vin === undefined || vin === null) return null
-  if (typeof vin !== 'string') return rejected('vin', 'string')
-
-  return VIN.test(vin.toUpperCase()) ? vin.toUpperCase() : rejected('vin', 'regex')
-}
-
-function checkedQuery(query: unknown) {
-  if (query === undefined || query === null || query === '') return rejected('query', 'required')
-  if (typeof query !== 'string') return rejected('query', 'string')
-
-  const trimmed = query.trim()
-  if (trimmed.length < 2) rejected('query', 'minLength')
-
-  return trimmed
-}
-
 function checkedSearcherId(query: URLSearchParams) {
   if (!query.has('searcherId')) return null
 
@@ -393,6 +372,22 @@ function matching(query: string) {
   return Object.entries(CATALOG)
     .filter(([, { words }]) => words.some((word) => text.includes(word)))
     .map(([id]) => id)
+}
+
+const VIN_IN_TEXT = /\b[A-HJ-NPR-Z0-9]{17}\b/i
+const PLATE_IN_TEXT = /\b[A-Z]{2}[\s-]?\d{3}[\s-]?[A-Z]{2}\b/i
+const CONNECTORS = /^(?:\W|for|per|the|la|il)+|(?:\W|for|per|of|di|del|della)+$/gi
+
+// Like the model: the photos are read from their file names
+function readMessage(text: string, images: File[]) {
+  const photos = images.map(({ name }) => name.replace(/\.\w+$/, '').replace(/[_-]+/g, ' '))
+  const all = [text, ...photos].join(' ')
+  const vin = all.match(VIN_IN_TEXT)?.[0].toUpperCase() ?? null
+  const plate = all.match(PLATE_IN_TEXT)?.[0].replace(/[\s-]/g, '').toUpperCase() ?? null
+  const rest = text.replace(VIN_IN_TEXT, ' ').replace(PLATE_IN_TEXT, ' ').replace(/\s+/g, ' ')
+  const parts = matching(rest).length > 0 ? rest.replace(CONNECTORS, '').trim() : null
+
+  return { vin, plate, parts }
 }
 
 function settled(lookup: Stored): Stored {
@@ -475,25 +470,33 @@ export const lookupMocks = [
       }
     })
   }),
-  getPostApiV1LookupsMockHandler(async ({ request }) => {
-    const body = await apiBody<PostApiV1LookupsBody>(request)
+  getPostApiV1LookupsMessageMockHandler(async ({ request }) => {
     const { company, country, user: me } = member()
-    const plate = checkedPlate(body.plate)
-    const vin = checkedVin(body.vin)
-    if (!plate && !vin) {
-      invalid([
-        { field: 'plate', rule: 'required' },
-        { field: 'vin', rule: 'required' },
-      ])
+    const form = await request.formData()
+    const text = String(form.get('message') ?? '').trim()
+    const images = form.getAll('images').filter((value): value is File => value instanceof File)
+    if (!text && images.length === 0) invalid([{ field: 'message', rule: 'requiredIfMissing' }])
+    if (images.length > 4) invalid([{ field: 'images', rule: 'array.maxLength' }])
+    if (readerBusy && BUSY_PLATE.test(text)) {
+      readerBusy = false
+      fail(503, 'service-unavailable', 'Service unavailable')
     }
-    const query = checkedQuery(body.query)
+
+    const read = readMessage(text, images)
+    const missing = [
+      ...(read.vin || read.plate ? [] : ['vehicle']),
+      ...(read.parts ? [] : ['parts']),
+    ]
+    if (missing.length > 0 || !read.parts) return { data: { ...read, missing, lookup: null } }
+
+    const query = read.parts
 
     return archive((state) => {
       const running: Stored = {
         id: state.nextId++,
         company,
-        plate,
-        vin,
+        plate: read.plate,
+        vin: read.vin,
         query,
         country,
         nodeIds: [],
@@ -505,7 +508,7 @@ export const lookupMocks = [
       }
       state.lookups.push(settled(running))
 
-      return { data: lookupOf(running, languageOf(request)) }
+      return { data: { ...read, missing, lookup: lookupOf(running, languageOf(request)) } }
     })
   }),
   getGetApiV1WorkspaceLookupsStatsMockHandler(async ({ request }) => {

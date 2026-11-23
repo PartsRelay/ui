@@ -41,7 +41,7 @@ const loaded = <Item>(...pages: Item[][]) => ({
 })
 
 describe('searches address', () => {
-  it('keeps the page, the filters and the new search sheet', () => {
+  it('keeps the page and the filters', () => {
     const search = {
       page: 2,
       searcherType: 'contact',
@@ -50,10 +50,6 @@ describe('searches address', () => {
       status: 'failed',
       source: 'whatsapp',
       days: 30,
-      new: true,
-      plate: 'AB123CD',
-      vin: 'WVWZZZAUZHW204411',
-      query: 'Oil filter',
     }
 
     expect(lookupsSearchSchema.parse({})).toEqual({ page: 1 })
@@ -98,8 +94,6 @@ describe('searches address', () => {
         status: 'done',
         source: 'web',
         days: 7,
-        new: true,
-        plate: 'AB123CD',
       })
     ).toEqual({ page: 1, search: 'CA7', status: 'done', source: 'web', days: 7 })
   })

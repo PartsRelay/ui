@@ -59,38 +59,7 @@
     "connect": "Collega le officine"
   },
   "new": {
-    "open": "Nuova ricerca",
-    "eyebrow": "Nuova richiesta · Web",
-    "title": "Trova il ricambio.",
-    "description": "Inserisci la targa o il telaio (VIN) e il ricambio che ti serve. Il risultato resta nella coda delle ricerche dell'azienda.",
-    "plate": "Targa",
-    "plate-hint": "Spazi, punti e trattini vanno bene.",
-    "plate-placeholder": "AB123CD",
-    "query": "Ricambio richiesto",
-    "query-hint": "Sii preciso: nome del ricambio e posizione, se la conosci.",
-    "query-placeholder": "Pastiglie freno anteriori",
-    "tips": {
-      "title": "Consigli per la ricerca",
-      "body": "Controlla la targa e indica la posizione del ricambio, per esempio anteriore o posteriore."
-    },
-    "requester": "Richiesta da {name} · Web",
-    "submit": "Avvia la ricerca",
-    "errors": {
-      "plate-required": "Inserisci la targa.",
-      "plate": "Controlla la targa: da 4 a 8 lettere e cifre.",
-      "query-required": "Inserisci il ricambio che ti serve, per esempio pastiglie freno anteriori.",
-      "query": "Descrivi il ricambio con almeno 2 caratteri.",
-      "vin-required": "Inserisci il telaio.",
-      "vin": "Controlla il telaio: 17 lettere e cifre, senza I, O e Q."
-    },
-    "identify": "Identifica il veicolo con",
-    "by": {
-      "plate": "Targa",
-      "vin": "Telaio (VIN)"
-    },
-    "vin": "Telaio (VIN)",
-    "vin-hint": "17 lettere e cifre, senza I, O e Q.",
-    "vin-placeholder": "WVWZZZAUZHW204411"
+    "open": "Nuova ricerca"
   },
   "fitment": "I risultati aiutano a identificare il ricambio. Verifica sempre la compatibilità con il veicolo prima dell'acquisto.",
   "detail": {
@@ -156,5 +125,57 @@
       "title": "Chi cerca di più",
       "description": "Ultimi {days} giorni · Solo il proprietario lo vede"
     }
+  },
+  "ai": {
+    "title": "Che ricambio ti serve?",
+    "description": "Scrivi la targa o il telaio e i ricambi, oppure allega una foto del libretto.",
+    "message": "Richiesta",
+    "message-hint": "Invio per mandare, Maiusc+Invio per andare a capo. Il telaio vale più della targa.",
+    "message-placeholder": "Targa o telaio, e i ricambi che ti servono",
+    "attach": "Allega foto",
+    "remove": "Rimuovi {name}",
+    "send": "Cerca",
+    "open": "Apri il risultato",
+    "refused": "{count, plural, one {# foto è stata scartata: al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.} other {# foto sono state scartate: al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.}}",
+    "trace": {
+      "reading": "Leggo la richiesta",
+      "read": "Richiesta letta",
+      "read-failed": "Non sono riuscito a leggere la richiesta",
+      "missing-vehicle": "Manca la targa o il telaio",
+      "missing-parts": "Manca il ricambio",
+      "searching": "Identifico il veicolo e cerco i ricambi",
+      "vehicle": "Veicolo identificato",
+      "vehicle-not-found": "Veicolo non trovato",
+      "not-matched": "Nessuna categoria per questi ricambi",
+      "found": "Ricambi trovati",
+      "failed": "La ricerca non è riuscita"
+    },
+    "errors": {
+      "message": "Scrivi la richiesta in al massimo 2000 caratteri, o allega una foto.",
+      "images": "Allega al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.",
+      "empty": "Scrivi la richiesta, o allega una foto."
+    },
+    "head": "Nuova ricerca",
+    "examples-label": "Prova con",
+    "examples": {
+      "brakes": "Pastiglie freno anteriori per AB 123 CD",
+      "filters": "Filtro olio e filtro aria per GH 482 KL",
+      "clutch": "Kit frizione, telaio WVWZZZAUZHW204411"
+    },
+    "conversation": "Conversazione",
+    "you": "Tu",
+    "assistant": "Assistente",
+    "reply": {
+      "missing-both": "Dimmi la targa o il telaio e i ricambi che ti servono, oppure allega una foto del libretto.",
+      "missing-vehicle": "Mi serve la targa o il telaio del veicolo: scrivili qui, oppure allega una foto del libretto.",
+      "missing-parts": "Quali ricambi ti servono per {vehicle}?",
+      "found": "{count, plural, one {Ho trovato # categoria} other {Ho trovato # categorie}} per {vehicle}: {categories}.",
+      "done": "La ricerca è finita: apri il risultato per vederla.",
+      "vehicle-not-found": "Non ho trovato un veicolo per {identifier}. Controlla la targa, oppure scrivi il telaio.",
+      "not-matched": "Nel catalogo di {vehicle} non c'è una categoria per {parts}. Prova con altre parole.",
+      "failed": "La ricerca non è riuscita. Riprova tra poco."
+    },
+    "reply-placeholder": "Rispondi all'assistente",
+    "retry": "Riprova"
   }
 }

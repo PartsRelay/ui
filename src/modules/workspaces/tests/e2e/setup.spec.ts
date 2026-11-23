@@ -54,8 +54,8 @@ test.describe('as a newcomer', () => {
       '/contacts'
     )
     await page.getByRole('link', { name: 'Start a search' }).click()
-    await expect(page.getByRole('dialog', { name: 'Find the part.' })).toBeVisible()
-    await page.keyboard.press('Escape')
+    await expect(page).toHaveURL('/lookups/new')
+    await expect(page.getByRole('textbox', { name: 'Request' })).toBeFocused()
 
     await page.goto('/workspace')
     await expect(page.getByRole('row', { name: /Anna North \(you\)/ })).toContainText('Owner')

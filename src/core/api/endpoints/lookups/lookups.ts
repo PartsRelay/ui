@@ -30,8 +30,8 @@ import type {
 import type {
   ErrorBody,
   GetApiV1LookupsLookupId200,
-  PostApiV1Lookups202,
-  PostApiV1LookupsBody
+  PostApiV1LookupsMessage200,
+  PostApiV1LookupsMessageBody
 } from '../../models';
 
 import { http } from '../../../http/client';
@@ -57,16 +57,26 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export const postApiV1Lookups = (
-    postApiV1LookupsBody?: BodyType<PostApiV1LookupsBody>,
+export const postApiV1LookupsMessage = (
+    postApiV1LookupsMessageBody?: BodyType<PostApiV1LookupsMessageBody>,
  options?: SecondParameter<typeof http>,signal?: AbortSignal
 ) => {
 
+      const formData = postApiV1LookupsMessageBody === undefined ? undefined : (() => {
+const formData = new FormData();
+if(postApiV1LookupsMessageBody?.message !== undefined) {
+ formData.append(`message`, postApiV1LookupsMessageBody.message);
+ }
+if(postApiV1LookupsMessageBody?.images !== undefined) {
+ postApiV1LookupsMessageBody?.images.forEach(value => formData.append(`images`, value));
+ }
+return formData;
+})();
 
-      return http<PostApiV1Lookups202>(
-      {url: `/api/v1/lookups`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: postApiV1LookupsBody, signal
+      return http<PostApiV1LookupsMessage200>(
+      {url: `/api/v1/lookups/message`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
     },
       options);
     }
@@ -74,13 +84,13 @@ export const postApiV1Lookups = (
 
 
 
-export const getPostApiV1LookupsMutationKey = () => ['postApiV1Lookups'] as const;
+export const getPostApiV1LookupsMessageMutationKey = () => ['postApiV1LookupsMessage'] as const;
 
-export const getPostApiV1LookupsMutationOptions = <TError = ErrorType<ErrorBody>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1Lookups>>, TError,PostApiV1LookupsMutationVariables, TContext>, request?: SecondParameter<typeof http>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiV1Lookups>>, TError,PostApiV1LookupsMutationVariables, TContext> => {
+export const getPostApiV1LookupsMessageMutationOptions = <TError = ErrorType<ErrorBody>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1LookupsMessage>>, TError,PostApiV1LookupsMessageMutationVariables, TContext>, request?: SecondParameter<typeof http>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1LookupsMessage>>, TError,PostApiV1LookupsMessageMutationVariables, TContext> => {
 
-const mutationKey = getPostApiV1LookupsMutationKey();
+const mutationKey = getPostApiV1LookupsMessageMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -90,10 +100,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1Lookups>>, PostApiV1LookupsMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1LookupsMessage>>, PostApiV1LookupsMessageMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  postApiV1Lookups(data,requestOptions)
+          return  postApiV1LookupsMessage(data,requestOptions)
         }
 
 
@@ -103,20 +113,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostApiV1LookupsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1Lookups>>>
-    export type PostApiV1LookupsMutationBody = BodyType<PostApiV1LookupsBody> | undefined
-    export type PostApiV1LookupsMutationError = ErrorType<ErrorBody>
-    export type PostApiV1LookupsMutationVariables = {data?: BodyType<PostApiV1LookupsBody>}
+    export type PostApiV1LookupsMessageMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1LookupsMessage>>>
+    export type PostApiV1LookupsMessageMutationBody = BodyType<PostApiV1LookupsMessageBody> | undefined
+    export type PostApiV1LookupsMessageMutationError = ErrorType<ErrorBody>
+    export type PostApiV1LookupsMessageMutationVariables = {data?: BodyType<PostApiV1LookupsMessageBody>}
 
-    export const usePostApiV1Lookups = <TError = ErrorType<ErrorBody>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1Lookups>>, TError,PostApiV1LookupsMutationVariables, TContext>, request?: SecondParameter<typeof http>}
+    export const usePostApiV1LookupsMessage = <TError = ErrorType<ErrorBody>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1LookupsMessage>>, TError,PostApiV1LookupsMessageMutationVariables, TContext>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiV1Lookups>>,
+        Awaited<ReturnType<typeof postApiV1LookupsMessage>>,
         TError,
-        PostApiV1LookupsMutationVariables,
+        PostApiV1LookupsMessageMutationVariables,
         TContext
       > => {
-      return useMutation(getPostApiV1LookupsMutationOptions(options), queryClient);
+      return useMutation(getPostApiV1LookupsMessageMutationOptions(options), queryClient);
     }
     export const getApiV1LookupsLookupId = (
     lookupId: string,
@@ -186,7 +196,6 @@ export function useGetApiV1LookupsLookupId<TData = Awaited<ReturnType<typeof get
  lookupId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1LookupsLookupId<TData = Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError = ErrorType<ErrorBody>>(
  lookupId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -238,7 +247,6 @@ export function useGetApiV1LookupsLookupIdSuspense<TData = Awaited<ReturnType<ty
  lookupId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1LookupsLookupIdSuspense<TData = Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError = ErrorType<ErrorBody>>(
  lookupId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1LookupsLookupId>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient

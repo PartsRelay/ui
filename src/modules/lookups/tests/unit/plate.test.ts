@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test'
-import { formatPlate, plateCountry, plateExample } from '@/modules/lookups/core/plate'
+import { formatPlate, plateCountry } from '@/modules/lookups/core/plate'
 
 describe('formatPlate', () => {
   it('writes a plate as the country of the company does', () => {
@@ -29,23 +29,6 @@ describe('formatPlate', () => {
     expect(formatPlate('7ABC123', 'US')).toBe('7ABC123')
     expect(formatPlate('AB12CDE', 'IT')).toBe('AB12CDE')
     expect(formatPlate('ROMA12', 'IT')).toBe('ROMA12')
-  })
-})
-
-describe('plateExample', () => {
-  it('shows a plate of the country of the company', () => {
-    expect(plateExample('IT')).toBe('AB 123 CD')
-    expect(plateExample('DE')).toBe('M-AB 1234')
-    expect(plateExample('GB')).toBe('AB12 CDE')
-  })
-
-  it('shows a plate as the core keeps it for a country without a format', () => {
-    expect(plateExample('US')).toBe('7ABC123')
-    expect(plateExample('AT')).toBe('G123AB')
-  })
-
-  it('has none without a country', () => {
-    expect(plateExample(null)).toBeNull()
   })
 })
 

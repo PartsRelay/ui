@@ -98,6 +98,7 @@ export function lookupListParams({
   return {
     page,
     ...requester,
+    // Plates and VINs are stored without spaces, dots or dashes
     search: search?.replace(/[\s.-]/g, '') || undefined,
     status,
     source,

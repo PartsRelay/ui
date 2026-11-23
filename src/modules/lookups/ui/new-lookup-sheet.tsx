@@ -12,8 +12,6 @@ import {
   querySchema,
   toIdentifier,
 } from '@/modules/lookups/core/lookup-form'
-import { plateExample } from '@/modules/lookups/core/plate'
-import { useRegionalCountry } from '@/modules/workspaces/ui/hooks/use-regional-country'
 import { useStartLookup } from '@/modules/lookups/ui/hooks/use-start-lookup'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { Callout } from '@/ui/components/callout'
@@ -53,7 +51,6 @@ export function NewLookupSheet({ open, prefill, onClose }: NewLookupSheetProps) 
 
 function NewLookupForm({ prefill }: { prefill: LookupPrefill }) {
   const { t } = useTranslation()
-  const example = plateExample(useRegionalCountry())
   const { me } = useMe()
   const navigate = useNavigate()
   const start = useStartLookup()
@@ -110,9 +107,7 @@ function NewLookupForm({ prefill }: { prefill: LookupPrefill }) {
                     autoComplete="off"
                     autoCapitalize="characters"
                     spellCheck={false}
-                    placeholder={
-                      by === 'plate' && example ? example : t(`lookups.new.${by}-placeholder`)
-                    }
+                    placeholder={t(`lookups.new.${by}-placeholder`)}
                     className="uppercase placeholder:normal-case"
                   />
                 )}

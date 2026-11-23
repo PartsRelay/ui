@@ -468,11 +468,6 @@ test.describe('in an Italian company', () => {
     await expect(
       queue(page).getByRole('link', { name: 'Open the search of FT915ZR' }).first()
     ).toBeVisible()
-    await page.getByRole('link', { name: 'New search' }).first().click()
-    await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveAttribute(
-      'placeholder',
-      'AB123CD'
-    )
   })
 
   test.describe('with the regional-format flag', () => {
@@ -485,14 +480,6 @@ test.describe('in an Italian company', () => {
       await queue(page).getByRole('link', { name: 'Open the search of FT 915 ZR' }).first().click()
 
       await expect(page.getByRole('heading', { level: 2, name: 'FT 915 ZR' })).toBeVisible()
-    })
-
-    test('a new search shows an Italian plate', async ({ page }) => {
-      await page.getByRole('link', { name: 'New search' }).first().click()
-
-      await expect(
-        sheet(page).getByRole('textbox', { name: 'Registration plate' })
-      ).toHaveAttribute('placeholder', 'AB 123 CD')
     })
 
     test('a plate searched as it is shown finds its searches', async ({ page }) => {

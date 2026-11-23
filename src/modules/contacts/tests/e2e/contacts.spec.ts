@@ -212,3 +212,22 @@ test.describe('with the regional-format flag in a British company', () => {
     )
   })
 })
+
+test('with the contact-country flag a number shows its country', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('mock.flags', 'contact-country'))
+  await page.goto('/contacts')
+  const search = page.getByRole('searchbox', { name: 'Search' })
+
+  await search.fill('capitol')
+  await expect(
+    page.getByRole('row', { name: /Capitol Auto Care/ }).getByRole('img', { name: 'United States' })
+  ).toBeVisible()
+  await search.fill('oak')
+  await expect(page.getByRole('row', { name: /Oakfield Garage/ }).getByRole('img')).toHaveCount(0)
+})
+
+test('without the contact-country flag no number shows a country', async ({ page }) => {
+  await page.getByRole('searchbox', { name: 'Search' }).fill('capitol')
+
+  await expect(page.getByRole('row', { name: /Capitol Auto Care/ }).getByRole('img')).toHaveCount(0)
+})

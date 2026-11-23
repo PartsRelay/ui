@@ -68,7 +68,14 @@ const myRole = ({ company, me }: World) =>
 
 function signedInMember() {
   return world((state) =>
-    state.signedIn ? { company: state.company.slug, role: myRole(state), user: state.me } : null
+    state.signedIn
+      ? {
+          company: state.company.slug,
+          country: state.company.country,
+          role: myRole(state),
+          user: state.me,
+        }
+      : null
   )
 }
 

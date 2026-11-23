@@ -6,7 +6,7 @@ import {
 } from 'libphonenumber-js'
 import type { ContactObject } from '@/core/api/models'
 import { type Message, message } from '@/core/message'
-import type { Country } from '@/modules/workspaces/core/country'
+import { type Country, toCountry } from '@/modules/workspaces/core/country'
 import type { Me } from '@/modules/workspaces/core/workspace'
 
 export type ContactRow = {
@@ -14,6 +14,7 @@ export type ContactRow = {
   name: string
   whatsappName: string | null
   phone: string
+  numberCountry: Country | null
   statusLabel: Message
   tone: 'success' | 'danger'
   searches: { total: number; month: number }
@@ -32,6 +33,11 @@ export function formatPhone(phone: string, country: Country | null = null) {
   return country && number.countryCallingCode === getCountryCallingCode(country as CountryCode)
     ? number.formatNational()
     : number.formatInternational()
+}
+
+// Like the core: the country of a valid number, if in the list
+export function numberCountry(waId: string) {
+  return toCountry(parsePhoneNumberFromString(`+${waId}`)?.country)
 }
 
 const phoneOf = ({ waId }: ContactObject, country: Country | null) =>
@@ -54,6 +60,7 @@ export function contactRow(
     name: contactName(contact, country),
     whatsappName: contact.name && contact.profileName !== contact.name ? contact.profileName : null,
     phone: phoneOf(contact, country),
+    numberCountry: numberCountry(contact.waId),
     statusLabel: message(`contacts.status.${contact.status}`),
     tone: TONES[contact.status],
     searches: { total: contact.lookupsCount, month: contact.monthLookupsCount },

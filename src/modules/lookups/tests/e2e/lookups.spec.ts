@@ -451,77 +451,128 @@ test.describe('in an American browser', () => {
 })
 
 test.describe('with the ai-search flag', () => {
-  const request = (page: Page) => sheet(page).getByRole('textbox', { name: 'Request' })
-  const trace = (page: Page) => sheet(page).getByRole('region', { name: 'What the assistant did' })
-  const send = (page: Page) =>
-    sheet(page).getByRole('button', { name: 'Search', exact: true }).click()
+  const request = (page: Page) => page.getByRole('textbox', { name: 'Request' })
+  const trace = (page: Page) => page.getByRole('region', { name: 'What the assistant did' })
+  const send = (page: Page) => page.getByRole('button', { name: 'Search', exact: true }).click()
 
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('mock.flags', 'ai-search'))
     await page.goto('/lookups')
     await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+  })
+
+  test('a new search opens its own page', async ({ page }) => {
     await page.getByRole('link', { name: 'New search' }).first().click()
+
+    await expect(page).toHaveURL('/lookups/new')
+    await expect(page.getByRole('heading', { level: 1, name: 'Find the part.' })).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'breadcrumb' })).toContainText('New search')
+    await expect(request(page)).toBeFocused()
+    await expect(page.getByRole('textbox', { name: 'Registration plate' })).toHaveCount(0)
+    await expect(trace(page)).toContainText(
+      'Write the request and press Search: each step of the assistant shows here.'
+    )
   })
 
-  test('one message is read, searched and opened', async ({ page }) => {
-    await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveCount(0)
-    await request(page).fill('Front brake pads for AB 123 CD')
-    await send(page)
+  test.describe('on the new search page', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.getByRole('link', { name: 'New search' }).first().click()
+      await expect(request(page)).toBeVisible()
+    })
 
-    await expect(trace(page)).toContainText('Read the request')
-    await expect(trace(page)).toContainText('AB123CD · Front brake pads')
-    await expect(trace(page)).toContainText('Identified the vehicle')
-    await expect(trace(page)).toContainText('Fiat Panda 1.2')
-    await expect(trace(page)).toContainText('Found the parts')
+    test('one message is read, searched and opened', async ({ page }) => {
+      await request(page).fill('Front brake pads for AB 123 CD')
+      await send(page)
 
-    await sheet(page).getByRole('link', { name: 'Open the result' }).click()
-    await expect(page).toHaveURL(/\/lookups\/\d+$/)
-    await expect(page.getByRole('heading', { level: 2, name: 'Front brake pads' })).toBeVisible()
-  })
+      await expect(trace(page)).toContainText('Read the request')
+      await expect(trace(page)).toContainText('AB123CD · Front brake pads')
+      await expect(trace(page)).toContainText('Identified the vehicle')
+      await expect(trace(page)).toContainText('Fiat Panda 1.2')
+      await expect(trace(page)).toContainText('Found the parts')
 
-  test('a VIN in the message wins over the plate', async ({ page }) => {
-    await request(page).fill('Oil filter, VIN ZFA31200003456789, plate DK 318 MP')
-    await send(page)
+      await page.getByRole('link', { name: 'Open the result' }).click()
+      await expect(page).toHaveURL(/\/lookups\/\d+$/)
+      await expect(page.getByRole('heading', { level: 2, name: 'Front brake pads' })).toBeVisible()
+    })
 
-    await expect(trace(page)).toContainText('ZFA31200003456789 · DK318MP · Oil filter')
-    await expect(trace(page)).toContainText('Fiat Panda 1.2')
-    await expect(trace(page)).not.toContainText('Renault Clio')
-  })
+    test('the page keeps the search in its address, so a reload shows it again', async ({
+      page,
+    }) => {
+      await request(page).fill('Oil filter for GH 482 KL')
+      await send(page)
+      await expect(trace(page)).toContainText('Found the parts')
+      await expect(page).toHaveURL(/\/lookups\/new\?lookupId=\d+$/)
 
-  test('a photo of the registration document gives the plate', async ({ page }) => {
-    await sheet(page)
-      .locator('input[type=file]')
-      .setInputFiles({
+      await page.reload()
+
+      await expect(trace(page)).toContainText('GH482KL · Oil filter')
+      await expect(trace(page)).toContainText('Fiat Panda 1.2 8V')
+      await expect(trace(page)).toContainText('Found the parts')
+    })
+
+    test('a VIN in the message wins over the plate', async ({ page }) => {
+      await request(page).fill('Oil filter, VIN ZFA31200003456789, plate DK 318 MP')
+      await send(page)
+
+      await expect(trace(page)).toContainText('ZFA31200003456789 · DK318MP · Oil filter')
+      await expect(trace(page)).toContainText('Fiat Panda 1.2')
+      await expect(trace(page)).not.toContainText('Renault Clio')
+    })
+
+    test('a photo of the registration document gives the plate', async ({ page }) => {
+      await page.locator('input[type=file]').setInputFiles({
         name: 'libretto-FT915ZR.jpg',
         mimeType: 'image/jpeg',
         buffer: Buffer.from('jpeg'),
       })
-    await expect(
-      sheet(page).getByRole('button', { name: 'Remove libretto-FT915ZR.jpg' })
-    ).toBeVisible()
-    await request(page).fill('Oil filter')
-    await send(page)
+      await expect(page.getByRole('button', { name: 'Remove libretto-FT915ZR.jpg' })).toBeVisible()
+      await request(page).fill('Oil filter')
+      await send(page)
 
-    await expect(trace(page)).toContainText('FT915ZR · Oil filter')
-    await expect(trace(page)).toContainText('Volkswagen Golf VII 2.0 TDI')
+      await expect(trace(page)).toContainText('FT915ZR · Oil filter')
+      await expect(trace(page)).toContainText('Volkswagen Golf VII 2.0 TDI')
+    })
+
+    test('a message without a plate or a VIN says what is missing', async ({ page }) => {
+      await request(page).fill('Oil filter')
+      await send(page)
+
+      await expect(trace(page)).toContainText(
+        'No plate or VIN: add one, or a photo of the registration document'
+      )
+      await expect(page.getByRole('link', { name: 'Open the result' })).toHaveCount(0)
+      await expect(page).toHaveURL('/lookups/new')
+    })
+
+    test('an empty request asks for a message or a photo', async ({ page }) => {
+      await send(page)
+
+      await expect(request(page)).toBeFocused()
+      await expect(request(page)).toHaveAccessibleDescription(
+        /Write the request, or attach a photo\./
+      )
+    })
   })
 
-  test('a message without a plate or a VIN says what is missing', async ({ page }) => {
-    await request(page).fill('Oil filter')
+  test('a failed search is offered again on the page, as one message', async ({ page }) => {
+    await page.goto('/lookups/new')
+    await request(page).fill('Oil filter for XY 123 ZZ')
     await send(page)
+    await expect(trace(page)).toContainText('Vehicle not found: check the plate or the VIN')
+    await page.getByRole('link', { name: 'Open the result' }).click()
 
-    await expect(trace(page)).toContainText(
-      'No plate or VIN: add one, or a photo of the registration document'
-    )
-    await expect(sheet(page).getByRole('link', { name: 'Open the result' })).toHaveCount(0)
+    await page.getByRole('link', { name: 'Search again' }).click()
+
+    await expect(page).toHaveURL(/\/lookups\/new\?/)
+    await expect(request(page)).toHaveValue('XY123ZZ Oil filter')
   })
+})
 
-  test('an empty request asks for a message or a photo', async ({ page }) => {
-    await send(page)
+test('without the ai-search flag the new search page leads to the form', async ({ page }) => {
+  await page.goto('/lookups/new?plate=AB123CD&query=Oil+filter')
 
-    await expect(request(page)).toBeFocused()
-    await expect(request(page)).toHaveAccessibleDescription(
-      /Write the request, or attach a photo\./
-    )
-  })
+  await expect(page).toHaveURL(/\/lookups\?.*new=true/)
+  await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveValue(
+    'AB123CD'
+  )
 })

@@ -186,6 +186,8 @@
       "message": "Scrivi la richiesta in al massimo 2000 caratteri, o allega una foto.",
       "images": "Allega al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.",
       "empty": "Scrivi la richiesta, o allega una foto."
-    }
+    },
+    "head": "Nuova ricerca",
+    "trace-empty": "Scrivi la richiesta e premi Cerca: qui vedi ogni passo dell'assistente."
   }
 }

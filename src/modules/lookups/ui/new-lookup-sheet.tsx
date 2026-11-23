@@ -13,7 +13,6 @@ import {
   toIdentifier,
 } from '@/modules/lookups/core/lookup-form'
 import { useStartLookup } from '@/modules/lookups/ui/hooks/use-start-lookup'
-import { MessageSearch } from '@/modules/lookups/ui/message-search'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { Callout } from '@/ui/components/callout'
 import { ChoiceGroup } from '@/ui/components/choice-group'
@@ -31,14 +30,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/ui/components/ui/sheet'
-import { useFlag } from '@/ui/hooks/use-flag'
 import { useReturnFocus } from '@/ui/hooks/use-return-focus'
 
 type NewLookupSheetProps = { open: boolean; prefill: LookupPrefill; onClose: () => void }
 
 export function NewLookupSheet({ open, prefill, onClose }: NewLookupSheetProps) {
   const returnFocus = useReturnFocus(open)
-  const aiSearch = useFlag('ai-search')
 
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
@@ -46,7 +43,7 @@ export function NewLookupSheet({ open, prefill, onClose }: NewLookupSheetProps) 
         onCloseAutoFocus={returnFocus}
         className="gap-0 overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-lg"
       >
-        {aiSearch ? <MessageSearch prefill={prefill} /> : <NewLookupForm prefill={prefill} />}
+        <NewLookupForm prefill={prefill} />
       </SheetContent>
     </Sheet>
   )

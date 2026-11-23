@@ -1,4 +1,4 @@
-import { getRouteApi, useCanGoBack, useRouter } from '@tanstack/react-router'
+import { getRouteApi, Navigate, useCanGoBack, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { greeting } from '@/modules/lookups/core/lookup-stats'
 import { LookupQueue } from '@/modules/lookups/ui/lookup-queue'
@@ -7,6 +7,7 @@ import { NewLookupButton } from '@/modules/lookups/ui/new-lookup-button'
 import { NewLookupSheet } from '@/modules/lookups/ui/new-lookup-sheet'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
 import { PageHeader } from '@/ui/components/page-header'
+import { useFlag } from '@/ui/hooks/use-flag'
 
 const route = getRouteApi('/_app/(lookups)/lookups/')
 
@@ -17,6 +18,7 @@ export function LookupsPage() {
   const navigate = route.useNavigate()
   const router = useRouter()
   const canGoBack = useCanGoBack()
+  const aiSearch = useFlag('ai-search')
   const close = () =>
     canGoBack
       ? router.history.back()
@@ -31,6 +33,8 @@ export function LookupsPage() {
           replace: true,
           resetScroll: false,
         })
+
+  if (open && aiSearch) return <Navigate to="/lookups/new" search={{ plate, vin, query }} replace />
 
   return (
     <>

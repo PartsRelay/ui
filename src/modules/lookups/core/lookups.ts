@@ -43,6 +43,15 @@ export const lookupsSearchSchema = filtersSchema.extend({
 
 export type LookupsSearch = z.infer<typeof lookupsSearchSchema>
 
+export const newSearchSchema = z.object({
+  plate: optionalText,
+  vin: optionalText,
+  query: optionalText,
+  lookupId: z.number().int().positive().optional().catch(undefined),
+})
+
+export type NewSearch = z.infer<typeof newSearchSchema>
+
 export type LookupFilters = z.infer<typeof filtersSchema>
 
 export type Requester = z.infer<typeof requesterSchema>

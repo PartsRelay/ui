@@ -7,6 +7,7 @@ import {
   MAX_IMAGE_BYTES,
   messageError,
   messageOf,
+  readOfLookup,
   searchTrace,
 } from '@/modules/lookups/core/message-search'
 import { lookupFixture } from '@/modules/lookups/tests/unit/fixtures'
@@ -103,5 +104,17 @@ describe('message search', () => {
       messageError(coreError(422, 'validation-error', [{ field: 'images', rule: 'file.size' }]))
     ).toEqual(message('lookups.ai.errors.images'))
     expect(messageError(null)).toBeNull()
+  })
+
+  it('shows a search kept in the address as read from its row', () => {
+    const lookup = lookupFixture(7)
+
+    expect(readOfLookup(lookup)).toEqual({
+      vin: 'WF0FXXGCDFKA12345',
+      plate: 'AB12CDE',
+      parts: 'Oil filter change',
+      missing: [],
+      lookup,
+    })
   })
 })

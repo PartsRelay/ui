@@ -23,6 +23,7 @@ import { Route as AppworkspacesCompanyRouteImport } from './routes/_app/(workspa
 import { Route as AppworkspacesWorkspaceRouteImport } from './routes/_app/(workspaces)/workspace'
 import { Route as ApplookupsLookupsIndexRouteImport } from './routes/_app/(lookups)/lookups.index'
 import { Route as ApplookupsLookupsLookupIdRouteImport } from './routes/_app/(lookups)/lookups.$lookupId'
+import { Route as ApplookupsLookupsNewRouteImport } from './routes/_app/(lookups)/lookups.new'
 
 const authRouteRoute = authRouteRouteImport.update({
   id: '/(auth)',
@@ -94,6 +95,11 @@ const ApplookupsLookupsLookupIdRoute =
     path: '/lookups/$lookupId',
     getParentRoute: () => AppRouteRoute,
   } as any)
+const ApplookupsLookupsNewRoute = ApplookupsLookupsNewRouteImport.update({
+  id: '/(lookups)/lookups/new',
+  path: '/lookups/new',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppworkspacesIndexRoute
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/company': typeof AppworkspacesCompanyRoute
   '/workspace': typeof AppworkspacesWorkspaceRoute
   '/lookups/$lookupId': typeof ApplookupsLookupsLookupIdRoute
+  '/lookups/new': typeof ApplookupsLookupsNewRoute
   '/lookups/': typeof ApplookupsLookupsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/company': typeof AppworkspacesCompanyRoute
   '/workspace': typeof AppworkspacesWorkspaceRoute
   '/lookups/$lookupId': typeof ApplookupsLookupsLookupIdRoute
+  '/lookups/new': typeof ApplookupsLookupsNewRoute
   '/lookups': typeof ApplookupsLookupsIndexRoute
 }
 export interface FileRoutesById {
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/_app/(workspaces)/workspace': typeof AppworkspacesWorkspaceRoute
   '/_app/(workspaces)/': typeof AppworkspacesIndexRoute
   '/_app/(lookups)/lookups/$lookupId': typeof ApplookupsLookupsLookupIdRoute
+  '/_app/(lookups)/lookups/new': typeof ApplookupsLookupsNewRoute
   '/_app/(lookups)/lookups/': typeof ApplookupsLookupsIndexRoute
 }
 export interface FileRouteTypes {
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/company'
     | '/workspace'
     | '/lookups/$lookupId'
+    | '/lookups/new'
     | '/lookups/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/company'
     | '/workspace'
     | '/lookups/$lookupId'
+    | '/lookups/new'
     | '/lookups'
   id:
     | '__root__'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/_app/(workspaces)/workspace'
     | '/_app/(workspaces)/'
     | '/_app/(lookups)/lookups/$lookupId'
+    | '/_app/(lookups)/lookups/new'
     | '/_app/(lookups)/lookups/'
   fileRoutesById: FileRoutesById
 }
@@ -293,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplookupsLookupsLookupIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/(lookups)/lookups/new': {
+      id: '/_app/(lookups)/lookups/new'
+      path: '/lookups/new'
+      fullPath: '/lookups/new'
+      preLoaderRoute: typeof ApplookupsLookupsNewRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
@@ -320,6 +339,7 @@ interface AppRouteRouteChildren {
   AppworkspacesWorkspaceRoute: typeof AppworkspacesWorkspaceRoute
   AppworkspacesIndexRoute: typeof AppworkspacesIndexRoute
   ApplookupsLookupsLookupIdRoute: typeof ApplookupsLookupsLookupIdRoute
+  ApplookupsLookupsNewRoute: typeof ApplookupsLookupsNewRoute
   ApplookupsLookupsIndexRoute: typeof ApplookupsLookupsIndexRoute
 }
 
@@ -331,6 +351,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppworkspacesWorkspaceRoute: AppworkspacesWorkspaceRoute,
   AppworkspacesIndexRoute: AppworkspacesIndexRoute,
   ApplookupsLookupsLookupIdRoute: ApplookupsLookupsLookupIdRoute,
+  ApplookupsLookupsNewRoute: ApplookupsLookupsNewRoute,
   ApplookupsLookupsIndexRoute: ApplookupsLookupsIndexRoute,
 }
 

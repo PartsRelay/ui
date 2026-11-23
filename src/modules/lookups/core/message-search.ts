@@ -23,6 +23,11 @@ type Search = {
   lookup: LookupObject | undefined
 }
 
+// What a search kept in the URL was read from, after a reload
+export function readOfLookup(lookup: LookupObject): LookupMessageObject {
+  return { vin: lookup.vin, plate: lookup.plate, parts: lookup.query, missing: [], lookup }
+}
+
 // The message a failed search offers to send again
 export function messageOf({ plate, vin, query }: LookupPrefill) {
   return [vin ?? plate, query].filter(Boolean).join(' ')

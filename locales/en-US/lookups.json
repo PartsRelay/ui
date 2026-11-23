@@ -186,6 +186,8 @@
       "message": "Write the request in at most 2000 characters, or attach a photo.",
       "images": "Attach up to 4 photos, JPG, PNG or WebP, 5 MB each.",
       "empty": "Write the request, or attach a photo."
-    }
+    },
+    "head": "New search",
+    "trace-empty": "Write the request and press Search: each step of the assistant shows here."
   }
 }

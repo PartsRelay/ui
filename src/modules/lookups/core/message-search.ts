@@ -5,7 +5,7 @@ import type {
 } from '@/core/api/models'
 import { errorMessage, fieldErrors } from '@/core/errors'
 import { type Message, message } from '@/core/message'
-import type { LookupPrefill } from '@/modules/lookups/core/lookup-form'
+import type { LookupPrefill } from '@/modules/lookups/core/lookups'
 
 export const MAX_IMAGES = 4
 

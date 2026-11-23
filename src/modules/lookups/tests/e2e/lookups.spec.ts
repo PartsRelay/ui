@@ -3,16 +3,24 @@ import { expect, type Locator, type Page, test } from '@playwright/test'
 const queue = (page: Page) =>
   page.getByRole('table').filter({ has: page.getByRole('columnheader', { name: 'Plate' }) })
 
-const sheet = (page: Page) => page.getByRole('dialog', { name: 'Find the part.' })
-
 const greeting = /^Good (morning|afternoon|evening), Mark Reed\.$/
 
-async function startSearch(page: Page, plate: string, part: string) {
+const request = (page: Page) => page.getByRole('textbox', { name: 'Request' })
+
+const chat = (page: Page) => page.getByRole('log', { name: 'Conversation' })
+
+const asked = (page: Page) => chat(page).getByRole('article', { name: 'You' })
+
+const answered = (page: Page) => chat(page).getByRole('article', { name: 'Assistant' })
+
+const send = (page: Page) => page.getByRole('button', { name: 'Search', exact: true }).click()
+
+// Asks the assistant, then opens the result once the search ends
+async function startSearch(page: Page, message: string) {
   await page.getByRole('link', { name: 'New search' }).first().click()
-  await expect(sheet(page)).toBeVisible()
-  await sheet(page).getByRole('textbox', { name: 'Registration plate' }).fill(plate)
-  await sheet(page).getByRole('textbox', { name: 'Part needed' }).fill(part)
-  await sheet(page).getByRole('button', { name: 'Start search' }).click()
+  await request(page).fill(message)
+  await send(page)
+  await answered(page).last().getByRole('link', { name: 'Open the result' }).click()
 }
 
 async function pick(page: Page, filter: string, option: string) {
@@ -219,42 +227,8 @@ test.describe('as the owner', () => {
     await expect(page.getByText('24 searches')).toBeVisible()
   })
 
-  test('a new search needs a plate and the part, like the core', async ({ page }) => {
-    await page.getByRole('link', { name: 'New search' }).first().click()
-    await expect(page).toHaveURL('/lookups?new=true')
-    await sheet(page).getByRole('button', { name: 'Start search' }).click()
-
-    const plate = sheet(page).getByRole('textbox', { name: 'Registration plate' })
-    const part = sheet(page).getByRole('textbox', { name: 'Part needed' })
-    await expect(plate).toBeFocused()
-    await expect(plate).toHaveAccessibleDescription('Enter the registration plate.')
-    await expect(part).toHaveAccessibleDescription(
-      'Enter the part you need, such as front brake pads.'
-    )
-    await expect(part).not.toHaveAttribute('maxlength')
-
-    await plate.fill('CA 7')
-    await sheet(page).getByRole('button', { name: 'Start search' }).click()
-    await expect(plate).toHaveAccessibleDescription('Check the plate: 4 to 8 letters and digits.')
-
-    await page.goBack()
-    await expect(sheet(page)).toBeHidden()
-    await expect(page).toHaveURL('/lookups')
-  })
-
-  test('closing a new search puts the focus back on its link', async ({ page }) => {
-    const open = page.getByRole('link', { name: 'New search' }).first()
-    await open.focus()
-    await page.keyboard.press('Enter')
-    await expect(sheet(page)).toBeVisible()
-    await page.keyboard.press('Escape')
-
-    await expect(sheet(page)).toBeHidden()
-    await expect(open).toBeFocused()
-  })
-
   test('a new search opens its result', async ({ page }) => {
-    await startSearch(page, 'ab 123-cd', 'pastiglie freno anteriori')
+    await startSearch(page, 'pastiglie freno anteriori ab 123-cd')
 
     await expect(page).toHaveURL(/\/lookups\/\d+$/)
     await expect(page.getByRole('heading', { level: 2, name: 'AB123CD' })).toBeVisible()
@@ -265,6 +239,8 @@ test.describe('as the owner', () => {
     await expect(page.getByText('pastiglie freno anteriori')).toBeVisible()
 
     await page.getByRole('link', { name: 'Back to searches' }).click()
+    await expect(answered(page)).toContainText('Found the parts')
+    await page.goto('/lookups')
     await expect(page.getByText('25 searches')).toBeVisible()
     await expect(queue(page).getByRole('row').nth(1)).toContainText(/AB123CD.*Done.*Mark Reed/)
   })
@@ -272,7 +248,7 @@ test.describe('as the owner', () => {
   test('the result lists each unit of the catalog with its code, view and positions', async ({
     page,
   }) => {
-    await startSearch(page, 'AB123CD', 'front brake pads')
+    await startSearch(page, 'front brake pads AB123CD')
     const part = (code: string) => page.getByRole('listitem').filter({ hasText: `OEM ${code}` })
 
     await expect(page.getByRole('heading', { level: 3, name: '50110 Front brakes' })).toBeVisible()
@@ -301,7 +277,7 @@ test.describe('as the owner', () => {
   })
 
   test('a category without parts for the vehicle says so', async ({ page }) => {
-    await startSearch(page, 'AB123CD', 'filtro abitacolo')
+    await startSearch(page, 'filtro abitacolo AB123CD')
 
     await expect(page.getByRole('heading', { level: 2, name: 'Cabin filter' })).toBeVisible()
     await expect(page.getByText('0 original parts · 0 aftermarket matches')).toBeVisible()
@@ -309,39 +285,17 @@ test.describe('as the owner', () => {
   })
 
   test('a plate the catalog does not know offers the same search again', async ({ page }) => {
-    await startSearch(page, 'XY123ZZ', 'filtro olio')
+    await startSearch(page, 'filtro olio XY123ZZ')
 
     await expect(page.getByRole('heading', { level: 2, name: 'Vehicle not found' })).toBeVisible()
     await page.getByRole('link', { name: 'Search again' }).click()
 
-    await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveValue(
-      'XY123ZZ'
-    )
-    await expect(sheet(page).getByRole('textbox', { name: 'Part needed' })).toHaveValue(
-      'filtro olio'
-    )
+    await expect(page).toHaveURL(/\/lookups\/new\?/)
+    await expect(request(page)).toHaveValue('XY123ZZ filtro olio')
   })
 
   test('a search by VIN finds the vehicle', async ({ page }) => {
-    await page.getByRole('link', { name: 'New search' }).first().click()
-    const plate = sheet(page).getByRole('textbox', { name: 'Registration plate' })
-    await plate.fill('XX')
-    await sheet(page).getByRole('button', { name: 'Start search' }).click()
-    await expect(plate).toHaveAccessibleDescription('Check the plate: 4 to 8 letters and digits.')
-
-    await sheet(page).getByRole('radio', { name: 'VIN' }).click()
-    const vin = sheet(page).getByRole('textbox', { name: 'VIN' })
-    await expect(vin).toBeEmpty()
-    await expect(vin).toHaveAccessibleDescription('17 letters and digits, without I, O and Q.')
-    await vin.fill('WVWZZZAUZHW2044')
-    await sheet(page).getByRole('textbox', { name: 'Part needed' }).fill('front brake pads')
-    await sheet(page).getByRole('button', { name: 'Start search' }).click()
-    await expect(vin).toHaveAccessibleDescription(
-      'Check the VIN: 17 letters and digits, without I, O and Q.'
-    )
-
-    await vin.fill('wvwzzzauzhw204411')
-    await sheet(page).getByRole('button', { name: 'Start search' }).click()
+    await startSearch(page, 'front brake pads wvwzzzauzhw204411')
 
     await expect(page).toHaveURL(/\/lookups\/\d+$/)
     await expect(page.getByRole('heading', { level: 2, name: 'WVWZZZAUZHW204411' })).toBeVisible()
@@ -350,11 +304,7 @@ test.describe('as the owner', () => {
   })
 
   test('a VIN the catalog does not know says the vehicle was not identified', async ({ page }) => {
-    await page.getByRole('link', { name: 'New search' }).first().click()
-    await sheet(page).getByRole('radio', { name: 'VIN' }).click()
-    await sheet(page).getByRole('textbox', { name: 'VIN' }).fill('ZFA31200000000000')
-    await sheet(page).getByRole('textbox', { name: 'Part needed' }).fill('oil filter')
-    await sheet(page).getByRole('button', { name: 'Start search' }).click()
+    await startSearch(page, 'oil filter ZFA31200000000000')
 
     await expect(page.getByRole('heading', { level: 2, name: 'Vehicle not found' })).toBeVisible()
     await expect(page.getByText('Vehicle not identified')).toBeVisible()
@@ -450,15 +400,8 @@ test.describe('in an American browser', () => {
   })
 })
 
-test.describe('with the ai-search flag', () => {
-  const request = (page: Page) => page.getByRole('textbox', { name: 'Request' })
-  const chat = (page: Page) => page.getByRole('log', { name: 'Conversation' })
-  const asked = (page: Page) => chat(page).getByRole('article', { name: 'You' })
-  const answered = (page: Page) => chat(page).getByRole('article', { name: 'Assistant' })
-  const send = (page: Page) => page.getByRole('button', { name: 'Search', exact: true }).click()
-
+test.describe('the new search chat', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('mock.flags', 'ai-search'))
     await page.goto('/lookups')
     await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
   })
@@ -653,13 +596,4 @@ test.describe('with the ai-search flag', () => {
       )
     })
   })
-})
-
-test('without the ai-search flag the new search page leads to the form', async ({ page }) => {
-  await page.goto('/lookups/new?plate=AB123CD&query=Oil+filter')
-
-  await expect(page).toHaveURL(/\/lookups\?.*new=true/)
-  await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveValue(
-    'AB123CD'
-  )
 })

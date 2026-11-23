@@ -50,8 +50,6 @@ export * from './oemPart';
 export * from './patchApiV1WorkspaceContactsContactId200';
 export * from './patchApiV1WorkspaceContactsContactIdBody';
 export * from './patchApiV1WorkspaceContactsContactIdBodyStatus';
-export * from './postApiV1Lookups202';
-export * from './postApiV1LookupsBody';
 export * from './postApiV1LookupsMessage200';
 export * from './postApiV1LookupsMessageBody';
 export * from './postApiV1WorkspaceContacts201';

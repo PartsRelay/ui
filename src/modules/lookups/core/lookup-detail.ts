@@ -6,7 +6,7 @@ import type {
   OemPart,
 } from '@/core/api/models'
 import { type Message, message } from '@/core/message'
-import type { LookupPrefill } from '@/modules/lookups/core/lookup-form'
+import type { LookupPrefill } from '@/modules/lookups/core/lookups'
 import { type LookupRow, lookupRow, textKey } from '@/modules/lookups/core/lookup-row'
 
 export type LookupState = Exclude<LookupObjectStatus, 'done'> | 'results' | 'unavailable'

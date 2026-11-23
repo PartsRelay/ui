@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getRouteApi, Link, Navigate } from '@tanstack/react-router'
+import { getRouteApi, Link } from '@tanstack/react-router'
 import { cn } from 'cn'
 import {
   ArrowRightIcon,
@@ -45,7 +45,6 @@ import {
   type TraceStep,
 } from '@/modules/lookups/core/message-search'
 import { useSearchMessage } from '@/modules/lookups/ui/hooks/use-search-message'
-import { ListSkeleton } from '@/ui/components/list-skeleton'
 import { LogoMark } from '@/ui/components/logo-mark'
 import {
   Attachment,
@@ -77,7 +76,6 @@ import {
   TraceLine,
   TraceTitle,
 } from '@/ui/components/ui/trace'
-import { useFlag, useFlagsLoaded } from '@/ui/hooks/use-flag'
 
 const route = getRouteApi('/_app/(lookups)/lookups/new')
 
@@ -261,20 +259,6 @@ function KeptSkeleton() {
 }
 
 export function NewSearchPage() {
-  const aiSearch = useFlag('ai-search')
-  const loaded = useFlagsLoaded()
-  const { plate, vin, query } = route.useSearch()
-
-  if (aiSearch) return <ChatSearch />
-
-  return loaded ? (
-    <Navigate to="/lookups" search={{ new: true, plate, vin, query }} replace />
-  ) : (
-    <ListSkeleton />
-  )
-}
-
-function ChatSearch() {
   const { t } = useTranslation()
   const id = useId()
   const navigate = route.useNavigate()

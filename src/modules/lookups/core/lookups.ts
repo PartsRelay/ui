@@ -35,11 +35,9 @@ const filtersSchema = requesterSchema.extend({
 
 export const lookupsSearchSchema = filtersSchema.extend({
   page: z.number().int().min(1).default(1).catch(1),
-  new: z.boolean().optional().catch(undefined),
-  plate: optionalText,
-  vin: optionalText,
-  query: optionalText,
 })
+
+export type LookupPrefill = { plate?: string; vin?: string; query?: string }
 
 export type LookupsSearch = z.infer<typeof lookupsSearchSchema>
 

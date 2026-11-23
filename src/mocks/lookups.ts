@@ -2,7 +2,6 @@ import { subDays, subMinutes } from 'date-fns'
 import {
   getGetApiV1LookupsLookupIdMockHandler,
   getPostApiV1LookupsMessageMockHandler,
-  getPostApiV1LookupsMockHandler,
 } from '@/core/api/endpoints/lookups/lookups.msw'
 import {
   getGetApiV1WorkspaceLookupsMockHandler,
@@ -12,17 +11,15 @@ import {
   type LookupObject,
   LookupObjectSource,
   LookupObjectStatus,
-  type PostApiV1LookupsBody,
   type Searcher,
   SearcherType,
   type TopSearcher,
 } from '@/core/api/models'
 import { member } from '@/mocks/auth'
 import { checkedPage, page, people, type Person } from '@/mocks/data'
-import { apiBody, fail, invalid, rejected } from '@/mocks/errors'
+import { fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
-import { flagEnabled } from '@/core/flags'
 
 type Text = [en: string, it: string]
 
@@ -48,7 +45,6 @@ type Stored = Omit<LookupObject, 'searcher' | 'vehicleDescription' | 'categories
 
 type Archive = { lookups: Stored[]; nextId: number }
 
-const PLATE = /^[A-Z0-9]{4,8}$/
 const VIN = /^[A-HJ-NPR-Z0-9]{17}$/
 const STALE_MINUTES = 15
 const STATS_DAYS = 30
@@ -348,32 +344,6 @@ function lookupOf(stored: Stored, language: Language): LookupObject {
   }
 }
 
-function checkedPlate(plate: unknown) {
-  if (plate === undefined || plate === null) return null
-  if (typeof plate !== 'string') return rejected('plate', 'string')
-
-  const compact = plate.toUpperCase().replace(/[\s.-]/g, '')
-
-  return PLATE.test(compact) ? compact : rejected('plate', 'plate')
-}
-
-function checkedVin(vin: unknown) {
-  if (vin === undefined || vin === null) return null
-  if (typeof vin !== 'string') return rejected('vin', 'string')
-
-  return VIN.test(vin.toUpperCase()) ? vin.toUpperCase() : rejected('vin', 'regex')
-}
-
-function checkedQuery(query: unknown) {
-  if (query === undefined || query === null || query === '') return rejected('query', 'required')
-  if (typeof query !== 'string') return rejected('query', 'string')
-
-  const trimmed = query.trim()
-  if (trimmed.length < 2) rejected('query', 'minLength')
-
-  return trimmed
-}
-
 function checkedSearcherId(query: URLSearchParams) {
   if (!query.has('searcherId')) return null
 
@@ -488,43 +458,7 @@ export const lookupMocks = [
       }
     })
   }),
-  getPostApiV1LookupsMockHandler(async ({ request }) => {
-    const body = await apiBody<PostApiV1LookupsBody>(request)
-    const { company, user: me } = member()
-    const plate = checkedPlate(body.plate)
-    const vin = checkedVin(body.vin)
-    if (!plate && !vin) {
-      invalid([
-        { field: 'plate', rule: 'required' },
-        { field: 'vin', rule: 'required' },
-      ])
-    }
-    const query = checkedQuery(body.query)
-
-    return archive((state) => {
-      const running: Stored = {
-        id: state.nextId++,
-        company,
-        plate,
-        vin,
-        query,
-        nodeIds: [],
-        status: 'running',
-        source: 'web',
-        searcher: user(me),
-        createdAt: new Date().toISOString(),
-        cached: true,
-      }
-      state.lookups.push(settled(running))
-
-      return { data: lookupOf(running, languageOf(request)) }
-    })
-  }),
   getPostApiV1LookupsMessageMockHandler(async ({ request }) => {
-    if (!flagEnabled('ai-search')) {
-      fail(404, 'route-not-found', 'Cannot POST:/api/v1/lookups/message')
-    }
-
     const { company, user: me } = member()
     const form = await request.formData()
     const text = String(form.get('message') ?? '').trim()

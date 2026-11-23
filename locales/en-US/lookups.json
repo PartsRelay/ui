@@ -59,38 +59,7 @@
     "connect": "Connect workshops"
   },
   "new": {
-    "open": "New search",
-    "eyebrow": "New request · Web",
-    "title": "Find the part.",
-    "description": "Enter the registration plate or the VIN and the part you need. The result stays in the company search queue.",
-    "plate": "Registration plate",
-    "plate-hint": "Spaces, dots and dashes are fine.",
-    "plate-placeholder": "AB123CD",
-    "query": "Part needed",
-    "query-hint": "Be specific: part name and position, if known.",
-    "query-placeholder": "Front brake pads",
-    "tips": {
-      "title": "Search tips",
-      "body": "Check the registration plate, and include the position of the part, such as front or rear."
-    },
-    "requester": "Requested by {name} · Web",
-    "submit": "Start search",
-    "errors": {
-      "plate-required": "Enter the registration plate.",
-      "plate": "Check the plate: 4 to 8 letters and digits.",
-      "query-required": "Enter the part you need, such as front brake pads.",
-      "query": "Describe the part in at least 2 characters.",
-      "vin-required": "Enter the VIN.",
-      "vin": "Check the VIN: 17 letters and digits, without I, O and Q."
-    },
-    "identify": "Identify the vehicle by",
-    "by": {
-      "plate": "Plate",
-      "vin": "VIN"
-    },
-    "vin": "VIN",
-    "vin-hint": "17 letters and digits, without I, O and Q.",
-    "vin-placeholder": "WVWZZZAUZHW204411"
+    "open": "New search"
   },
   "fitment": "Results are identification guidance. Always confirm vehicle fitment before purchase.",
   "detail": {

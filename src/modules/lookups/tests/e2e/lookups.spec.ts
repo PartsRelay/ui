@@ -449,3 +449,79 @@ test.describe('in an American browser', () => {
     await expect(queue(page).getByRole('row').nth(1)).toContainText(/Nov 17, 2026, 3:03\sPM/)
   })
 })
+
+test.describe('with the ai-search flag', () => {
+  const request = (page: Page) => sheet(page).getByRole('textbox', { name: 'Request' })
+  const trace = (page: Page) => sheet(page).getByRole('region', { name: 'What the assistant did' })
+  const send = (page: Page) =>
+    sheet(page).getByRole('button', { name: 'Search', exact: true }).click()
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'ai-search'))
+    await page.goto('/lookups')
+    await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+    await page.getByRole('link', { name: 'New search' }).first().click()
+  })
+
+  test('one message is read, searched and opened', async ({ page }) => {
+    await expect(sheet(page).getByRole('textbox', { name: 'Registration plate' })).toHaveCount(0)
+    await request(page).fill('Front brake pads for AB 123 CD')
+    await send(page)
+
+    await expect(trace(page)).toContainText('Read the request')
+    await expect(trace(page)).toContainText('AB123CD · Front brake pads')
+    await expect(trace(page)).toContainText('Identified the vehicle')
+    await expect(trace(page)).toContainText('Fiat Panda 1.2')
+    await expect(trace(page)).toContainText('Found the parts')
+
+    await sheet(page).getByRole('link', { name: 'Open the result' }).click()
+    await expect(page).toHaveURL(/\/lookups\/\d+$/)
+    await expect(page.getByRole('heading', { level: 2, name: 'Front brake pads' })).toBeVisible()
+  })
+
+  test('a VIN in the message wins over the plate', async ({ page }) => {
+    await request(page).fill('Oil filter, VIN ZFA31200003456789, plate DK 318 MP')
+    await send(page)
+
+    await expect(trace(page)).toContainText('ZFA31200003456789 · DK318MP · Oil filter')
+    await expect(trace(page)).toContainText('Fiat Panda 1.2')
+    await expect(trace(page)).not.toContainText('Renault Clio')
+  })
+
+  test('a photo of the registration document gives the plate', async ({ page }) => {
+    await sheet(page)
+      .locator('input[type=file]')
+      .setInputFiles({
+        name: 'libretto-FT915ZR.jpg',
+        mimeType: 'image/jpeg',
+        buffer: Buffer.from('jpeg'),
+      })
+    await expect(
+      sheet(page).getByRole('button', { name: 'Remove libretto-FT915ZR.jpg' })
+    ).toBeVisible()
+    await request(page).fill('Oil filter')
+    await send(page)
+
+    await expect(trace(page)).toContainText('FT915ZR · Oil filter')
+    await expect(trace(page)).toContainText('Volkswagen Golf VII 2.0 TDI')
+  })
+
+  test('a message without a plate or a VIN says what is missing', async ({ page }) => {
+    await request(page).fill('Oil filter')
+    await send(page)
+
+    await expect(trace(page)).toContainText(
+      'No plate or VIN: add one, or a photo of the registration document'
+    )
+    await expect(sheet(page).getByRole('link', { name: 'Open the result' })).toHaveCount(0)
+  })
+
+  test('an empty request asks for a message or a photo', async ({ page }) => {
+    await send(page)
+
+    await expect(request(page)).toBeFocused()
+    await expect(request(page)).toHaveAccessibleDescription(
+      /Write the request, or attach a photo\./
+    )
+  })
+})

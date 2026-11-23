@@ -1,6 +1,7 @@
 import { subDays, subMinutes } from 'date-fns'
 import {
   getGetApiV1LookupsLookupIdMockHandler,
+  getPostApiV1LookupsMessageMockHandler,
   getPostApiV1LookupsMockHandler,
 } from '@/core/api/endpoints/lookups/lookups.msw'
 import {
@@ -21,6 +22,7 @@ import { checkedPage, page, people, type Person } from '@/mocks/data'
 import { apiBody, fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
+import { flagEnabled } from '@/core/flags'
 
 type Text = [en: string, it: string]
 
@@ -251,8 +253,10 @@ const OLDER: Seed[] = [
   ['DK318MP', 'done', workshops.oakfield, ['g1'], 'Oil filter'],
 ]
 
+// The VIN first, like the core
 const vehicleOf = ({ plate, vin }: Pick<LookupObject, 'plate' | 'vin'>) =>
-  (plate && VEHICLES[plate]) || Object.values(VEHICLES).find((vehicle) => vehicle.vin === vin)
+  (vin && Object.values(VEHICLES).find((vehicle) => vehicle.vin === vin)) ||
+  (plate ? VEHICLES[plate] : undefined)
 
 function seed(): Stored[] {
   const now = new Date()
@@ -383,6 +387,22 @@ function matching(query: string) {
     .map(([id]) => id)
 }
 
+const VIN_IN_TEXT = /\b[A-HJ-NPR-Z0-9]{17}\b/i
+const PLATE_IN_TEXT = /\b[A-Z]{2}[\s-]?\d{3}[\s-]?[A-Z]{2}\b/i
+const CONNECTORS = /^(?:\W|for|per|the|la|il)+|(?:\W|for|per|of|di|del|della)+$/gi
+
+// Like the model: the photos are read from their file names
+function readMessage(text: string, images: File[]) {
+  const photos = images.map(({ name }) => name.replace(/\.\w+$/, '').replace(/[_-]+/g, ' '))
+  const all = [text, ...photos].join(' ')
+  const vin = all.match(VIN_IN_TEXT)?.[0].toUpperCase() ?? null
+  const plate = all.match(PLATE_IN_TEXT)?.[0].replace(/[\s-]/g, '').toUpperCase() ?? null
+  const rest = text.replace(VIN_IN_TEXT, ' ').replace(PLATE_IN_TEXT, ' ').replace(/\s+/g, ' ')
+  const parts = matching(rest).length > 0 ? rest.replace(CONNECTORS, '').trim() : null
+
+  return { vin, plate, parts }
+}
+
 function settled(lookup: Stored): Stored {
   const vehicle = vehicleOf(lookup)
   if (lookup.plate === FAILING_PLATE) return { ...lookup, status: 'failed' }
@@ -493,6 +513,46 @@ export const lookupMocks = [
       state.lookups.push(settled(running))
 
       return { data: lookupOf(running, languageOf(request)) }
+    })
+  }),
+  getPostApiV1LookupsMessageMockHandler(async ({ request }) => {
+    if (!flagEnabled('ai-search')) {
+      fail(404, 'route-not-found', 'Cannot POST:/api/v1/lookups/message')
+    }
+
+    const { company, user: me } = member()
+    const form = await request.formData()
+    const text = String(form.get('message') ?? '').trim()
+    const images = form.getAll('images').filter((value): value is File => value instanceof File)
+    if (!text && images.length === 0) invalid([{ field: 'message', rule: 'requiredIfMissing' }])
+    if (images.length > 4) invalid([{ field: 'images', rule: 'array.maxLength' }])
+
+    const read = readMessage(text, images)
+    const missing = [
+      ...(read.vin || read.plate ? [] : ['vehicle']),
+      ...(read.parts ? [] : ['parts']),
+    ]
+    if (missing.length > 0 || !read.parts) return { data: { ...read, missing, lookup: null } }
+
+    const query = read.parts
+
+    return archive((state) => {
+      const running: Stored = {
+        id: state.nextId++,
+        company,
+        plate: read.plate,
+        vin: read.vin,
+        query,
+        nodeIds: [],
+        status: 'running',
+        source: 'web',
+        searcher: user(me),
+        createdAt: new Date().toISOString(),
+        cached: true,
+      }
+      state.lookups.push(settled(running))
+
+      return { data: { ...read, missing, lookup: lookupOf(running, languageOf(request)) } }
     })
   }),
   getGetApiV1WorkspaceLookupsStatsMockHandler(async ({ request }) => {

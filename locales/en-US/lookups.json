@@ -156,5 +156,36 @@
       "title": "Top searchers",
       "description": "Last {days} days · Only the owner sees this"
     }
+  },
+  "ai": {
+    "title": "Find the part.",
+    "description": "Write the plate or the VIN and the parts you need, or attach a photo of the registration document. The assistant reads it and searches.",
+    "message": "Request",
+    "message-hint": "For example: front brake pads for AB 123 CD. A VIN is used before the plate.",
+    "message-placeholder": "Front brake pads for AB 123 CD",
+    "attach": "Attach photos",
+    "remove": "Remove {name}",
+    "send": "Search",
+    "open": "Open the result",
+    "trace-label": "What the assistant did",
+    "refused": "{count, plural, one {# photo was left out: up to 4 photos, JPG, PNG or WebP, 5 MB each.} other {# photos were left out: up to 4 photos, JPG, PNG or WebP, 5 MB each.}}",
+    "trace": {
+      "reading": "Reading the request",
+      "read": "Read the request",
+      "read-failed": "Could not read the request. Try again.",
+      "missing-vehicle": "No plate or VIN: add one, or a photo of the registration document",
+      "missing-parts": "No part: write the parts you need",
+      "searching": "Identifying the vehicle and searching the parts",
+      "vehicle": "Identified the vehicle",
+      "vehicle-not-found": "Vehicle not found: check the plate or the VIN",
+      "not-matched": "No category of this vehicle holds these parts",
+      "found": "Found the parts",
+      "failed": "The search failed. Try again."
+    },
+    "errors": {
+      "message": "Write the request in at most 2000 characters, or attach a photo.",
+      "images": "Attach up to 4 photos, JPG, PNG or WebP, 5 MB each.",
+      "empty": "Write the request, or attach a photo."
+    }
   }
 }

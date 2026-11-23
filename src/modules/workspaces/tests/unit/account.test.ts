@@ -36,7 +36,12 @@ const redwoodParts = (): FullOrganization => ({
   invitations: [],
 })
 
-const { getFullOrganization } = vi.hoisted(() => ({ getFullOrganization: vi.fn() }))
+const { getFullOrganization, loadFlags } = vi.hoisted(() => ({
+  getFullOrganization: vi.fn(),
+  loadFlags: vi.fn(),
+}))
+
+vi.mock('@/core/flags', () => ({ loadFlags }))
 
 vi.mock('@/modules/auth/core/auth.client', () => ({
   authClient: { organization: { getFullOrganization } },
@@ -81,6 +86,7 @@ describe('loadAccount', () => {
     expect(workspace.name).toBe('Redwood Parts Ltd')
     expect(me.member.name).toBe('Julia Bennett')
     expect(me.role).toBe('admin')
+    expect(loadFlags).toHaveBeenLastCalledWith(people.julia.id, '1')
   })
 
   it('uses the cached company when I am in it', async () => {

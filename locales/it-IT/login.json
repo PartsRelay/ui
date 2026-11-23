@@ -2,6 +2,7 @@
   "title": "Accedi a Parts Relay",
   "sign-in": "Accedi",
   "description": "Continua con Google o ricevi un link di accesso via email.",
+  "google-description": "Continua con il tuo account Google.",
   "google": "Continua con Google",
   "or": "oppure",
   "magic-link": {

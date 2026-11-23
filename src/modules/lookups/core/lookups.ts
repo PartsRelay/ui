@@ -129,7 +129,7 @@ export function requesterGroups<
   return [
     {
       label: message('lookups.filter.members'),
-      items: records(members).map((member) => ({
+      items: records<WorkspaceMemberObject>(members).map((member) => ({
         value: requesterValue({ searcherType: 'user', searcherId: member.userId }),
         label: member.name,
       })),
@@ -137,7 +137,7 @@ export function requesterGroups<
     },
     {
       label: message('lookups.filter.contacts'),
-      items: records(contacts).map((contact) => ({
+      items: records<ContactObject>(contacts).map((contact) => ({
         value: requesterValue({ searcherType: 'contact', searcherId: contact.id }),
         label: contactName(contact),
       })),

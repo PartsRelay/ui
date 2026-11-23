@@ -204,7 +204,7 @@ function AssistantTurn({ reply, onRetry }: { reply: Reply; onRetry?: () => void 
     <article aria-label={t('lookups.ai.assistant')}>
       <Message className="gap-3">
         <MessageAvatar className="size-8 self-start bg-transparent">
-          <LogoMark className="size-7" />
+          <LogoMark className="h-7" />
         </MessageAvatar>
         <MessageContent className="gap-3 pt-1">
           <Trace>
@@ -402,7 +402,7 @@ export function NewLookupPage() {
       )}
     >
       <header className={started ? 'sr-only' : 'grid justify-items-center gap-3 text-center'}>
-        {!started && <LogoMark className="size-12" />}
+        {!started && <LogoMark className="h-12" />}
         <h1 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
           {t('lookups.ai.title')}
         </h1>

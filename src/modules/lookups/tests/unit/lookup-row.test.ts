@@ -26,6 +26,16 @@ describe('lookup rows', () => {
     expect(row({ vehicleDescription: null }).vehicle).toBeNull()
   })
 
+  it('writes the plate as the country given, and the VIN as it is', () => {
+    const lookup = lookupFixture(1)
+
+    expect(lookupRow(lookup, 'en-US', 'GB').identifier).toBe('AB12 CDE')
+    expect(lookupRow(lookup, 'en-US', null).identifier).toBe('AB12CDE')
+    expect(lookupRow({ ...lookup, plate: null }, 'en-US', 'GB').identifier).toBe(
+      'WF0FXXGCDFKA12345'
+    )
+  })
+
   it('names a search by its VIN when it has no plate', () => {
     expect(row({ plate: null }).identifier).toBe('WF0FXXGCDFKA12345')
   })

@@ -449,3 +449,81 @@ test.describe('in an American browser', () => {
     await expect(queue(page).getByRole('row').nth(1)).toContainText(/Nov 17, 2026, 3:03\sPM/)
   })
 })
+
+async function chooseItaly(page: Page) {
+  await page.goto('/company')
+  await page.getByRole('combobox', { name: 'Country' }).click()
+  await page.getByRole('option', { name: 'Italy' }).click()
+  await expect(page.getByText('Country set to Italy.')).toBeVisible()
+  await page.goto('/lookups')
+  await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+}
+
+test.describe('in an Italian company', () => {
+  test('without the regional-format flag the plates stay as the core keeps them', async ({
+    page,
+  }) => {
+    await chooseItaly(page)
+
+    await expect(
+      queue(page).getByRole('link', { name: 'Open the search of FT915ZR' }).first()
+    ).toBeVisible()
+  })
+
+  test.describe('with the regional-format flag', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-format'))
+      await chooseItaly(page)
+    })
+
+    test('the plates are written as in Italy, in the queue and in the search', async ({ page }) => {
+      await queue(page).getByRole('link', { name: 'Open the search of FT 915 ZR' }).first().click()
+
+      await expect(page.getByRole('heading', { level: 2, name: 'FT 915 ZR' })).toBeVisible()
+    })
+
+    test('a plate searched as it is shown finds its searches', async ({ page }) => {
+      await page.getByRole('searchbox', { name: 'Plate or VIN' }).fill('DK 318 MP')
+
+      await expect(queue(page).getByRole('row').nth(1)).toContainText('DK 318 MP')
+      await expect(queue(page).getByRole('row').filter({ hasNotText: 'DK 318 MP' })).toHaveCount(1)
+    })
+  })
+
+  test.describe('with the contact-country flag too', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() =>
+        localStorage.setItem('mock.flags', 'regional-format,contact-country')
+      )
+      await chooseItaly(page)
+    })
+
+    test('the plate of a contact search is written as the country of its number', async ({
+      page,
+    }) => {
+      const search = page.getByRole('searchbox', { name: 'Plate or VIN' })
+
+      await search.fill('DK318MP')
+      await expect(queue(page).getByRole('row', { name: /Capitol Auto Care/ })).toContainText(
+        'DK318MP'
+      )
+      await expect(
+        queue(page)
+          .getByRole('row', { name: /Baker and Sons Motors/ })
+          .first()
+      ).toContainText('DK 318 MP')
+    })
+  })
+
+  test('without the contact-country flag every plate is written as the company country', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem('mock.flags', 'regional-format'))
+    await chooseItaly(page)
+    await page.getByRole('searchbox', { name: 'Plate or VIN' }).fill('DK318MP')
+
+    await expect(queue(page).getByRole('row', { name: /Capitol Auto Care/ })).toContainText(
+      'DK 318 MP'
+    )
+  })
+})

@@ -21,6 +21,7 @@ import { checkedPage, page, people, type Person } from '@/mocks/data'
 import { apiBody, fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
+import { flagEnabled } from '@/core/flags'
 
 type Text = [en: string, it: string]
 
@@ -220,6 +221,15 @@ const workshops = {
   quickFit: contact(5, 'Quick Fit Tyres'),
 }
 
+const NUMBER_COUNTRIES: Record<number, string> = { 6: 'US' }
+
+// Like the core: the number country of a contact with contact-country on
+const countryOf = (searcher: Searcher, company: string) =>
+  (searcher.type === 'contact' &&
+    flagEnabled('contact-country') &&
+    NUMBER_COUNTRIES[searcher.id]) ||
+  company
+
 const identified: LookupObjectStatus[] = ['done', 'not_matched']
 
 type Seed = [
@@ -256,6 +266,7 @@ const vehicleOf = ({ plate, vin }: Pick<LookupObject, 'plate' | 'vin'>) =>
 
 function seed(): Stored[] {
   const now = new Date()
+  const { country } = member()
   const seeds = [...RECENT, ...OLDER, ...OLDER, ...OLDER].reverse()
 
   return seeds.map(([identifier, status, searcher, nodeIds, query, options], index) => {
@@ -270,6 +281,7 @@ function seed(): Stored[] {
       plate,
       vin,
       query,
+      country: countryOf(searcher, country),
       nodeIds,
       status,
       source: searcher.type === 'contact' ? 'whatsapp' : 'web',
@@ -465,7 +477,7 @@ export const lookupMocks = [
   }),
   getPostApiV1LookupsMockHandler(async ({ request }) => {
     const body = await apiBody<PostApiV1LookupsBody>(request)
-    const { company, user: me } = member()
+    const { company, country, user: me } = member()
     const plate = checkedPlate(body.plate)
     const vin = checkedVin(body.vin)
     if (!plate && !vin) {
@@ -483,6 +495,7 @@ export const lookupMocks = [
         plate,
         vin,
         query,
+        country,
         nodeIds: [],
         status: 'running',
         source: 'web',

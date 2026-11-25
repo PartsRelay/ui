@@ -65,10 +65,13 @@ test('the company name cannot be empty', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Redwood Parts Ltd/ })).toBeVisible()
 })
 
-test('the company has a name and a country, no WhatsApp language', async ({ page }) => {
+test('the company has a name, a country and a subscription, no WhatsApp language', async ({
+  page,
+}) => {
   await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveText([
     'Company name',
     'Country',
+    'Subscription',
     'Delete company',
   ])
   await expect(page.getByRole('combobox')).toHaveCount(1)

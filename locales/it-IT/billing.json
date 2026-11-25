@@ -1,0 +1,10 @@
+{
+  "title": "Abbonamento",
+  "none": "La tua azienda non ha ancora un abbonamento. Il pagamento è gestito da Polar.",
+  "active": "{product} è attivo e si rinnova il {date}.",
+  "ending": "{product} termina il {date} e non si rinnova.",
+  "undated": "{product} è attivo.",
+  "confirming": "Pagamento ricevuto. L'abbonamento compare qui tra un momento.",
+  "subscribe": "Abbonati",
+  "manage": "Gestisci abbonamento"
+}

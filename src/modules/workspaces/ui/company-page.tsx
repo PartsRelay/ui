@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { CompanySubscription } from '@/modules/billing/ui/company-subscription'
 import { CompanyCountry } from '@/modules/workspaces/ui/company-country'
 import { CompanyName } from '@/modules/workspaces/ui/company-name'
 import { DeleteCompany } from '@/modules/workspaces/ui/delete-company'
@@ -14,6 +15,7 @@ export function CompanyPage() {
       <PageHeader title={t('company.title')} description={t('company.description')} />
       <CompanyName name={workspace.name} />
       <CompanyCountry country={workspace.country} />
+      <CompanySubscription workspaceId={workspace.id} />
       <DeleteCompany workspace={workspace} />
     </>
   )

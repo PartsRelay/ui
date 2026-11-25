@@ -24,6 +24,7 @@ type World = {
   company: Company
   offered: boolean
   nextInvitation: number
+  subscribed: boolean
 }
 
 const worldKey = () =>
@@ -39,6 +40,7 @@ function freshWorld(): World {
     company: pending ? newCompany(me) : redwoodParts(),
     offered: setting('invitation') === '1',
     nextInvitation: 100,
+    subscribed: false,
   }
 }
 
@@ -86,6 +88,21 @@ export function team() {
 function ownerOnly(state: World, code: string, message: string) {
   if (myRole(state) !== 'owner') fail(403, code, message)
 }
+
+// Like the core: no Polar route without its token
+function billingOwner(state: World, route: string) {
+  if (setting('billing') === 'off') fail(404, 'route-not-found', `Cannot ${route}`)
+  signedIn(state)
+  ownerOnly(state, 'subscription-owner-only', 'Only the owner manages the subscription')
+}
+
+const subscription = () => ({
+  id: 'sub_1',
+  status: 'active',
+  current_period_end: daysAgo(-30),
+  cancel_at_period_end: false,
+  product: { id: 'prod_1', name: 'Parts Relay' },
+})
 
 const MANAGES: Record<string, string[]> = { owner: ['admin', 'viewer'], admin: ['viewer'] }
 
@@ -434,4 +451,27 @@ export const authMocks = [
       }
     })
   }),
+  get('/customer/subscriptions/list', () =>
+    world((state) => {
+      billingOwner(state, 'GET:/api/auth/customer/subscriptions/list')
+      const items = state.subscribed ? [subscription()] : []
+
+      return { items, pagination: { total_count: items.length, max_page: 1 } }
+    })
+  ),
+  post('/checkout', () =>
+    world((state) => {
+      billingOwner(state, 'POST:/api/auth/checkout')
+      state.subscribed = true
+
+      return { url: `${location.origin}/company?checkout_id=mock`, redirect: false }
+    })
+  ),
+  post('/customer/portal', () =>
+    world((state) => {
+      billingOwner(state, 'POST:/api/auth/customer/portal')
+
+      return { url: `${location.origin}/company?portal=mock`, redirect: false }
+    })
+  ),
 ]

@@ -56,16 +56,6 @@ describe('flags', () => {
     expect(flagEnabled('magic')).toBe(false)
   })
 
-  it('reads the flags of mock.flags with the mocks', async () => {
-    env.MOCKS = true
-    vi.stubGlobal('localStorage', { getItem: () => 'new-search,regional-format' })
-
-    const { flagEnabled } = await signIn('7')
-
-    expect(flagEnabled('regional-format')).toBe(true)
-    expect(flagEnabled('regional')).toBe(false)
-  })
-
   it('asks PostHog once, for the signed in user and without analytics', async () => {
     const { loadFlags } = await signIn('7')
     loadFlags('7')

@@ -40,7 +40,7 @@ describe('plateCountry', () => {
     expect(plateCountry({ country: 'JP' }, 'IT', true)).toBe('IT')
   })
 
-  it('is none without the regional-format country', () => {
+  it('is none for a company without a country', () => {
     expect(plateCountry({ country: 'US' }, null, true)).toBeNull()
   })
 })

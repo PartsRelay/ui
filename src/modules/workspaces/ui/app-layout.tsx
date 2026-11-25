@@ -13,7 +13,7 @@ import { AppHeader } from '@/modules/workspaces/ui/app-header'
 import { AppSidebar } from '@/modules/workspaces/ui/app-sidebar'
 import { AppTabs } from '@/modules/workspaces/ui/app-tabs'
 import { AccountContext, useMe } from '@/modules/workspaces/ui/hooks/use-me'
-import { useRegionalTexts } from '@/modules/workspaces/ui/hooks/use-regional-country'
+import { useRegionalTexts } from '@/modules/workspaces/ui/hooks/use-regional-texts'
 import { AppFooter } from '@/ui/components/app-footer'
 import { SidebarInset, SidebarProvider } from '@/ui/components/ui/sidebar'
 

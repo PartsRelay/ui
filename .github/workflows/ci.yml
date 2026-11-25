@@ -4,10 +4,13 @@ on:
   pull_request:
     branches: [main]
     types: [opened, ready_for_review, synchronize]
+  push:
+    branches: [main]
 
+# Every merge into main keeps its own run
 concurrency:
-  group: ci-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

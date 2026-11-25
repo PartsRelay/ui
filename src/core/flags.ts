@@ -2,7 +2,7 @@ import type { PostHog } from 'posthog-js'
 import { env } from '@/env'
 import { mocksEnabled } from '@/mocks/enabled'
 
-export type Flag = 'magic-link' | 'contact-country'
+export type Flag = 'magic-link'
 
 // PostHog group type of a company, as the core sends it
 export const WORKSPACE_GROUP = 'workspace'

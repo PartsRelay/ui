@@ -200,9 +200,7 @@ test('in a British company a British number is written as in the UK, another one
   )
 })
 
-test('with the contact-country flag a number shows its country', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('mock.flags', 'contact-country'))
-  await page.goto('/contacts')
+test('a number shows its country', async ({ page }) => {
   const search = page.getByRole('searchbox', { name: 'Search' })
 
   await search.fill('capitol')
@@ -211,10 +209,4 @@ test('with the contact-country flag a number shows its country', async ({ page }
   ).toBeVisible()
   await search.fill('oak')
   await expect(page.getByRole('row', { name: /Oakfield Garage/ }).getByRole('img')).toHaveCount(0)
-})
-
-test('without the contact-country flag no number shows a country', async ({ page }) => {
-  await page.getByRole('searchbox', { name: 'Search' }).fill('capitol')
-
-  await expect(page.getByRole('row', { name: /Capitol Auto Care/ }).getByRole('img')).toHaveCount(0)
 })

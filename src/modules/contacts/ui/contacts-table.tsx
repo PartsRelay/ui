@@ -6,7 +6,6 @@ import { ContactActions } from '@/modules/contacts/ui/contact-actions'
 import { ContactNameForm } from '@/modules/contacts/ui/contact-name-form'
 import { countryFlag, countryName } from '@/modules/workspaces/core/country'
 import { useMe } from '@/modules/workspaces/ui/hooks/use-me'
-import { useFlag } from '@/ui/hooks/use-flag'
 import { PersonItem } from '@/ui/components/person-item'
 import { ResponsiveTable } from '@/ui/components/responsive-table'
 import { StatusBadge } from '@/ui/components/status-badge'
@@ -40,7 +39,6 @@ type ContactsTableProps = {
 export function ContactsTable({ rows, onBlock, onRemove }: ContactsTableProps) {
   const { t, i18n } = useTranslation()
   const { me } = useMe()
-  const numberCountries = useFlag('contact-country')
   const [renaming, setRenaming] = useState<number | null>(null)
   const renamed = useRef<number | null>(null)
   const manage = me.permissions.manageContacts
@@ -79,7 +77,7 @@ export function ContactsTable({ rows, onBlock, onRemove }: ContactsTableProps) {
                 )}
               </TableCell>
               <TableCell data-label={t('contacts.columns.phone')}>
-                {numberCountries && row.numberCountry && (
+                {row.numberCountry && (
                   <span
                     role="img"
                     aria-label={countryName(row.numberCountry, i18n.language)}

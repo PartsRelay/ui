@@ -181,7 +181,6 @@ describe('already gone', () => {
     expect(alreadyGone(coreError(404, 'row-not-found'))).toBe(true)
     expect(alreadyGone(coreError(400, 'member-not-found'))).toBe(true)
     expect(alreadyGone(coreError(400, 'invitation-not-found'))).toBe(true)
-    expect(alreadyGone(coreError(404, 'key-not-found'))).toBe(true)
   })
 
   it('leaves the other failures to retry', () => {

@@ -2,7 +2,6 @@ import { Link, useLocation } from '@tanstack/react-router'
 import {
   BookUserIcon,
   Building2Icon,
-  CodeXmlIcon,
   type LucideIcon,
   ScanSearchIcon,
   UsersIcon,
@@ -33,7 +32,6 @@ const icons: Record<Section, LucideIcon> = {
   contacts: BookUserIcon,
   workspace: UsersIcon,
   company: Building2Icon,
-  developers: CodeXmlIcon,
 }
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {

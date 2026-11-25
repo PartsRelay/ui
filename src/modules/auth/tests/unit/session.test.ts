@@ -111,15 +111,6 @@ describe('failureNotice', () => {
     expect(resetFlags).toHaveBeenCalledOnce()
   })
 
-  it('ends a session the API keys find expired', () => {
-    client.setQueryData(sessionQuery.queryKey, session)
-
-    expect(failureNotice(client, authError(401, 'unauthorized-session'))).toEqual([
-      'errors.unauthorized-access',
-    ])
-    expect(client.getQueryData(sessionQuery.queryKey)).toBeNull()
-  })
-
   it('stays quiet about a session that was never there', () => {
     expect(failureNotice(client, authError(401, 'unauthorized'))).toBeNull()
   })

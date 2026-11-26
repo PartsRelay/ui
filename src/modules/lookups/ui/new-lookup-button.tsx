@@ -14,7 +14,7 @@ export function NewLookupButton({ prefill, children, ...props }: NewLookupButton
 
   return (
     <Button {...props} asChild>
-      <Link to="/lookups/new" search={{ ...prefill }}>
+      <Link to="/lookups/new" search={{ ...prefill }} viewTransition>
         <PlusIcon data-icon="inline-start" />
         {children ?? t('lookups.new.open')}
       </Link>

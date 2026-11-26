@@ -18,7 +18,6 @@ import { Route as authAuthCallbackRouteImport } from './routes/(auth)/auth.callb
 import { Route as authInvitationsInvitationIdRouteImport } from './routes/(auth)/invitations.$invitationId'
 import { Route as AppauthProfileRouteImport } from './routes/_app/(auth)/profile'
 import { Route as AppcontactsContactsRouteImport } from './routes/_app/(contacts)/contacts'
-import { Route as AppdevelopersDevelopersRouteImport } from './routes/_app/(developers)/developers'
 import { Route as AppworkspacesIndexRouteImport } from './routes/_app/(workspaces)/index'
 import { Route as AppworkspacesCompanyRouteImport } from './routes/_app/(workspaces)/company'
 import { Route as AppworkspacesWorkspaceRouteImport } from './routes/_app/(workspaces)/workspace'
@@ -70,11 +69,6 @@ const AppcontactsContactsRoute = AppcontactsContactsRouteImport.update({
   path: '/contacts',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppdevelopersDevelopersRoute = AppdevelopersDevelopersRouteImport.update({
-  id: '/(developers)/developers',
-  path: '/developers',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppworkspacesIndexRoute = AppworkspacesIndexRouteImport.update({
   id: '/(workspaces)/',
   path: '/',
@@ -116,7 +110,6 @@ export interface FileRoutesByFullPath {
   '/invitations/$invitationId': typeof authInvitationsInvitationIdRoute
   '/profile': typeof AppauthProfileRoute
   '/contacts': typeof AppcontactsContactsRoute
-  '/developers': typeof AppdevelopersDevelopersRoute
   '/company': typeof AppworkspacesCompanyRoute
   '/workspace': typeof AppworkspacesWorkspaceRoute
   '/lookups/$lookupId': typeof ApplookupsLookupsLookupIdRoute
@@ -132,7 +125,6 @@ export interface FileRoutesByTo {
   '/invitations/$invitationId': typeof authInvitationsInvitationIdRoute
   '/profile': typeof AppauthProfileRoute
   '/contacts': typeof AppcontactsContactsRoute
-  '/developers': typeof AppdevelopersDevelopersRoute
   '/company': typeof AppworkspacesCompanyRoute
   '/workspace': typeof AppworkspacesWorkspaceRoute
   '/lookups/$lookupId': typeof ApplookupsLookupsLookupIdRoute
@@ -150,7 +142,6 @@ export interface FileRoutesById {
   '/(auth)/invitations/$invitationId': typeof authInvitationsInvitationIdRoute
   '/_app/(auth)/profile': typeof AppauthProfileRoute
   '/_app/(contacts)/contacts': typeof AppcontactsContactsRoute
-  '/_app/(developers)/developers': typeof AppdevelopersDevelopersRoute
   '/_app/(workspaces)/company': typeof AppworkspacesCompanyRoute
   '/_app/(workspaces)/workspace': typeof AppworkspacesWorkspaceRoute
   '/_app/(workspaces)/': typeof AppworkspacesIndexRoute
@@ -169,7 +160,6 @@ export interface FileRouteTypes {
     | '/invitations/$invitationId'
     | '/profile'
     | '/contacts'
-    | '/developers'
     | '/company'
     | '/workspace'
     | '/lookups/$lookupId'
@@ -185,7 +175,6 @@ export interface FileRouteTypes {
     | '/invitations/$invitationId'
     | '/profile'
     | '/contacts'
-    | '/developers'
     | '/company'
     | '/workspace'
     | '/lookups/$lookupId'
@@ -202,7 +191,6 @@ export interface FileRouteTypes {
     | '/(auth)/invitations/$invitationId'
     | '/_app/(auth)/profile'
     | '/_app/(contacts)/contacts'
-    | '/_app/(developers)/developers'
     | '/_app/(workspaces)/company'
     | '/_app/(workspaces)/workspace'
     | '/_app/(workspaces)/'
@@ -283,13 +271,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppcontactsContactsRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/(developers)/developers': {
-      id: '/_app/(developers)/developers'
-      path: '/developers'
-      fullPath: '/developers'
-      preLoaderRoute: typeof AppdevelopersDevelopersRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_app/(workspaces)/': {
       id: '/_app/(workspaces)/'
       path: '/'
@@ -354,7 +335,6 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
 interface AppRouteRouteChildren {
   AppauthProfileRoute: typeof AppauthProfileRoute
   AppcontactsContactsRoute: typeof AppcontactsContactsRoute
-  AppdevelopersDevelopersRoute: typeof AppdevelopersDevelopersRoute
   AppworkspacesCompanyRoute: typeof AppworkspacesCompanyRoute
   AppworkspacesWorkspaceRoute: typeof AppworkspacesWorkspaceRoute
   AppworkspacesIndexRoute: typeof AppworkspacesIndexRoute
@@ -366,7 +346,6 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppauthProfileRoute: AppauthProfileRoute,
   AppcontactsContactsRoute: AppcontactsContactsRoute,
-  AppdevelopersDevelopersRoute: AppdevelopersDevelopersRoute,
   AppworkspacesCompanyRoute: AppworkspacesCompanyRoute,
   AppworkspacesWorkspaceRoute: AppworkspacesWorkspaceRoute,
   AppworkspacesIndexRoute: AppworkspacesIndexRoute,

@@ -22,6 +22,7 @@ const read = (overrides: Partial<LookupMessageObject> = {}): LookupMessageObject
   plate: 'AB123CD',
   parts: 'front brake pads',
   missing: [],
+  reply: null,
   lookup: null,
   ...overrides,
 })
@@ -119,6 +120,7 @@ describe('message search', () => {
       plate: 'AB12CDE',
       parts: 'Oil filter change',
       missing: [],
+      reply: null,
       lookup,
     })
   })
@@ -170,6 +172,16 @@ describe('message search', () => {
     expect(answer(read({ parts: null, missing: ['parts'] }))).toEqual(
       message('lookups.ai.reply.missing-parts', { vehicle: 'AB123CD' })
     )
+  })
+
+  it('answers with the question of the assistant until the search starts', () => {
+    const asked = read({ reply: 'Front or rear?' })
+    const answer = (said: LookupMessageObject) =>
+      assistantReply({ error: null, read: said, lookup: undefined })
+
+    expect(answer(asked)).toBe('Front or rear?')
+    expect(answer(read({ ...asked, parts: null, missing: ['parts'] }))).toBe('Front or rear?')
+    expect(answer(read({ ...asked, lookup: lookupFixture(7, { status: 'running' }) }))).toBeNull()
   })
 
   it('tells the outcome of the search once it ends', () => {

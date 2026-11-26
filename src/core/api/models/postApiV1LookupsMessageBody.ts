@@ -8,6 +8,7 @@
 export type PostApiV1LookupsMessageBody = {
   /** @maxLength 2000 */
   message?: string;
+  conversation?: string;
   /** @maxItems 4 */
   images?: (Blob | File)[];
 };

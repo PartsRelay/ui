@@ -67,6 +67,9 @@ const formData = new FormData();
 if(postApiV1LookupsMessageBody?.message !== undefined) {
  formData.append(`message`, postApiV1LookupsMessageBody.message);
  }
+if(postApiV1LookupsMessageBody?.conversation !== undefined) {
+ formData.append(`conversation`, postApiV1LookupsMessageBody.conversation);
+ }
 if(postApiV1LookupsMessageBody?.images !== undefined) {
  postApiV1LookupsMessageBody?.images.forEach(value => formData.append(`images`, value));
  }

@@ -13,6 +13,7 @@ export * from './channelLinkSource';
 export * from './checkout';
 export * from './checkoutObject';
 export * from './checkoutObjectStatus';
+export * from './checkoutSearch';
 export * from './checkoutStatus';
 export * from './contact';
 export * from './contactObject';

@@ -6,6 +6,8 @@
  */
 
 export type PostApiV1CheckoutsTokenConfirmBodyItemsItem = {
+  /** @minimum 0 */
+  lookupId: number;
   /**
      * @minLength 1
      * @maxLength 64

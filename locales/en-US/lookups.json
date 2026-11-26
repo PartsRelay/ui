@@ -137,6 +137,7 @@
     "remove": "Remove {name}",
     "send": "Search",
     "open": "Open the result",
+    "order": "Choose and order",
     "refused": "{count, plural, one {# photo was left out: up to 4 photos, JPG, PNG or WebP, 5 MB each.} other {# photos were left out: up to 4 photos, JPG, PNG or WebP, 5 MB each.}}",
     "trace": {
       "reading": "Reading the request",
@@ -167,10 +168,8 @@
     "you": "You",
     "assistant": "Assistant",
     "reply": {
-      "missing-both": "Tell me the plate or the VIN and the parts you need, or attach a photo of the registration document.",
-      "missing-vehicle": "I need the plate or the VIN of the vehicle: write it here, or attach a photo of the registration document.",
-      "missing-parts": "Which parts do you need for {vehicle}?",
       "found": "{count, plural, one {I found # category} other {I found # categories}} for {vehicle}: {categories}.",
+      "order": "{count, plural, one {I found # category} other {I found # categories}} for {vehicle}: {categories}. Here is the order page, tell me if you want to add anything else.",
       "done": "The search is done: open the result to see it.",
       "vehicle-not-found": "I found no vehicle for {identifier}. Check the plate, or write the VIN.",
       "not-matched": "The catalog of {vehicle} has no category for {parts}. Try other words.",

@@ -129,7 +129,6 @@ export function useGetApiV1WorkspaceContacts<TData = Awaited<ReturnType<typeof g
  params?: GetApiV1WorkspaceContactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceContacts>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1WorkspaceContacts<TData = Awaited<ReturnType<typeof getApiV1WorkspaceContacts>>, TError = ErrorType<ErrorBody>>(
  params?: GetApiV1WorkspaceContactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceContacts>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -181,7 +180,6 @@ export function useGetApiV1WorkspaceContactsSuspense<TData = Awaited<ReturnType<
  params?: GetApiV1WorkspaceContactsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceContacts>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1WorkspaceContactsSuspense<TData = Awaited<ReturnType<typeof getApiV1WorkspaceContacts>>, TError = ErrorType<ErrorBody>>(
  params?: GetApiV1WorkspaceContactsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceContacts>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient

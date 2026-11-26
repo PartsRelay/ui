@@ -6,6 +6,7 @@
  */
 
 export interface OrderItem {
+  lookupId: number;
   original: boolean;
   code: string;
   /** @nullable */

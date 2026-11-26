@@ -2,6 +2,7 @@
   "title": "Order",
   "heading": "Order from {company}",
   "description": "Choose the parts you need and confirm. {company} receives the order and you get the confirmation on WhatsApp.",
+  "description-web": "Choose the parts you need and confirm: {company} receives the order.",
   "original": "Original",
   "price": "Price",
   "availability": "Available",
@@ -16,18 +17,21 @@
   "close": "You can close this page.",
   "confirmed": {
     "title": "Order sent",
-    "description": "{company} received your order. The confirmation is in your WhatsApp chat."
+    "description": "{company} received your order. The confirmation is in your WhatsApp chat.",
+    "description-web": "{company} received the order."
   },
   "cancelled": {
     "title": "Order cancelled",
-    "description": "Nothing was sent to {company}. Search again on WhatsApp to order."
+    "description": "Nothing was sent to {company}. Search again on WhatsApp to order.",
+    "description-web": "Nothing was sent to {company}. Search again to order."
   },
   "unavailable": {
     "title": "This link is no longer valid",
-    "description": "It has expired or the search is no longer available. Search again on WhatsApp to get a new link."
+    "description": "It expired, or the search is no longer available. Search again to get a new one."
   },
   "decline": {
     "title": "Close without ordering?",
-    "description": "The link closes and nothing is sent to {company}. To order later, search again on WhatsApp."
+    "description": "The link closes and nothing is sent to {company}. To order later, search again on WhatsApp.",
+    "description-web": "The link closes and nothing is sent to {company}. To order later, search again."
   }
 }

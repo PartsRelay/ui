@@ -60,7 +60,7 @@ function signedIn(state: World) {
 const myRole = ({ company, me }: World) =>
   company.members.find(({ userId }) => userId === me.id)?.role
 
-function signedInMember() {
+export function signedInMember() {
   return world((state) =>
     state.signedIn
       ? {

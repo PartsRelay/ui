@@ -6,14 +6,14 @@ import {
   addImages,
   assistantReply,
   MAX_IMAGE_BYTES,
-  MAX_MESSAGE_LENGTH,
   messageError,
   messageOf,
+  messageRequest,
   readOfLookup,
   requestOfLookup,
   retryable,
+  searchOutcome,
   searchTrace,
-  threadRequest,
 } from '@/modules/lookups/core/message-search'
 import { lookupFixture } from '@/modules/lookups/tests/unit/fixtures'
 
@@ -22,7 +22,7 @@ const read = (overrides: Partial<LookupMessageObject> = {}): LookupMessageObject
   plate: 'AB123CD',
   parts: 'front brake pads',
   missing: [],
-  reply: null,
+  reply: 'Ok',
   lookup: null,
   ...overrides,
 })
@@ -120,7 +120,7 @@ describe('message search', () => {
       plate: 'AB12CDE',
       parts: 'Oil filter change',
       missing: [],
-      reply: null,
+      reply: '',
       lookup,
     })
   })
@@ -132,86 +132,79 @@ describe('message search', () => {
     )
   })
 
-  it('sends the messages since the last search as one request', () => {
+  it('sends one message of its chat: the core remembers the ones before it', () => {
     const plate = photo('libretto.jpg')
 
-    expect(
-      threadRequest([
-        { text: 'Brake pads for AB 123 CD', images: [], started: true },
-        { text: 'Oil filter', images: [plate] },
-        { text: 'Down, try later', images: [], failed: true },
-        { text: ' GH 482 KL ', images: [] },
-      ])
-    ).toEqual({ message: 'Oil filter\nGH 482 KL', images: [plate] })
-    expect(threadRequest([{ text: '  ', images: [] }])).toEqual({})
+    expect(messageRequest('chat-1', ' GH 482 KL ', [plate])).toEqual({
+      conversation: 'chat-1',
+      message: 'GH 482 KL',
+      images: [plate],
+    })
+    expect(messageRequest('chat-1', '  ', [plate])).toEqual({
+      conversation: 'chat-1',
+      images: [plate],
+    })
+    expect(messageRequest('chat-1', 'si', [])).toEqual({ conversation: 'chat-1', message: 'si' })
   })
 
-  it('keeps the newest photos and words of a long thread', () => {
-    const photos = ['1', '2', '3', '4', '5'].map((name) => photo(`${name}.jpg`))
-    const body = threadRequest([
-      { text: 'a'.repeat(1500), images: photos.slice(0, 3) },
-      { text: 'b'.repeat(1000), images: photos.slice(3) },
-    ])
-
-    expect(body.images).toEqual(photos.slice(1))
-    expect(body.message).toHaveLength(MAX_MESSAGE_LENGTH)
-    expect(body.message?.endsWith('b'.repeat(1000))).toBe(true)
-  })
-
-  it('asks in words for what is missing', () => {
+  it('answers with the words of the assistant, before and after a search starts', () => {
     const answer = (said: LookupMessageObject) =>
       assistantReply({ error: null, read: said, lookup: undefined })
+    const running = lookupFixture(7, { status: 'running' })
 
     expect(assistantReply({ error: null, read: undefined, lookup: undefined })).toBeNull()
-    expect(answer(read({ plate: null, parts: null, missing: ['vehicle', 'parts'] }))).toEqual(
-      message('lookups.ai.reply.missing-both')
+    expect(answer(read({ reply: 'Front or rear?', parts: null, missing: ['parts'] }))).toBe(
+      'Front or rear?'
     )
-    expect(answer(read({ plate: null, missing: ['vehicle'] }))).toEqual(
-      message('lookups.ai.reply.missing-vehicle')
-    )
-    expect(answer(read({ parts: null, missing: ['parts'] }))).toEqual(
-      message('lookups.ai.reply.missing-parts', { vehicle: 'AB123CD' })
+    expect(answer(read({ reply: 'Search started for AB123CD.', lookup: running }))).toBe(
+      'Search started for AB123CD.'
     )
   })
 
-  it('answers with the question of the assistant until the search starts', () => {
-    const asked = read({ reply: 'Front or rear?' })
-    const answer = (said: LookupMessageObject) =>
-      assistantReply({ error: null, read: said, lookup: undefined })
+  it('follows a search only in its newest turn', () => {
+    const changed = read({ lookup: lookupFixture(7, { status: 'running' }) })
 
-    expect(answer(asked)).toBe('Front or rear?')
-    expect(answer(read({ ...asked, parts: null, missing: ['parts'] }))).toBe('Front or rear?')
-    expect(answer(read({ ...asked, lookup: lookupFixture(7, { status: 'running' }) }))).toBeNull()
+    expect(searchTrace({ ...idle, read: changed }, false).map(({ key }) => key)).toEqual(['read'])
+    expect(searchTrace({ ...idle, read: changed }).map(({ key }) => key)).toEqual([
+      'read',
+      'search',
+    ])
   })
 
-  it('tells the outcome of the search once it ends', () => {
-    const running = lookupFixture(7, { status: 'running', categories: undefined })
-    const answer = (lookup: Parameters<typeof lookupFixture>[1]) =>
-      assistantReply({
-        error: null,
-        read: read({ lookup: running }),
-        lookup: lookupFixture(7, lookup),
+  it('tells the outcome of the search once it ends, with the order page when it has one', () => {
+    const outcome = (lookup: Parameters<typeof lookupFixture>[1]) =>
+      searchOutcome(lookupFixture(7, lookup))
+    const found = { count: 1, vehicle: 'Ford Fiesta 1.0', categories: 'Oil filter' }
+
+    expect(searchOutcome(undefined)).toBeNull()
+    expect(outcome({ status: 'running', categories: undefined })).toBeNull()
+    expect(outcome({})).toEqual(message('lookups.ai.reply.found', found))
+    expect(outcome({ orderUrl: 'https://app.example.com/checkout?token=t' })).toEqual(
+      message('lookups.ai.reply.order', found)
+    )
+    expect(outcome({ categories: [] })).toEqual(message('lookups.ai.reply.done'))
+    expect(outcome({ status: 'not_matched', categories: [] })).toEqual(
+      message('lookups.ai.reply.not-matched', {
+        vehicle: 'Ford Fiesta 1.0',
+        parts: 'Oil filter change',
       })
+    )
+    expect(outcome({ status: 'vehicle_not_found', vehicleDescription: null })).toEqual(
+      message('lookups.ai.reply.vehicle-not-found', { identifier: 'WF0FXXGCDFKA12345' })
+    )
+    expect(outcome({ status: 'failed' })).toEqual(message('lookups.ai.reply.failed'))
+  })
 
-    expect(answer({ status: 'running', categories: undefined })).toBeNull()
-    expect(answer({})).toEqual(
+  it('tells a search kept in the address by its outcome, having no words of the assistant', () => {
+    const lookup = lookupFixture(7)
+
+    expect(assistantReply({ error: null, read: readOfLookup(lookup), lookup })).toEqual(
       message('lookups.ai.reply.found', {
         count: 1,
         vehicle: 'Ford Fiesta 1.0',
         categories: 'Oil filter',
       })
     )
-    expect(answer({ categories: [] })).toEqual(message('lookups.ai.reply.done'))
-    expect(answer({ status: 'not_matched', categories: [] })).toEqual(
-      message('lookups.ai.reply.not-matched', {
-        vehicle: 'Ford Fiesta 1.0',
-        parts: 'Oil filter change',
-      })
-    )
-    expect(answer({ status: 'vehicle_not_found', vehicleDescription: null })).toEqual(
-      message('lookups.ai.reply.vehicle-not-found', { identifier: 'WF0FXXGCDFKA12345' })
-    )
-    expect(answer({ status: 'failed' })).toEqual(message('lookups.ai.reply.failed'))
   })
 
   it('answers a refused request with its reason, and offers to send again the others', () => {

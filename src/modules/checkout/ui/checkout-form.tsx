@@ -29,8 +29,10 @@ export function CheckoutForm({ token, checkout }: CheckoutFormProps) {
   const articleName = useArticleName()
   const decide = useDecideCheckout(token)
   const [declining, setDeclining] = useState(false)
-  const { company, plate, vin, vehicleDescription, query } = checkout
-  const { groups, articles } = checkoutView(checkout)
+  const { company, chatUrl } = checkout
+  const { vehicles, articles } = checkoutView(checkout)
+  // The confirmation comes in the chat, when the order comes from one
+  const worded = (key: string) => t(chatUrl ? key : `${key}-web`, { company })
   const form = useForm({
     defaultValues: { quantities: articles.map(() => 0) },
     onSubmit: ({ value }) =>
@@ -85,26 +87,28 @@ export function CheckoutForm({ token, checkout }: CheckoutFormProps) {
         <h1 className="font-heading text-2xl font-bold wrap-anywhere">
           {t('checkout.heading', { company })}
         </h1>
-        <p className="text-muted-foreground">{t('checkout.description', { company })}</p>
-        <p className="font-semibold wrap-anywhere">
-          {[plate ?? vin, vehicleDescription, query].filter(Boolean).join(' · ')}
-        </p>
+        <p className="text-muted-foreground">{worded('checkout.description')}</p>
       </header>
-      {groups.map((group) => (
-        <Card key={group.key}>
-          {group.name && (
-            <CardHeader>
-              <CardHeading>{group.name}</CardHeading>
-            </CardHeader>
-          )}
-          <CardContent className="grid gap-3">
-            {group.parts.map((part) => (
-              <ul key={part.key} className="divide-y overflow-hidden rounded-lg border">
-                {part.articles.map(row)}
-              </ul>
-            ))}
-          </CardContent>
-        </Card>
+      {vehicles.map((vehicle) => (
+        <section key={vehicle.key} aria-label={vehicle.title} className="grid gap-4">
+          <p className="font-semibold wrap-anywhere">{vehicle.title}</p>
+          {vehicle.groups.map((group) => (
+            <Card key={group.key}>
+              {group.name && (
+                <CardHeader>
+                  <CardHeading>{group.name}</CardHeading>
+                </CardHeader>
+              )}
+              <CardContent className="grid gap-3">
+                {group.parts.map((part) => (
+                  <ul key={part.key} className="divide-y overflow-hidden rounded-lg border">
+                    {part.articles.map(row)}
+                  </ul>
+                ))}
+              </CardContent>
+            </Card>
+          ))}
+        </section>
       ))}
       <div className="fixed inset-x-0 bottom-0 border-t bg-background">
         <div className="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
@@ -135,7 +139,7 @@ export function CheckoutForm({ token, checkout }: CheckoutFormProps) {
       <ConfirmDialog
         open={declining}
         title={t('checkout.decline.title')}
-        description={t('checkout.decline.description', { company })}
+        description={worded('checkout.decline.description')}
         action={t('checkout.cancel')}
         pending={decide.isPending}
         onClose={() => setDeclining(false)}

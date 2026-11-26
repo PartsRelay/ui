@@ -3,6 +3,8 @@
   "heading": "Order from {company}",
   "description": "Choose the parts you need and confirm. {company} receives the order and you get the confirmation on WhatsApp.",
   "original": "Original",
+  "price": "Price",
+  "availability": "Available",
   "decrease": "One less of {name}",
   "increase": "One more of {name}",
   "selected": "{count, plural, =0 {No parts chosen} one {# part chosen} other {# parts chosen}}",

@@ -38,6 +38,18 @@ test('orders the chosen parts and goes back to the WhatsApp chat', async ({ page
   await expect(page.getByRole('listitem')).toHaveCount(2)
 })
 
+test('shows the price and the stock of a part, a dash when not loaded', async ({ page }) => {
+  await open(page)
+
+  const part = (name: string) => page.getByRole('listitem').filter({ hasText: name })
+
+  await expect(part('BREMBO P 23 141')).toContainText('Price €48.90')
+  await expect(part('BREMBO P 23 141')).toContainText('Available 4')
+  await expect(part('TRW GDB1891')).toContainText('Available 0')
+  await expect(part('BOSCH 0 986 494 597')).toContainText('Price —')
+  await expect(part('BOSCH 0 986 494 597')).toContainText('Available —')
+})
+
 test.describe('in the browser of WhatsApp', () => {
   test.use({ userAgent: WHATSAPP })
 

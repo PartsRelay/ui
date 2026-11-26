@@ -9,6 +9,9 @@ updates:
       include: scope
     schedule:
       interval: weekly
+    ignore:
+      # Must match the vitest bundled in vite-plus
+      - dependency-name: '@vitest/coverage-istanbul'
     groups:
       minor-and-patch:
         patterns: ['*']

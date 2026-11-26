@@ -421,9 +421,7 @@ export function NewLookupPage() {
             {t('lookups.ai.title')}
           </h1>
           {!started && (
-            <p className="max-w-xl text-balance text-muted-foreground">
-              {t('lookups.ai.description')}
-            </p>
+            <p className="text-balance text-muted-foreground">{t('lookups.ai.description')}</p>
           )}
         </header>
         <div

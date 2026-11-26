@@ -33,14 +33,13 @@ describe('formatPlate', () => {
 })
 
 describe('plateCountry', () => {
-  it('is the country of the search with contact-country on, else of the company', () => {
-    expect(plateCountry({ country: 'US' }, 'IT', true)).toBe('US')
-    expect(plateCountry({ country: 'US' }, 'IT', false)).toBe('IT')
-    expect(plateCountry({ country: null }, 'IT', true)).toBe('IT')
-    expect(plateCountry({ country: 'JP' }, 'IT', true)).toBe('IT')
+  it('is the country of the search, else of the company', () => {
+    expect(plateCountry({ country: 'US' }, 'IT')).toBe('US')
+    expect(plateCountry({ country: null }, 'IT')).toBe('IT')
+    expect(plateCountry({ country: 'JP' }, 'IT')).toBe('IT')
   })
 
-  it('is none without the regional-format country', () => {
-    expect(plateCountry({ country: 'US' }, null, true)).toBeNull()
+  it('is none for a company without a country', () => {
+    expect(plateCountry({ country: 'US' }, null)).toBeNull()
   })
 })

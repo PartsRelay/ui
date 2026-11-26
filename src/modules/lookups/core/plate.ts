@@ -55,13 +55,9 @@ export function formatPlate(plate: string, country: Country | null) {
     : rule.format(plate)
 }
 
-// The search country with contact-country on, else the company one
-export function plateCountry(
-  { country }: { country?: string | null },
-  company: Country | null,
-  searchCountry: boolean
-) {
+// The country of the search, else the one of the company
+export function plateCountry({ country }: { country?: string | null }, company: Country | null) {
   if (!company) return null
 
-  return (searchCountry && toCountry(country)) || company
+  return toCountry(country) || company
 }

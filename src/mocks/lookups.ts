@@ -20,7 +20,6 @@ import { checkedPage, page, people, type Person } from '@/mocks/data'
 import { fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
 import { DEFAULT_PER_PAGE, MAX_PER_PAGE } from '@/core/pagination'
-import { flagEnabled } from '@/core/flags'
 
 type Text = [en: string, it: string]
 
@@ -226,12 +225,9 @@ const workshops = {
 
 const NUMBER_COUNTRIES: Record<number, string> = { 6: 'US' }
 
-// Like the core: the number country of a contact with contact-country on
+// Like the core: a contact searches in its number country
 const countryOf = (searcher: Searcher, company: string) =>
-  (searcher.type === 'contact' &&
-    flagEnabled('contact-country') &&
-    NUMBER_COUNTRIES[searcher.id]) ||
-  company
+  (searcher.type === 'contact' && NUMBER_COUNTRIES[searcher.id]) || company
 
 const identified: LookupObjectStatus[] = ['done', 'not_matched']
 

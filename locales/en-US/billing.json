@@ -1,0 +1,10 @@
+{
+  "title": "Subscription",
+  "none": "Your company has no subscription yet. Polar handles the payment.",
+  "active": "{product} is active and renews on {date}.",
+  "ending": "{product} ends on {date} and does not renew.",
+  "undated": "{product} is active.",
+  "confirming": "Payment received. The subscription shows here in a moment.",
+  "subscribe": "Subscribe",
+  "manage": "Manage subscription"
+}

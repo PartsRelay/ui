@@ -433,6 +433,28 @@ test.describe('the new search chat', () => {
       await expect(request(page)).toBeVisible()
     })
 
+    test('a button goes back to the searches', async ({ page }) => {
+      await page.getByRole('link', { name: 'Back to searches' }).click()
+
+      await expect(page).toHaveURL('/lookups')
+      await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+    })
+
+    test('the first message is answered also when the transition starts late', async ({ page }) => {
+      // WebKit runs the update of a view transition some frames later
+      await page.evaluate(() => {
+        document.startViewTransition = ((update: () => void) => {
+          setTimeout(update, 1500)
+        }) as never
+      })
+      await request(page).fill('Front brake pads for AB 123 CD')
+      await send(page)
+
+      await expect(answered(page)).toContainText(
+        'I found 1 category for Fiat Panda 1.2: Front brake pads.'
+      )
+    })
+
     test('one message is read, searched and opened', async ({ page }) => {
       await request(page).fill('Front brake pads for AB 123 CD')
       await request(page).press('Enter')

@@ -129,6 +129,7 @@
   "ai": {
     "title": "What part do you need?",
     "description": "Write the plate or the VIN and the parts, or attach a photo of the registration document.",
+    "back": "Back to searches",
     "message": "Request",
     "message-hint": "Enter sends, Shift+Enter starts a new line. A VIN is used before the plate.",
     "message-placeholder": "Plate or VIN, and the parts you need",

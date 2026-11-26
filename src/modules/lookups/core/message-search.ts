@@ -31,7 +31,14 @@ type Search = {
 
 // What a search kept in the URL was read from, after a reload
 export function readOfLookup(lookup: LookupObject): LookupMessageObject {
-  return { vin: lookup.vin, plate: lookup.plate, parts: lookup.query, missing: [], lookup }
+  return {
+    vin: lookup.vin,
+    plate: lookup.plate,
+    parts: lookup.query,
+    missing: [],
+    reply: null,
+    lookup,
+  }
 }
 
 // The message a failed search offers to send again
@@ -193,10 +200,17 @@ function outcome(lookup: LookupObject): Message | null {
   }
 }
 
-// What the assistant answers in words, under its steps
-export function assistantReply({ error, read, lookup }: Omit<Search, 'sending'>): Message | null {
+// What the assistant answers under its steps: its question, or our words
+export function assistantReply({
+  error,
+  read,
+  lookup,
+}: Omit<Search, 'sending'>): Message | string | null {
   if (error) return messageError(error)
   if (!read) return null
+
+  const started = lookup ?? read.lookup
+  if (!started && read.reply) return read.reply
 
   const vehicle = !read.missing.includes('vehicle')
   const parts = !read.missing.includes('parts')
@@ -206,8 +220,6 @@ export function assistantReply({ error, read, lookup }: Omit<Search, 'sending'>)
   if (!parts) {
     return message('lookups.ai.reply.missing-parts', { vehicle: read.vin ?? read.plate ?? '' })
   }
-
-  const started = lookup ?? read.lookup
 
   return started ? outcome(started) : null
 }

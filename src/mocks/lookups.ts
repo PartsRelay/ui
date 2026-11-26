@@ -374,6 +374,10 @@ const VIN_IN_TEXT = /\b[A-HJ-NPR-Z0-9]{17}\b/i
 const PLATE_IN_TEXT = /\b[A-Z]{2}[\s-]?\d{3}[\s-]?[A-Z]{2}\b/i
 const CONNECTORS = /^(?:\W|for|per|the|la|il)+|(?:\W|for|per|of|di|del|della)+$/gi
 
+// Parts the assistant asks about before it searches
+const UNCLEAR = /^(?:(?:brake )?pads|pastiglie(?: freno)?)$/i
+const WHICH_PADS = ['Front or rear brake pads?', 'Pastiglie anteriori o posteriori?']
+
 // Like the model: the photos are read from their file names
 function readMessage(text: string, images: File[]) {
   const photos = images.map(({ name }) => name.replace(/\.\w+$/, '').replace(/[_-]+/g, ' '))
@@ -483,9 +487,17 @@ export const lookupMocks = [
       ...(read.vin || read.plate ? [] : ['vehicle']),
       ...(read.parts ? [] : ['parts']),
     ]
-    if (missing.length > 0 || !read.parts) return { data: { ...read, missing, lookup: null } }
+    if (missing.length > 0 || !read.parts) {
+      return { data: { ...read, missing, reply: null, lookup: null } }
+    }
 
     const query = read.parts
+
+    if (UNCLEAR.test(query)) {
+      const reply = WHICH_PADS[languageOf(request)]!
+
+      return { data: { ...read, missing, reply, lookup: null } }
+    }
 
     return archive((state) => {
       const running: Stored = {
@@ -504,7 +516,9 @@ export const lookupMocks = [
       }
       state.lookups.push(settled(running))
 
-      return { data: { ...read, missing, lookup: lookupOf(running, languageOf(request)) } }
+      return {
+        data: { ...read, missing, reply: null, lookup: lookupOf(running, languageOf(request)) },
+      }
     })
   }),
   getGetApiV1WorkspaceLookupsStatsMockHandler(async ({ request }) => {

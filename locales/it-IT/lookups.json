@@ -129,6 +129,7 @@
   "ai": {
     "title": "Che ricambio ti serve?",
     "description": "Scrivi la targa o il telaio e i ricambi, oppure allega una foto del libretto.",
+    "back": "Torna alle ricerche",
     "message": "Richiesta",
     "message-hint": "Invio per mandare, Maiusc+Invio per andare a capo. Il telaio vale più della targa.",
     "message-placeholder": "Targa o telaio, e i ricambi che ti servono",

@@ -433,6 +433,13 @@ test.describe('the new search chat', () => {
       await expect(request(page)).toBeVisible()
     })
 
+    test('a button goes back to the searches', async ({ page }) => {
+      await page.getByRole('link', { name: 'Back to searches' }).click()
+
+      await expect(page).toHaveURL('/lookups')
+      await expect(page.getByRole('heading', { level: 1, name: greeting })).toBeVisible()
+    })
+
     test('one message is read, searched and opened', async ({ page }) => {
       await request(page).fill('Front brake pads for AB 123 CD')
       await request(page).press('Enter')

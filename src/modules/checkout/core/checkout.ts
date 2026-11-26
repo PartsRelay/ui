@@ -8,9 +8,20 @@ import { errorCode } from '@/core/errors'
 
 export const MAX_QUANTITY = 99
 
+// Shown for a price or a stock the seller has not loaded
+export const NOT_LOADED = '—'
+
 export const checkoutSearchSchema = z.object({ token: z.string().catch('') })
 
-export type Article = Omit<OrderItem, 'quantity'> & { index: number }
+type Stock = { price: string | null; currency: string | null; available: number | null }
+
+export type Article = Omit<OrderItem, 'quantity'> & Stock & { index: number }
+
+const stockOf = ({ price = null, currency = null, available = null }: Partial<Stock>) => ({
+  price,
+  currency,
+  available,
+})
 
 export type PartView = { key: string; position: string | null; articles: Article[] }
 
@@ -33,9 +44,15 @@ export function checkoutView({ categories }: Pick<CheckoutObject, 'categories'>)
         key: `${key}:${index}`,
         position: part.position,
         articles: [
-          listed({ original: true, code: part.code, brand: null, description: part.name }),
-          ...part.aftermarket.map(({ code, brand, description }) =>
-            listed({ original: false, code, brand, description })
+          listed({
+            original: true,
+            code: part.code,
+            brand: null,
+            description: part.name,
+            ...stockOf(part),
+          }),
+          ...part.aftermarket.map(({ code, brand, description, ...match }) =>
+            listed({ original: false, code, brand, description, ...stockOf(match) })
           ),
         ],
       }))
@@ -58,6 +75,13 @@ export function orderItems(
 
 export function pieces(quantities: number[]) {
   return quantities.reduce((total, quantity) => total + quantity, 0)
+}
+
+// The price in the format of the reader, a dash when not loaded
+export function priceOf({ price, currency }: Pick<Article, 'price' | 'currency'>, locale: string) {
+  if (price === null || currency === null) return NOT_LOADED
+
+  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(Number(price))
 }
 
 export function articleCode({ brand, code }: Pick<OrderItem, 'brand' | 'code'>) {

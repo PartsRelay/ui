@@ -3,6 +3,8 @@
   "heading": "Ordina da {company}",
   "description": "Scegli i ricambi che ti servono e conferma. {company} riceve l'ordine e tu trovi la conferma su WhatsApp.",
   "original": "Originale",
+  "price": "Prezzo",
+  "availability": "Disponibili",
   "decrease": "Uno in meno di {name}",
   "increase": "Uno in più di {name}",
   "selected": "{count, plural, =0 {Nessun ricambio scelto} one {# ricambio scelto} other {# ricambi scelti}}",

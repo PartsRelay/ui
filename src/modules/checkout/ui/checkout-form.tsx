@@ -3,7 +3,14 @@ import { cn } from 'cn'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { CheckoutObject } from '@/core/api/models'
-import { type Article, checkoutView, orderItems, pieces } from '@/modules/checkout/core/checkout'
+import {
+  type Article,
+  checkoutView,
+  NOT_LOADED,
+  orderItems,
+  pieces,
+  priceOf,
+} from '@/modules/checkout/core/checkout'
 import { useArticleName } from '@/modules/checkout/ui/hooks/use-article-name'
 import { useDecideCheckout } from '@/modules/checkout/ui/hooks/use-decide-checkout'
 import { QuantityStepper } from '@/modules/checkout/ui/quantity-stepper'
@@ -18,7 +25,7 @@ import { Card, CardContent, CardHeader } from '@/ui/components/ui/card'
 type CheckoutFormProps = { token: string; checkout: CheckoutObject }
 
 export function CheckoutForm({ token, checkout }: CheckoutFormProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const articleName = useArticleName()
   const decide = useDecideCheckout(token)
   const [declining, setDeclining] = useState(false)
@@ -48,6 +55,20 @@ export function CheckoutForm({ token, checkout }: CheckoutFormProps) {
           {article.description && (
             <span className="text-muted-foreground">{article.description}</span>
           )}
+          <span className="flex flex-wrap gap-x-4 text-sm text-muted-foreground">
+            <span>
+              {t('checkout.price')}{' '}
+              <span className="font-semibold text-foreground">
+                {priceOf(article, i18n.language)}
+              </span>
+            </span>
+            <span>
+              {t('checkout.availability')}{' '}
+              <span className="font-semibold text-foreground">
+                {article.available ?? NOT_LOADED}
+              </span>
+            </span>
+          </span>
         </span>
         <form.Field name={`quantities[${article.index}]`}>
           {(field) => (

@@ -14,6 +14,25 @@ import { categoriesOf, languageOf } from '@/mocks/lookups'
 type Decision = Pick<CheckoutObject, 'status' | 'items'>
 
 const EXPIRED = 'expired'
+
+// What the seller loaded: the other parts show no price or stock
+const STOCK: Record<string, { price: string; currency: string; available: number }> = {
+  'P 23 141': { price: '48.90', currency: 'EUR', available: 4 },
+  'GDB1891': { price: '39.50', currency: 'EUR', available: 0 },
+}
+
+function stocked(categories: CheckoutObject['categories']): CheckoutObject['categories'] {
+  return categories.map((category) => ({
+    ...category,
+    units: category.units.map((unit) => ({
+      ...unit,
+      original: unit.original.map((part) => ({
+        ...part,
+        aftermarket: part.aftermarket.map((match) => ({ ...match, ...STOCK[match.code] })),
+      })),
+    })),
+  }))
+}
 const MAX_ITEMS = 50
 const MAX_QUANTITY = 99
 
@@ -40,7 +59,7 @@ function checkoutOf(token: string, request: Request): CheckoutObject {
     query: 'front brake pads',
     vehicleDescription: 'Fiat Panda 1.2',
     chatUrl: 'https://wa.me/390287341190',
-    categories: decision ? [] : categoriesOf(['g4'], languageOf(request)),
+    categories: decision ? [] : stocked(categoriesOf(['g4'], languageOf(request))),
     items: decision?.items ?? [],
   }
 }
@@ -64,7 +83,12 @@ function offers({ categories }: CheckoutObject): Omit<OrderItem, 'quantity'>[] {
     .flatMap((unit) => unit.original)
     .flatMap((part) => [
       { original: true, code: part.code, brand: null, description: part.name },
-      ...part.aftermarket.map((match) => ({ original: false, ...match })),
+      ...part.aftermarket.map(({ code, brand, description }) => ({
+        original: false,
+        code,
+        brand,
+        description,
+      })),
     ])
 }
 

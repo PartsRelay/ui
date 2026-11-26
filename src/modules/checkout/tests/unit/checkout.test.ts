@@ -5,8 +5,10 @@ import {
   checkoutSearchSchema,
   checkoutView,
   insideWhatsapp,
+  NOT_LOADED,
   orderItems,
   pieces,
+  priceOf,
   unavailable,
 } from '@/modules/checkout/core/checkout'
 
@@ -14,8 +16,17 @@ const part = (code: string, matches: [brand: string | null, code: string][] = []
   code,
   name: `Part ${code}`,
   position: '4',
-  aftermarket: matches.map(([brand, match]) => ({ brand, code: match, description: null })),
+  aftermarket: matches.map(([brand, match]) => ({
+    brand,
+    code: match,
+    description: null,
+    // Loaded by the seller only for its own brands
+    ...(brand && { price: '48.90', currency: 'EUR', available: 4 as number | null }),
+  })),
 })
+
+const unknown = { price: null, currency: null, available: null }
+const stock = { price: '48.90', currency: 'EUR', available: 4 }
 
 const unit = (name: string | null, original: ReturnType<typeof part>[]) => ({
   code: '50110',
@@ -46,12 +57,23 @@ describe('checkoutView', () => {
   const view = checkoutView({ categories })
 
   it('lists every part once, the original before its matches', () => {
-    expect(view.articles).toEqual([
-      { index: 0, original: true, code: '77367141', brand: null, description: 'Part 77367141' },
-      { index: 1, original: false, code: 'P 23 141', brand: 'BREMBO', description: null },
-      { index: 2, original: false, code: 'GDB1891', brand: null, description: null },
-      { index: 3, original: true, code: '46402682', brand: null, description: 'Part 46402682' },
-    ])
+    expect(view.articles).toEqual(
+      [
+        { index: 0, original: true, code: '77367141', brand: null, description: 'Part 77367141' },
+        { index: 1, original: false, code: 'P 23 141', brand: 'BREMBO', description: null },
+        { index: 2, original: false, code: 'GDB1891', brand: null, description: null },
+        { index: 3, original: true, code: '46402682', brand: null, description: 'Part 46402682' },
+      ].map((article) => ({ ...unknown, ...article, ...(article.brand && stock) }))
+    )
+  })
+
+  it('writes the price in the format of the reader, a dash when not loaded', () => {
+    const [original, loaded] = view.articles
+
+    expect(priceOf(loaded!, 'en-US')).toBe('€48.90')
+    expect(priceOf(loaded!, 'it-IT')).toBe('48,90\u00a0€')
+    expect(priceOf(original!, 'en-US')).toBe(NOT_LOADED)
+    expect(priceOf({ price: '48.90', currency: null }, 'en-US')).toBe(NOT_LOADED)
   })
 
   it('groups the parts by unit, named after the category when the unit has no name', () => {

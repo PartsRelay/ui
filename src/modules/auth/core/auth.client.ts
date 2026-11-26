@@ -1,4 +1,3 @@
-import { apiKeyClient } from '@better-auth/api-key/client'
 import { createAuthClient } from 'better-auth/client'
 import {
   inferOrgAdditionalFields,
@@ -34,7 +33,6 @@ export const authClient = createAuthClient({
       context: 'signin',
       promptOptions: { fedCM: true },
     }),
-    apiKeyClient(),
     organizationClient({
       ac,
       roles,

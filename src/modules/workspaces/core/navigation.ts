@@ -2,7 +2,7 @@ import { message } from '@/core/message'
 import type { Permissions } from '@/modules/workspaces/core/permissions'
 import type { Workspace } from '@/modules/workspaces/core/workspace'
 
-const sections = ['lookups', 'contacts', 'workspace', 'company', 'developers'] as const
+const sections = ['lookups', 'contacts', 'workspace', 'company'] as const
 
 const pages = [...sections, 'profile'] as const
 
@@ -15,7 +15,6 @@ const pagePaths = {
   contacts: '/contacts',
   workspace: '/workspace',
   company: '/company',
-  developers: '/developers',
   profile: '/profile',
 } as const satisfies Record<Page, string>
 
@@ -28,7 +27,6 @@ const CRUMB_PARENTS = {
   'contacts': null,
   'workspace': null,
   'company': 'workspace',
-  'developers': null,
   'profile': 'account',
 } as const satisfies Record<CrumbId, string | null>
 
@@ -43,7 +41,6 @@ export function pageAt(pathname: string): Page | null {
 export function canOpen(page: Page | null, permissions: Permissions) {
   if (page === 'workspace') return permissions.viewWorkspace
   if (page === 'company') return permissions.viewCompany
-  if (page === 'developers') return permissions.viewDevelopers
 
   return true
 }

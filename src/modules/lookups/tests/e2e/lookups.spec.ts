@@ -487,6 +487,26 @@ test.describe('the new search chat', () => {
       await expect(answered(page).last()).toContainText('No plate or VIN')
     })
 
+    test('the assistant asks what is not clear, and the answer starts the search', async ({
+      page,
+    }) => {
+      await request(page).fill('Pads for GH 482 KL')
+      await send(page)
+
+      await expect(answered(page)).toContainText('GH482KL · Pads')
+      await expect(answered(page)).toContainText('Front or rear brake pads?')
+      await expect(page.getByRole('link', { name: 'Open the result' })).toHaveCount(0)
+      await expect(page).toHaveURL('/lookups/new')
+
+      await request(page).fill('Front')
+      await send(page)
+
+      await expect(answered(page).last()).toContainText(
+        'I found 1 category for Fiat Panda 1.2 8V: Front brake pads.'
+      )
+      await expect(page).toHaveURL(/\/lookups\/new\?lookupId=\d+$/)
+    })
+
     test('the page keeps the last search in its address, so a reload shows it again', async ({
       page,
     }) => {

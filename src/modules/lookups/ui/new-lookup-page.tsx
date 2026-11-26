@@ -214,7 +214,11 @@ function AssistantTurn({ reply, onRetry }: { reply: Reply; onRetry?: () => void 
               <Step key={step.key} step={step} />
             ))}
           </Trace>
-          {answer && <p className="text-base leading-relaxed">{t(...answer)}</p>}
+          {answer && (
+            <p className="text-base leading-relaxed">
+              {typeof answer === 'string' ? answer : t(...answer)}
+            </p>
+          )}
           {lookup && lookup.status !== 'running' && (
             <Button asChild variant="outline" size="sm" className="w-fit">
               <Link to="/lookups/$lookupId" params={{ lookupId: String(lookup.id) }}>

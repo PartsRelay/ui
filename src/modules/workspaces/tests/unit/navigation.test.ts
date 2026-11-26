@@ -43,7 +43,6 @@ describe('pageAt', () => {
     ['/workspace', 'workspace'],
     ['/workspace/', 'workspace'],
     ['/company', 'company'],
-    ['/developers', 'developers'],
     ['/profile', 'profile'],
     ['/workspaces', null],
     ['/setup', null],
@@ -80,12 +79,6 @@ describe('canOpen', () => {
     ])
   })
 
-  it('opens the developers page to the owner only', () => {
-    expect([owner, admin, viewer].map((permissions) => canOpen('developers', permissions))).toEqual(
-      [true, false, false]
-    )
-  })
-
   it('opens the profile and other pages to everyone', () => {
     expect(canOpen('profile', viewer)).toBe(true)
     expect(canOpen(null, viewer)).toBe(true)
@@ -107,7 +100,6 @@ describe('navigation', () => {
       { page: 'contacts', path: '/contacts', label: ['nav.contacts'], active: false },
       { page: 'workspace', path: '/workspace', label: ['nav.workspace'], active: false },
       { page: 'company', path: '/company', label: ['nav.company'], active: true },
-      { page: 'developers', path: '/developers', label: ['nav.developers'], active: false },
     ])
   })
 
@@ -130,10 +122,6 @@ describe('breadcrumbs', () => {
     expect(breadcrumbs('contacts')).toEqual([['crumbs.contacts']])
     expect(breadcrumbs('workspace')).toEqual([['crumbs.workspace']])
     expect(breadcrumbs('company')).toEqual([['crumbs.workspace'], ['crumbs.company']])
-  })
-
-  it('puts the developers at the top of their own trail', () => {
-    expect(breadcrumbs('developers')).toEqual([['crumbs.developers']])
   })
 
   it('puts a search result under the searches', () => {

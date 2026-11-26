@@ -9,6 +9,7 @@ import {
   CircleAlertIcon,
   PackageSearchIcon,
   PaperclipIcon,
+  ReceiptTextIcon,
   RotateCcwIcon,
   ScanTextIcon,
   XIcon,
@@ -39,11 +40,12 @@ import {
   IMAGE_TYPES,
   MAX_MESSAGE_LENGTH,
   messageOf,
+  messageRequest,
   readOfLookup,
   requestOfLookup,
   retryable,
+  searchOutcome,
   searchTrace,
-  threadRequest,
   type TraceStep,
 } from '@/modules/lookups/core/message-search'
 import { useSearchMessage } from '@/modules/lookups/ui/hooks/use-search-message'
@@ -188,19 +190,29 @@ function UserTurn({ text, images }: { text: string; images: Picked[] }) {
   )
 }
 
-function AssistantTurn({ reply, onRetry }: { reply: Reply; onRetry?: () => void }) {
+type AssistantTurnProps = {
+  reply: Reply
+  // Only the newest turn of a search follows it to its end
+  followed?: boolean
+  onRetry?: () => void
+}
+
+function AssistantTurn({ reply, followed = true, onRetry }: AssistantTurnProps) {
   const { t } = useTranslation()
   const read = reply.state === 'read' ? reply.read : undefined
   const error = reply.state === 'failed' ? reply.error : undefined
   const lookupId = read?.lookup?.id
   const polled = useQuery({
     ...lookupQuery(lookupId ?? 0),
-    enabled: lookupId !== undefined,
+    enabled: followed && lookupId !== undefined,
     refetchInterval: ({ state }) => (state.data?.data.status === 'running' ? 2000 : false),
   })
-  const lookup = polled.data ?? read?.lookup ?? undefined
-  const steps = searchTrace({ sending: reply.state === 'sending', error, read, lookup })
+  const lookup = followed ? (polled.data ?? read?.lookup ?? undefined) : undefined
+  const ended = lookup && lookup.status !== 'running' ? lookup : undefined
+  const steps = searchTrace({ sending: reply.state === 'sending', error, read, lookup }, followed)
   const answer = assistantReply({ error, read, lookup })
+  // Under the words of the assistant, how its search ended
+  const outcome = read?.reply ? searchOutcome(ended) : null
 
   return (
     <article aria-label={t('lookups.ai.assistant')}>
@@ -219,13 +231,25 @@ function AssistantTurn({ reply, onRetry }: { reply: Reply; onRetry?: () => void 
               {typeof answer === 'string' ? answer : t(...answer)}
             </p>
           )}
-          {lookup && lookup.status !== 'running' && (
-            <Button asChild variant="outline" size="sm" className="w-fit">
-              <Link to="/lookups/$lookupId" params={{ lookupId: String(lookup.id) }}>
-                {t('lookups.ai.open')}
-                <ArrowRightIcon data-icon="inline-end" />
-              </Link>
-            </Button>
+          {outcome && <p className="text-base leading-relaxed">{t(...outcome)}</p>}
+          {ended && (
+            <div className="flex flex-wrap gap-2">
+              {ended.orderUrl && (
+                <Button asChild size="sm">
+                  {/* Its own tab, so the chat stays open to add more */}
+                  <a href={ended.orderUrl} target="_blank" rel="opener">
+                    <ReceiptTextIcon data-icon="inline-start" />
+                    {t('lookups.ai.order')}
+                  </a>
+                </Button>
+              )}
+              <Button asChild variant="outline" size="sm">
+                <Link to="/lookups/$lookupId" params={{ lookupId: String(ended.id) }}>
+                  {t('lookups.ai.open')}
+                  <ArrowRightIcon data-icon="inline-end" />
+                </Link>
+              </Button>
+            </div>
           )}
           {onRetry && (
             <Button variant="outline" size="sm" className="w-fit" onClick={onRetry}>
@@ -240,11 +264,11 @@ function AssistantTurn({ reply, onRetry }: { reply: Reply; onRetry?: () => void 
 }
 
 // The search kept in the address, after a reload
-function KeptSearch({ lookup }: { lookup: LookupObject }) {
+function KeptSearch({ lookup, followed }: { lookup: LookupObject; followed: boolean }) {
   return (
     <>
       <UserTurn text={requestOfLookup(lookup)} images={[]} />
-      <AssistantTurn reply={{ state: 'read', read: readOfLookup(lookup) }} />
+      <AssistantTurn reply={{ state: 'read', read: readOfLookup(lookup) }} followed={followed} />
     </>
   )
 }
@@ -270,6 +294,8 @@ export function NewLookupPage() {
   const navigate = route.useNavigate()
   const { plate, vin, query, lookupId } = route.useSearch()
   const [keptId] = useState(lookupId)
+  // The chat of this page: the core remembers its messages
+  const [conversation] = useState(() => crypto.randomUUID())
   const kept = useQuery({ ...lookupQuery(keptId ?? 0), enabled: keptId !== undefined })
   const textarea = useRef<HTMLTextAreaElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -287,6 +313,16 @@ export function NewLookupPage() {
   const sending = turns.some(({ reply }) => reply.state === 'sending')
   const error = blank ? message('lookups.ai.errors.empty') : null
   const last = turns.at(-1)
+  // The newest turn of each search: a changed search is followed there
+  const newest = new Map(
+    turns.flatMap((turn) =>
+      turn.reply.state === 'read' && turn.reply.read.lookup
+        ? [[turn.reply.read.lookup.id, turn.id] as const]
+        : []
+    )
+  )
+  const follows = ({ id, reply }: Turn) =>
+    reply.state !== 'read' || !reply.read.lookup || newest.get(reply.read.lookup.id) === id
 
   useEffect(() => {
     shown.current = [...images, ...turns.flatMap((turn) => turn.images)]
@@ -365,15 +401,11 @@ export function NewLookupPage() {
     }
 
     const turnId = turns.length + 1
-    const body = threadRequest([
-      ...turns.map((turn) => ({
-        text: turn.text,
-        images: turn.images.map(({ file }) => file),
-        started: turn.reply.state === 'read' && Boolean(turn.reply.read.lookup),
-        failed: turn.reply.state === 'failed',
-      })),
-      { text: said, images: images.map(({ file }) => file) },
-    ])
+    const body = messageRequest(
+      conversation,
+      said,
+      images.map(({ file }) => file)
+    )
     // Asks only once the turn is there to take the answer
     const send = () => {
       sliding.current = false
@@ -438,12 +470,13 @@ export function NewLookupPage() {
           className={cn('flex flex-col gap-8', started && 'flex-1 pt-2 pb-8')}
         >
           {restoring && <KeptSkeleton />}
-          {kept.data && <KeptSearch lookup={kept.data} />}
+          {kept.data && <KeptSearch lookup={kept.data} followed={!newest.has(kept.data.id)} />}
           {turns.map((turn) => (
             <Fragment key={turn.id}>
               <UserTurn text={turn.text} images={turn.images} />
               <AssistantTurn
                 reply={turn.reply}
+                followed={follows(turn)}
                 onRetry={
                   turn === last && turn.reply.state === 'failed' && retryable(turn.reply.error)
                     ? () => retry(turn)

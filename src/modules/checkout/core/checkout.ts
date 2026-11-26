@@ -27,9 +27,17 @@ export type PartView = { key: string; position: string | null; articles: Article
 
 export type GroupView = { key: string; name: string | null; parts: PartView[] }
 
-export type CheckoutView = { groups: GroupView[]; articles: Article[] }
+// One vehicle of the order, with the parts of its search
+export type VehicleView = { key: number; title: string; groups: GroupView[] }
 
-export function checkoutView({ categories }: Pick<CheckoutObject, 'categories'>): CheckoutView {
+export type CheckoutView = { vehicles: VehicleView[]; articles: Article[] }
+
+type Search = CheckoutObject['searches'][number]
+
+const titleOf = ({ plate, vin, vehicleDescription }: Search, query: string | null = null) =>
+  [plate ?? vin, vehicleDescription, query].filter(Boolean).join(' · ')
+
+export function checkoutView({ searches }: Pick<CheckoutObject, 'searches'>): CheckoutView {
   const articles: Article[] = []
   const listed = (article: Omit<Article, 'index'>) => {
     const item = { ...article, index: articles.length }
@@ -37,40 +45,61 @@ export function checkoutView({ categories }: Pick<CheckoutObject, 'categories'>)
 
     return item
   }
-  const groups = categories.flatMap((category) =>
-    category.units.flatMap((unit, at) => {
-      const key = `${category.id}:${at}`
-      const parts = unit.original.map((part, index) => ({
-        key: `${key}:${index}`,
-        position: part.position,
-        articles: [
-          listed({
-            original: true,
-            code: part.code,
-            brand: null,
-            description: part.name,
-            ...stockOf(part),
-          }),
-          ...part.aftermarket.map(({ code, brand, description, ...match }) =>
-            listed({ original: false, code, brand, description, ...stockOf(match) })
-          ),
-        ],
-      }))
+  const vehicles = searches.map((search) => ({
+    key: search.id,
+    title: titleOf(search, search.query),
+    groups: search.categories.flatMap((category) =>
+      category.units.flatMap((unit, at) => {
+        const key = `${search.id}:${category.id}:${at}`
+        const parts = unit.original.map((part, index) => ({
+          key: `${key}:${index}`,
+          position: part.position,
+          articles: [
+            listed({
+              lookupId: search.id,
+              original: true,
+              code: part.code,
+              brand: null,
+              description: part.name,
+              ...stockOf(part),
+            }),
+            ...part.aftermarket.map(({ code, brand, description, ...match }) =>
+              listed({
+                lookupId: search.id,
+                original: false,
+                code,
+                brand,
+                description,
+                ...stockOf(match),
+              })
+            ),
+          ],
+        }))
 
-      return parts.length > 0 ? [{ key, name: unit.name ?? category.name, parts }] : []
-    })
-  )
+        return parts.length > 0 ? [{ key, name: unit.name ?? category.name, parts }] : []
+      })
+    ),
+  }))
 
-  return { groups, articles }
+  return { vehicles, articles }
 }
 
 export function orderItems(
   articles: Article[],
   quantities: number[]
 ): PostApiV1CheckoutsTokenConfirmBodyItemsItem[] {
-  return articles.flatMap(({ index, code, brand }) =>
-    quantities[index]! > 0 ? [{ code, brand, quantity: quantities[index]! }] : []
+  return articles.flatMap(({ index, lookupId, code, brand }) =>
+    quantities[index]! > 0 ? [{ lookupId, code, brand, quantity: quantities[index]! }] : []
   )
+}
+
+// The parts ordered, under the vehicle they are for
+export function orderedByVehicle({ searches, items }: Pick<CheckoutObject, 'searches' | 'items'>) {
+  return searches.flatMap((search) => {
+    const ordered = items.filter((item) => item.lookupId === search.id)
+
+    return ordered.length > 0 ? [{ key: search.id, title: titleOf(search), items: ordered }] : []
+  })
 }
 
 export function pieces(quantities: number[]) {

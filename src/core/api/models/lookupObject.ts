@@ -26,5 +26,7 @@ export interface LookupObject {
   /** @nullable */
   vehicleDescription?: string | null;
   categories?: LookupCategory[];
+  /** @nullable */
+  orderUrl?: string | null;
   createdAt: string;
 }

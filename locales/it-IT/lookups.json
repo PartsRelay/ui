@@ -137,6 +137,7 @@
     "remove": "Rimuovi {name}",
     "send": "Cerca",
     "open": "Apri il risultato",
+    "order": "Scegli e ordina",
     "refused": "{count, plural, one {# foto è stata scartata: al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.} other {# foto sono state scartate: al massimo 4 foto, JPG, PNG o WebP, da 5 MB ciascuna.}}",
     "trace": {
       "reading": "Leggo la richiesta",
@@ -167,10 +168,8 @@
     "you": "Tu",
     "assistant": "Assistente",
     "reply": {
-      "missing-both": "Dimmi la targa o il telaio e i ricambi che ti servono, oppure allega una foto del libretto.",
-      "missing-vehicle": "Mi serve la targa o il telaio del veicolo: scrivili qui, oppure allega una foto del libretto.",
-      "missing-parts": "Quali ricambi ti servono per {vehicle}?",
       "found": "{count, plural, one {Ho trovato # categoria} other {Ho trovato # categorie}} per {vehicle}: {categories}.",
+      "order": "{count, plural, one {Ho trovato # categoria} other {Ho trovato # categorie}} per {vehicle}: {categories}. Ecco la pagina ordine, dimmi se vuoi aggiungere altro.",
       "done": "La ricerca è finita: apri il risultato per vederla.",
       "vehicle-not-found": "Non ho trovato un veicolo per {identifier}. Controlla la targa, oppure scrivi il telaio.",
       "not-matched": "Nel catalogo di {vehicle} non c'è una categoria per {parts}. Prova con altre parole.",

@@ -6,6 +6,7 @@ import {
   checkoutView,
   insideWhatsapp,
   NOT_LOADED,
+  orderedByVehicle,
   orderItems,
   pieces,
   priceOf,
@@ -36,7 +37,9 @@ const unit = (name: string | null, original: ReturnType<typeof part>[]) => ({
   original,
 })
 
-const categories: CheckoutObject['categories'] = [
+type Search = CheckoutObject['searches'][number]
+
+const categories: Search['categories'] = [
   {
     id: 'g4',
     name: 'Front brake pads',
@@ -53,17 +56,42 @@ const categories: CheckoutObject['categories'] = [
   },
 ]
 
-describe('checkoutView', () => {
-  const view = checkoutView({ categories })
+const panda: Search = {
+  id: 7,
+  plate: 'AB123CD',
+  vin: 'ZFA31200003456789',
+  query: 'front brake pads',
+  vehicleDescription: 'Fiat Panda 1.2',
+  categories,
+}
 
-  it('lists every part once, the original before its matches', () => {
+// A second vehicle of the same order, found by its VIN
+const golf: Search = {
+  id: 9,
+  plate: null,
+  vin: 'WVWZZZAUZHW204411',
+  query: 'brake pads',
+  vehicleDescription: null,
+  categories: [{ id: 'g4', name: 'Front brake pads', units: [unit(null, [part('5Q0698151')])] }],
+}
+
+describe('checkoutView', () => {
+  const view = checkoutView({ searches: [panda, golf] })
+
+  it('lists every part once, the original before its matches, with its search', () => {
     expect(view.articles).toEqual(
       [
         { index: 0, original: true, code: '77367141', brand: null, description: 'Part 77367141' },
         { index: 1, original: false, code: 'P 23 141', brand: 'BREMBO', description: null },
         { index: 2, original: false, code: 'GDB1891', brand: null, description: null },
         { index: 3, original: true, code: '46402682', brand: null, description: 'Part 46402682' },
-      ].map((article) => ({ ...unknown, ...article, ...(article.brand && stock) }))
+        { index: 4, original: true, code: '5Q0698151', brand: null, description: 'Part 5Q0698151' },
+      ].map((article) => ({
+        ...unknown,
+        lookupId: article.index < 4 ? 7 : 9,
+        ...article,
+        ...(article.brand && stock),
+      }))
     )
   })
 
@@ -76,24 +104,49 @@ describe('checkoutView', () => {
     expect(priceOf({ price: '48.90', currency: null }, 'en-US')).toBe(NOT_LOADED)
   })
 
-  it('groups the parts by unit, named after the category when the unit has no name', () => {
-    expect(view.groups.map(({ key, name, parts }) => [key, name, parts.length])).toEqual([
-      ['g4:0', 'Front brakes', 1],
-      ['g4:1', 'Front brake pads', 1],
+  it('gives each vehicle its section, named by its plate or its VIN', () => {
+    expect(view.vehicles.map(({ key, title, groups }) => [key, title, groups.length])).toEqual([
+      [7, 'AB123CD · Fiat Panda 1.2 · front brake pads', 2],
+      [9, 'WVWZZZAUZHW204411 · brake pads', 1],
     ])
-    expect(view.groups[0]!.parts[0]).toMatchObject({ key: 'g4:0:0', position: '4' })
-    expect(view.groups[0]!.parts[0]!.articles).toEqual(view.articles.slice(0, 3))
   })
 
-  it('orders only the parts with a quantity', () => {
-    const quantities = [2, 0, 1, 0]
+  it('groups the parts by unit, named after the category when the unit has no name', () => {
+    const [{ groups }, other] = view.vehicles
+
+    expect(groups.map(({ key, name, parts }) => [key, name, parts.length])).toEqual([
+      ['7:g4:0', 'Front brakes', 1],
+      ['7:g4:1', 'Front brake pads', 1],
+    ])
+    expect(groups[0]!.parts[0]).toMatchObject({ key: '7:g4:0:0', position: '4' })
+    expect(groups[0]!.parts[0]!.articles).toEqual(view.articles.slice(0, 3))
+    // The same category of two vehicles never shares a key
+    expect(other!.groups[0]!.key).toBe('9:g4:0')
+  })
+
+  it('orders only the parts with a quantity, each for its search', () => {
+    const quantities = [2, 0, 1, 0, 3]
 
     expect(orderItems(view.articles, quantities)).toEqual([
-      { code: '77367141', brand: null, quantity: 2 },
-      { code: 'GDB1891', brand: null, quantity: 1 },
+      { lookupId: 7, code: '77367141', brand: null, quantity: 2 },
+      { lookupId: 7, code: 'GDB1891', brand: null, quantity: 1 },
+      { lookupId: 9, code: '5Q0698151', brand: null, quantity: 3 },
     ])
-    expect(pieces(quantities)).toBe(3)
+    expect(pieces(quantities)).toBe(6)
     expect(pieces([])).toBe(0)
+  })
+
+  it('shows the parts ordered under their vehicle, and no vehicle without parts', () => {
+    const item = { original: true, brand: null, description: null, quantity: 1 }
+    const items = [
+      { ...item, lookupId: 9, code: '5Q0698151' },
+      { ...item, lookupId: 9, code: '5Q0698152' },
+    ]
+
+    expect(orderedByVehicle({ searches: [panda, golf], items })).toEqual([
+      { key: 9, title: 'WVWZZZAUZHW204411', items },
+    ])
+    expect(orderedByVehicle({ searches: [panda], items: [] })).toEqual([])
   })
 })
 

@@ -36,7 +36,7 @@ export function readOfLookup(lookup: LookupObject): LookupMessageObject {
     plate: lookup.plate,
     parts: lookup.query,
     missing: [],
-    reply: null,
+    reply: '',
     lookup,
   }
 }
@@ -114,7 +114,10 @@ function searchSteps(lookup: LookupObject): TraceStep[] {
 }
 
 // The steps the assistant took, for the Trace of a search
-export function searchTrace({ sending, error, read, lookup }: Search): TraceStep[] {
+export function searchTrace(
+  { sending, error, read, lookup }: Search,
+  followed = true
+): TraceStep[] {
   if (sending) {
     return [{ key: 'read', status: 'running', title: message('lookups.ai.trace.reading') }]
   }
@@ -130,7 +133,7 @@ export function searchTrace({ sending, error, read, lookup }: Search): TraceStep
   }
   if (!read) return []
 
-  const started = lookup ?? read.lookup ?? undefined
+  const started = followed ? (lookup ?? read.lookup ?? undefined) : undefined
 
   return [readStep(read), ...missingSteps(read), ...(started ? searchSteps(started) : [])]
 }
@@ -151,21 +154,17 @@ export function retryable(error: unknown) {
   return fieldErrors(error, { message: '', images: '' }) === null
 }
 
-export type Said = { text: string; images: File[]; started?: boolean; failed?: boolean }
-
-// Messages since the last search, sent as one request
-export function threadRequest(turns: Said[]): PostApiV1LookupsMessageBody {
-  const thread = turns
-    .slice(turns.findLastIndex(({ started }) => started) + 1)
-    .filter(({ failed }) => !failed)
-  const text = thread
-    .map((said) => said.text.trim())
-    .filter(Boolean)
-    .join('\n')
-    .slice(-MAX_MESSAGE_LENGTH)
-  const images = thread.flatMap((said) => said.images).slice(-MAX_IMAGES)
-
-  return { ...(text && { message: text }), ...(images.length > 0 && { images }) }
+// One message of a chat: the core remembers the ones before it
+export function messageRequest(
+  conversation: string,
+  text: string,
+  images: File[]
+): PostApiV1LookupsMessageBody {
+  return {
+    conversation,
+    ...(text.trim() && { message: text.trim() }),
+    ...(images.length > 0 && { images }),
+  }
 }
 
 function vehicleOf(lookup: LookupObject) {
@@ -180,7 +179,7 @@ function outcome(lookup: LookupObject): Message | null {
       return null
     case 'done':
       return categories.length > 0
-        ? message('lookups.ai.reply.found', {
+        ? message(`lookups.ai.reply.${lookup.orderUrl ? 'order' : 'found'}`, {
             count: categories.length,
             vehicle: vehicleOf(lookup),
             categories: categories.join(', '),
@@ -200,7 +199,7 @@ function outcome(lookup: LookupObject): Message | null {
   }
 }
 
-// What the assistant answers under its steps: its question, or our words
+// What the assistant answers under its steps: its words, else ours for a kept search
 export function assistantReply({
   error,
   read,
@@ -209,17 +208,10 @@ export function assistantReply({
   if (error) return messageError(error)
   if (!read) return null
 
-  const started = lookup ?? read.lookup
-  if (!started && read.reply) return read.reply
+  return read.reply || searchOutcome(lookup ?? read.lookup)
+}
 
-  const vehicle = !read.missing.includes('vehicle')
-  const parts = !read.missing.includes('parts')
-  if (!vehicle) {
-    return message(`lookups.ai.reply.${parts ? 'missing-vehicle' : 'missing-both'}`)
-  }
-  if (!parts) {
-    return message('lookups.ai.reply.missing-parts', { vehicle: read.vin ?? read.plate ?? '' })
-  }
-
-  return started ? outcome(started) : null
+// How a search ended, said once it is over
+export function searchOutcome(lookup: LookupObject | null | undefined): Message | null {
+  return lookup ? outcome(lookup) : null
 }

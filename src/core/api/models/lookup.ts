@@ -27,4 +27,6 @@ export interface Lookup {
   /** @nullable */
   vehicleDescription?: string | null;
   categories?: LookupCategory[];
+  /** @nullable */
+  orderUrl?: string | null;
 }

@@ -5,11 +5,12 @@ import {
 } from '@/core/api/endpoints/checkouts/checkouts.msw'
 import type {
   CheckoutObject,
+  CheckoutSearch,
   OrderItem,
   PostApiV1CheckoutsTokenConfirmBody,
 } from '@/core/api/models'
 import { apiBody, fail, rejected } from '@/mocks/errors'
-import { categoriesOf, languageOf } from '@/mocks/lookups'
+import { archive, categoriesOf, languageOf, lookupOf, ORDER_TOKEN } from '@/mocks/lookups'
 
 type Decision = Pick<CheckoutObject, 'status' | 'items'>
 
@@ -21,7 +22,7 @@ const STOCK: Record<string, { price: string; currency: string; available: number
   'GDB1891': { price: '39.50', currency: 'EUR', available: 0 },
 }
 
-function stocked(categories: CheckoutObject['categories']): CheckoutObject['categories'] {
+function stocked(categories: CheckoutSearch['categories']): CheckoutSearch['categories'] {
   return categories.map((category) => ({
     ...category,
     units: category.units.map((unit) => ({
@@ -44,22 +45,64 @@ function decisions<T>(change: (state: Record<string, Decision>) => T): T {
   return result
 }
 
+// The link of the demo: any token but the expired one, and the ones of the orders
+const DEMO: Omit<CheckoutSearch, 'categories'> & { nodeIds: string[] } = {
+  id: 1,
+  plate: 'AB123CD',
+  vin: 'ZFA31200003456789',
+  query: 'front brake pads',
+  vehicleDescription: 'Fiat Panda 1.2',
+  nodeIds: ['g4'],
+}
+
+// The order of a link: the one of a member, kept with the searches, or the demo
+function orderOf(token: string, request: Request) {
+  if (!token.startsWith(ORDER_TOKEN)) {
+    const decision: Decision | undefined = decisions((state) => state[token])
+
+    return { decision, chatUrl: 'https://wa.me/390287341190', searches: [DEMO] }
+  }
+
+  return archive((state) => {
+    const order = state.orders.find(({ id }) => id === Number(token.slice(ORDER_TOKEN.length)))
+    if (!order) fail(404, 'checkout-not-found', 'The checkout link is not valid or has expired')
+
+    return {
+      decision: order.status === 'open' ? undefined : order,
+      chatUrl: null,
+      searches: state.lookups
+        .filter(({ orderId, status }) => orderId === order.id && status === 'done')
+        .map((stored) => {
+          const {
+            id,
+            plate,
+            vin,
+            query,
+            nodeIds,
+            vehicleDescription = null,
+          } = lookupOf(stored, languageOf(request))
+
+          return { id, plate, vin, query, nodeIds, vehicleDescription }
+        }),
+    }
+  })
+}
+
 function checkoutOf(token: string, request: Request): CheckoutObject {
   if (token === EXPIRED) {
     fail(404, 'checkout-not-found', 'The checkout link is not valid or has expired')
   }
 
-  const decision: Decision | undefined = decisions((state) => state[token])
+  const { decision, chatUrl, searches } = orderOf(token, request)
 
   return {
     status: decision?.status ?? 'open',
     company: 'Redwood Parts Ltd',
-    plate: 'AB123CD',
-    vin: 'ZFA31200003456789',
-    query: 'front brake pads',
-    vehicleDescription: 'Fiat Panda 1.2',
-    chatUrl: 'https://wa.me/390287341190',
-    categories: decision ? [] : stocked(categoriesOf(['g4'], languageOf(request))),
+    chatUrl,
+    searches: searches.map(({ nodeIds, ...search }) => ({
+      ...search,
+      categories: decision ? [] : stocked(categoriesOf(nodeIds, languageOf(request))),
+    })),
     items: decision?.items ?? [],
   }
 }
@@ -72,24 +115,41 @@ function decide(token: string, request: Request, decision: (open: CheckoutObject
   }
 
   const decided = decision(open)
-  decisions((state) => void (state[token] = decided))
 
-  return { data: { ...open, categories: [], ...decided } }
+  if (token.startsWith(ORDER_TOKEN)) {
+    archive((state) => {
+      const order = state.orders.find(({ id }) => id === Number(token.slice(ORDER_TOKEN.length)))!
+      Object.assign(order, decided)
+    })
+  } else {
+    decisions((state) => void (state[token] = decided))
+  }
+
+  return {
+    data: {
+      ...open,
+      searches: open.searches.map((search) => ({ ...search, categories: [] })),
+      ...decided,
+    },
+  }
 }
 
-function offers({ categories }: CheckoutObject): Omit<OrderItem, 'quantity'>[] {
-  return categories
-    .flatMap((category) => category.units)
-    .flatMap((unit) => unit.original)
-    .flatMap((part) => [
-      { original: true, code: part.code, brand: null, description: part.name },
-      ...part.aftermarket.map(({ code, brand, description }) => ({
-        original: false,
-        code,
-        brand,
-        description,
-      })),
-    ])
+function offers({ searches }: CheckoutObject): Omit<OrderItem, 'quantity'>[] {
+  return searches.flatMap(({ id: lookupId, categories }) =>
+    categories
+      .flatMap((category) => category.units)
+      .flatMap((unit) => unit.original)
+      .flatMap((part) => [
+        { lookupId, original: true, code: part.code, brand: null, description: part.name },
+        ...part.aftermarket.map(({ code, brand, description }) => ({
+          lookupId,
+          original: false,
+          code,
+          brand,
+          description,
+        })),
+      ])
+  )
 }
 
 function ordered(open: CheckoutObject, picks: unknown): OrderItem[] {
@@ -98,8 +158,10 @@ function ordered(open: CheckoutObject, picks: unknown): OrderItem[] {
   if (items.length === 0) return rejected('items', 'array.minLength')
   if (items.length > MAX_ITEMS) return rejected('items', 'array.maxLength')
 
-  return items.map(({ code, brand = null, quantity }, index) => {
-    const offer = offers(open).find((item) => item.code === code && item.brand === brand)
+  return items.map(({ lookupId, code, brand = null, quantity }, index) => {
+    const offer = offers(open).find(
+      (item) => item.lookupId === lookupId && item.code === code && item.brand === brand
+    )
 
     if (!Number.isInteger(quantity) || quantity < 1)
       return rejected(`items.${index}.quantity`, 'min')

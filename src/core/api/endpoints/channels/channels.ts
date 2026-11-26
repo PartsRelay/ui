@@ -119,7 +119,6 @@ export function useGetApiV1Channels<TData = Awaited<ReturnType<typeof getApiV1Ch
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1Channels>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1Channels<TData = Awaited<ReturnType<typeof getApiV1Channels>>, TError = ErrorType<ErrorBody>>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1Channels>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -171,7 +170,6 @@ export function useGetApiV1ChannelsSuspense<TData = Awaited<ReturnType<typeof ge
   options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1Channels>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1ChannelsSuspense<TData = Awaited<ReturnType<typeof getApiV1Channels>>, TError = ErrorType<ErrorBody>>(
   options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1Channels>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient

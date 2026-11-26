@@ -12,18 +12,18 @@ export interface IamPart {
   /** @nullable */
   description: string | null;
   /**
-   * A decimal, like "48.90"
-   * @nullable
-   */
+     * A decimal, like "48.90"
+     * @nullable
+     */
   price?: string | null;
   /**
-   * ISO 4217, like "EUR"
-   * @nullable
-   */
+     * ISO 4217, like "EUR"
+     * @nullable
+     */
   currency?: string | null;
   /**
-   * The quantity available
-   * @nullable
-   */
+     * The quantity available
+     * @nullable
+     */
   available?: number | null;
 }

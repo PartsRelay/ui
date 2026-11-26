@@ -126,7 +126,6 @@ export function useGetApiV1CheckoutsToken<TData = Awaited<ReturnType<typeof getA
  token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1CheckoutsToken>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1CheckoutsToken<TData = Awaited<ReturnType<typeof getApiV1CheckoutsToken>>, TError = ErrorType<ErrorBody>>(
  token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1CheckoutsToken>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -178,7 +177,6 @@ export function useGetApiV1CheckoutsTokenSuspense<TData = Awaited<ReturnType<typ
  token: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1CheckoutsToken>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1CheckoutsTokenSuspense<TData = Awaited<ReturnType<typeof getApiV1CheckoutsToken>>, TError = ErrorType<ErrorBody>>(
  token: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1CheckoutsToken>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient

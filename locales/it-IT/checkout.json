@@ -2,6 +2,7 @@
   "title": "Ordine",
   "heading": "Ordina da {company}",
   "description": "Scegli i ricambi che ti servono e conferma. {company} riceve l'ordine e tu trovi la conferma su WhatsApp.",
+  "description-web": "Scegli i ricambi che ti servono e conferma: {company} riceve l'ordine.",
   "original": "Originale",
   "price": "Prezzo",
   "availability": "Disponibili",
@@ -16,18 +17,21 @@
   "close": "Puoi chiudere questa pagina.",
   "confirmed": {
     "title": "Ordine inviato",
-    "description": "{company} ha ricevuto il tuo ordine. Trovi la conferma nella chat WhatsApp."
+    "description": "{company} ha ricevuto il tuo ordine. Trovi la conferma nella chat WhatsApp.",
+    "description-web": "{company} ha ricevuto l'ordine."
   },
   "cancelled": {
     "title": "Ordine annullato",
-    "description": "Non è stato inviato nulla a {company}. Fai una nuova ricerca su WhatsApp per ordinare."
+    "description": "Non è stato inviato nulla a {company}. Fai una nuova ricerca su WhatsApp per ordinare.",
+    "description-web": "Non è stato inviato nulla a {company}. Fai una nuova ricerca per ordinare."
   },
   "unavailable": {
     "title": "Questo link non è più valido",
-    "description": "È scaduto oppure la ricerca non è più disponibile. Fai una nuova ricerca su WhatsApp per riceverne uno nuovo."
+    "description": "È scaduto oppure la ricerca non è più disponibile. Fai una nuova ricerca per riceverne uno nuovo."
   },
   "decline": {
     "title": "Chiudere senza ordinare?",
-    "description": "Il link si chiude e non viene inviato nulla a {company}. Per ordinare più tardi, fai una nuova ricerca su WhatsApp."
+    "description": "Il link si chiude e non viene inviato nulla a {company}. Per ordinare più tardi, fai una nuova ricerca su WhatsApp.",
+    "description-web": "Il link si chiude e non viene inviato nulla a {company}. Per ordinare più tardi, fai una nuova ricerca."
   }
 }

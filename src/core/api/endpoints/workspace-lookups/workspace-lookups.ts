@@ -123,7 +123,6 @@ export function useGetApiV1WorkspaceLookups<TData = Awaited<ReturnType<typeof ge
  params?: GetApiV1WorkspaceLookupsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookups>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1WorkspaceLookups<TData = Awaited<ReturnType<typeof getApiV1WorkspaceLookups>>, TError = ErrorType<ErrorBody>>(
  params?: GetApiV1WorkspaceLookupsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookups>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -175,7 +174,6 @@ export function useGetApiV1WorkspaceLookupsSuspense<TData = Awaited<ReturnType<t
  params?: GetApiV1WorkspaceLookupsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookups>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1WorkspaceLookupsSuspense<TData = Awaited<ReturnType<typeof getApiV1WorkspaceLookups>>, TError = ErrorType<ErrorBody>>(
  params?: GetApiV1WorkspaceLookupsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookups>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -262,7 +260,6 @@ export function useGetApiV1WorkspaceLookupsStats<TData = Awaited<ReturnType<type
  params?: GetApiV1WorkspaceLookupsStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookupsStats>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1WorkspaceLookupsStats<TData = Awaited<ReturnType<typeof getApiV1WorkspaceLookupsStats>>, TError = ErrorType<ErrorBody>>(
  params?: GetApiV1WorkspaceLookupsStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookupsStats>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
@@ -314,7 +311,6 @@ export function useGetApiV1WorkspaceLookupsStatsSuspense<TData = Awaited<ReturnT
  params?: GetApiV1WorkspaceLookupsStatsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookupsStats>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient
   ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetApiV1WorkspaceLookupsStatsSuspense<TData = Awaited<ReturnType<typeof getApiV1WorkspaceLookupsStats>>, TError = ErrorType<ErrorBody>>(
  params?: GetApiV1WorkspaceLookupsStatsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getApiV1WorkspaceLookupsStats>>, TError, TData>>, request?: SecondParameter<typeof http>}
  , queryClient?: QueryClient

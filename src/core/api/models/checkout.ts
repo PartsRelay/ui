@@ -4,23 +4,15 @@
  * Parts Relay
  * OpenAPI spec version: 1.0.0
  */
+import type { CheckoutSearch } from './checkoutSearch';
 import type { CheckoutStatus } from './checkoutStatus';
-import type { LookupCategory } from './lookupCategory';
 import type { OrderItem } from './orderItem';
 
 export interface Checkout {
   status: CheckoutStatus;
   company: string;
   /** @nullable */
-  plate: string | null;
-  /** @nullable */
-  vin: string | null;
-  /** @nullable */
-  query: string | null;
-  /** @nullable */
-  vehicleDescription: string | null;
-  /** @nullable */
   chatUrl: string | null;
-  categories: LookupCategory[];
+  searches: CheckoutSearch[];
   items: OrderItem[];
 }

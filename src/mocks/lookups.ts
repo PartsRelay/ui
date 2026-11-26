@@ -8,14 +8,16 @@ import {
   getGetApiV1WorkspaceLookupsStatsMockHandler,
 } from '@/core/api/endpoints/workspace-lookups/workspace-lookups.msw'
 import {
+  type CheckoutObjectStatus,
   type LookupObject,
   LookupObjectSource,
   LookupObjectStatus,
+  type OrderItem,
   type Searcher,
   SearcherType,
   type TopSearcher,
 } from '@/core/api/models'
-import { member } from '@/mocks/auth'
+import { member, signedInMember } from '@/mocks/auth'
 import { checkedPage, page, people, type Person } from '@/mocks/data'
 import { fail, invalid, rejected } from '@/mocks/errors'
 import explodedView from '@/mocks/exploded-view.svg?no-inline'
@@ -36,14 +38,24 @@ type Unit = {
 
 type Category = { name: Text; words: string[]; units: Unit[] }
 
-type Stored = Omit<LookupObject, 'searcher' | 'vehicleDescription' | 'categories'> & {
+type Stored = Omit<LookupObject, 'searcher' | 'vehicleDescription' | 'categories' | 'orderUrl'> & {
   company: string
   searcher: Searcher
   gone?: boolean
   cached: boolean
+  // The order it is in, none for the searches made before the orders
+  orderId?: number
 }
 
-type Archive = { lookups: Stored[]; nextId: number }
+export type StoredOrder = {
+  id: number
+  company: string
+  userId: number
+  status: CheckoutObjectStatus
+  items: OrderItem[]
+}
+
+type Archive = { lookups: Stored[]; nextId: number; orders: StoredOrder[] }
 
 const VIN = /^[A-HJ-NPR-Z0-9]{17}$/
 const STALE_MINUTES = 15
@@ -62,6 +74,8 @@ const VEHICLES: Record<string, { vin: string; description: string }> = {
   GH482KL: { vin: 'ZFA31200007712345', description: 'Fiat Panda 1.2 8V' },
   FT915ZR: { vin: 'WVWZZZAUZHW204411', description: 'Volkswagen Golf VII 2.0 TDI' },
   DK318MP: { vin: 'VF1RFB00X56123456', description: 'Renault Clio IV 1.5 dCi' },
+  GX345LM: { vin: 'ZAR94000007654321', description: 'Alfa Romeo Giulietta 1.6 JTDm' },
+  GH859KJ: { vin: 'VF3CCHMZ6FT012345', description: 'Peugeot 208 1.2 PureTech' },
 }
 
 const CATALOG: Record<string, Category> = {
@@ -294,9 +308,12 @@ function seed(): Stored[] {
   })
 }
 
-function archive<T>(change: (state: Archive) => T): T {
+export function archive<T>(change: (state: Archive) => T): T {
   const saved = sessionStorage.getItem('mock.lookups')
-  const state: Archive = saved ? JSON.parse(saved) : { lookups: seed(), nextId: 100 }
+  const state: Archive = {
+    orders: [],
+    ...(saved ? JSON.parse(saved) : { lookups: seed(), nextId: 100 }),
+  }
   const result = change(state)
   sessionStorage.setItem('mock.lookups', JSON.stringify(state))
 
@@ -338,8 +355,24 @@ const stale = ({ status, createdAt }: Stored) =>
 
 const statusOf = (stored: Stored) => (stale(stored) ? 'failed' : stored.status)
 
-function lookupOf(stored: Stored, language: Language): LookupObject {
-  const { company: _company, gone, cached, searcher, ...lookup } = stored
+export const ORDER_TOKEN = 'order-'
+
+// Like the core: the link of the open order, for who searched
+function orderUrlOf({ orderId, searcher, status }: Stored, orders: StoredOrder[], lang: Language) {
+  const mine = searcher.type === 'user' && searcher.id === Number(signedInMember()?.user.id)
+  const open = orders.some((order) => order.id === orderId && order.status === 'open')
+
+  return mine && open && status === 'done'
+    ? `${location.origin}/checkout?token=${ORDER_TOKEN}${orderId}&lng=${lang ? 'it-IT' : 'en-US'}`
+    : null
+}
+
+export function lookupOf(
+  stored: Stored,
+  language: Language,
+  orders: StoredOrder[] = []
+): LookupObject {
+  const { company: _company, gone, cached, searcher, orderId: _orderId, ...lookup } = stored
   const status = statusOf(stored)
   const details = cached && identified.includes(status)
 
@@ -349,6 +382,7 @@ function lookupOf(stored: Stored, language: Language): LookupObject {
     searcher: gone ? null : searcher,
     ...(details && { vehicleDescription: vehicleOf(lookup)?.description ?? null }),
     ...(details && status === 'done' && { categories: categoriesOf(lookup.nodeIds, language) }),
+    orderUrl: orderUrlOf(stored, orders, language),
   }
 }
 
@@ -376,7 +410,95 @@ const CONNECTORS = /^(?:\W|for|per|the|la|il)+|(?:\W|for|per|of|di|del|della)+$/
 
 // Parts the assistant asks about before it searches
 const UNCLEAR = /^(?:(?:brake )?pads|pastiglie(?: freno)?)$/i
-const WHICH_PADS = ['Front or rear brake pads?', 'Pastiglie anteriori o posteriori?']
+const YES = /^\s*(?:yes|ok|s[iì])\b/i
+const NO = /^\s*no\b/i
+const RESET = /\b(?:empty|reset|start over|azzera|svuota|ricomincia)\b/i
+
+type Wanted = Pick<Stored, 'plate' | 'vin'> & { query: string }
+
+// What a chat said so far: kept while the page lives, like the memory of the core
+type Talk = {
+  plate: string | null
+  vin: string | null
+  parts: string | null
+  // The search this chat last started or changed
+  last: number | null
+  // The search waiting for the answer about the open order
+  pending: Wanted | null
+}
+
+const NO_TALK: Talk = { plate: null, vin: null, parts: null, last: null, pending: null }
+
+const talks = new Map<string, Talk>()
+
+const said = (language: Language, en: string, it: string) => (language ? it : en)
+
+const REPLIES = {
+  both: (l: Language) =>
+    said(
+      l,
+      'Tell me the plate or the VIN and the parts you need, or attach a photo of the registration document.',
+      'Dimmi la targa o il telaio e i ricambi che ti servono, oppure allega una foto del libretto.'
+    ),
+  vehicle: (l: Language) =>
+    said(
+      l,
+      'Which vehicle is it for? Write the plate or the VIN, or attach a photo.',
+      'Per quale veicolo? Scrivi la targa o il telaio, oppure allega una foto.'
+    ),
+  parts: (l: Language, vehicle: string) =>
+    said(l, `Which parts do you need for ${vehicle}?`, `Quali ricambi ti servono per ${vehicle}?`),
+  pads: (l: Language) => said(l, 'Front or rear brake pads?', 'Pastiglie anteriori o posteriori?'),
+  started: (l: Language, vehicle: string, parts: string) =>
+    said(
+      l,
+      `Search started for ${vehicle}: ${parts}.`,
+      `Ricerca partita per ${vehicle}: ${parts}.`
+    ),
+  changed: (l: Language, vehicle: string, parts: string) =>
+    said(
+      l,
+      `Ok, I change the search for ${vehicle}: ${parts}.`,
+      `Ok, modifico la ricerca per ${vehicle}: ${parts}.`
+    ),
+  cancel: (l: Language, vehicle: string) =>
+    said(
+      l,
+      `Do you want to cancel the previous order for ${vehicle}?`,
+      `Vuoi annullare l'ordine precedente per ${vehicle}?`
+    ),
+  cancelled: (l: Language, vehicle: string, parts: string) =>
+    said(
+      l,
+      `Ok, order cancelled. Search started for ${vehicle}: ${parts}.`,
+      `Ok, ordine annullato. Ricerca partita per ${vehicle}: ${parts}.`
+    ),
+  reset: (l: Language) =>
+    said(
+      l,
+      'Ok, I emptied the order. Tell me the vehicle and the parts to start again.',
+      "Ok, ho azzerato l'ordine. Dimmi il veicolo e i ricambi per ricominciare."
+    ),
+  noOrder: (l: Language) => said(l, 'There is no open order.', "Non c'è nessun ordine aperto."),
+}
+
+const labelOf = ({ plate, vin }: Pick<Stored, 'plate' | 'vin'>) => plate ?? vin ?? ''
+
+const sameVehicle = (a: Pick<Stored, 'plate' | 'vin'>, b: Pick<Stored, 'plate' | 'vin'>) =>
+  (a.vin !== null && a.vin === (b.vin ?? vehicleOf(b)?.vin)) ||
+  (a.plate !== null && a.plate === b.plate)
+
+// The open order of a member, with its searches still running or done
+function openOrder(state: Archive, company: string, userId: number) {
+  const order = state.orders.find(
+    (item) => item.company === company && item.userId === userId && item.status === 'open'
+  )
+  const searches = state.lookups.filter(
+    (lookup) => order && lookup.orderId === order.id && ['running', 'done'].includes(lookup.status)
+  )
+
+  return { order, searches }
+}
 
 // Like the model: the photos are read from their file names
 function readMessage(text: string, images: File[]) {
@@ -466,14 +588,20 @@ export const lookupMocks = [
       )
 
       return {
-        data: lookupOf(found ?? fail(404, 'row-not-found', 'Row not found'), languageOf(request)),
+        data: lookupOf(
+          found ?? fail(404, 'row-not-found', 'Row not found'),
+          languageOf(request),
+          state.orders
+        ),
       }
     })
   }),
   getPostApiV1LookupsMessageMockHandler(async ({ request }) => {
     const { company, country, user: me } = member()
+    const language = languageOf(request)
     const form = await request.formData()
     const text = String(form.get('message') ?? '').trim()
+    const conversation = String(form.get('conversation') ?? '') || null
     const images = form.getAll('images').filter((value): value is File => value instanceof File)
     if (!text && images.length === 0) invalid([{ field: 'message', rule: 'requiredIfMissing' }])
     if (images.length > 4) invalid([{ field: 'images', rule: 'array.maxLength' }])
@@ -482,43 +610,138 @@ export const lookupMocks = [
       fail(503, 'service-unavailable', 'Service unavailable')
     }
 
-    const read = readMessage(text, images)
-    const missing = [
-      ...(read.vin || read.plate ? [] : ['vehicle']),
-      ...(read.parts ? [] : ['parts']),
-    ]
-    if (missing.length > 0 || !read.parts) {
-      return { data: { ...read, missing, reply: null, lookup: null } }
-    }
-
-    const query = read.parts
-
-    if (UNCLEAR.test(query)) {
-      const reply = WHICH_PADS[languageOf(request)]!
-
-      return { data: { ...read, missing, reply, lookup: null } }
-    }
+    const talk = (conversation && talks.get(conversation)) || NO_TALK
+    const remember = (next: Talk) => void (conversation && talks.set(conversation, next))
 
     return archive((state) => {
-      const running: Stored = {
-        id: state.nextId++,
-        company,
-        plate: read.plate,
-        vin: read.vin,
-        query,
-        country,
-        nodeIds: [],
-        status: 'running',
-        source: 'web',
-        searcher: user(me),
-        createdAt: new Date().toISOString(),
-        cached: true,
-      }
-      state.lookups.push(settled(running))
+      const userId = Number(me.id)
+      const { order, searches } = openOrder(state, company, userId)
+      const answer = (reply: string, read: Partial<Wanted> = {}, lookup: Stored | null = null) => ({
+        data: {
+          vin: lookup?.vin ?? read.vin ?? null,
+          plate: lookup?.plate ?? read.plate ?? null,
+          parts: lookup?.query ?? read.query ?? null,
+          missing: lookup
+            ? []
+            : [...(read.vin || read.plate ? [] : ['vehicle']), ...(read.query ? [] : ['parts'])],
+          reply,
+          lookup: lookup && lookupOf({ ...lookup, status: 'running' }, language, state.orders),
+        },
+      })
+      // A new search of the member, in its open order
+      const start = (wanted: Wanted, orderId: number) => {
+        const running: Stored = {
+          id: state.nextId++,
+          company,
+          ...wanted,
+          country,
+          nodeIds: [],
+          status: 'running',
+          source: 'web',
+          searcher: user(me),
+          createdAt: new Date().toISOString(),
+          cached: true,
+          orderId,
+        }
+        state.lookups.push(settled(running))
+        remember({ ...NO_TALK, plate: wanted.plate, vin: wanted.vin, last: running.id })
 
-      return {
-        data: { ...read, missing, reply: null, lookup: lookupOf(running, languageOf(request)) },
+        return running
       }
+      const opened = () => {
+        const id = Math.max(0, ...state.orders.map((item) => item.id)) + 1
+        state.orders.push({ id, company, userId, status: 'open', items: [] })
+
+        return id
+      }
+      const joined = () => order?.id ?? opened()
+
+      if (RESET.test(text)) {
+        if (order) order.status = 'cancelled'
+        remember(NO_TALK)
+
+        return answer(order ? REPLIES.reset(language) : REPLIES.noOrder(language))
+      }
+
+      // The answer to the question about the open order
+      if (talk.pending && (YES.test(text) || NO.test(text))) {
+        const cancelled = YES.test(text)
+        if (order && cancelled) order.status = 'cancelled'
+
+        const wanted = talk.pending
+        const lookup = start(wanted, cancelled ? opened() : joined())
+
+        return answer(
+          REPLIES[cancelled ? 'cancelled' : 'started'](language, labelOf(wanted), wanted.query),
+          wanted,
+          lookup
+        )
+      }
+
+      const read = readMessage(text, images)
+      const named = read.vin !== null || read.plate !== null
+      const vehicle = named
+        ? { plate: read.plate, vin: read.vin }
+        : { plate: talk.plate, vin: talk.vin }
+      // An answer with no part in it completes the parts asked about
+      const parts =
+        read.parts ?? (talk.parts && text && !named ? `${talk.parts} ${text}`.trim() : talk.parts)
+      const known = vehicle.vin !== null || vehicle.plate !== null
+      const last = searches.find(({ id }) => id === talk.last)
+
+      // More parts for the search of this chat: the same search, changed
+      if (!named && read.parts && last) {
+        last.query = `${last.query}, ${read.parts}`
+        Object.assign(last, settled({ ...last, status: 'running' }))
+
+        return answer(REPLIES.changed(language, labelOf(last), last.query), {}, last)
+      }
+
+      if (!known || !parts) {
+        remember({ ...talk, ...vehicle, parts })
+
+        return answer(
+          !known && !parts
+            ? REPLIES.both(language)
+            : known
+              ? REPLIES.parts(language, labelOf(vehicle))
+              : REPLIES.vehicle(language),
+          { ...vehicle, query: parts ?? undefined }
+        )
+      }
+
+      if (UNCLEAR.test(parts)) {
+        remember({ ...talk, ...vehicle, parts })
+
+        return answer(REPLIES.pads(language), { ...vehicle, query: parts })
+      }
+
+      const wanted = { ...vehicle, query: parts }
+      const same = searches.find((search) => sameVehicle(search, wanted))
+
+      // The vehicle is already in the order: its search takes the new parts
+      if (same) {
+        same.query = parts
+        Object.assign(same, settled({ ...same, status: 'running' }))
+        remember({ ...NO_TALK, ...vehicle, last: same.id })
+
+        return answer(REPLIES.changed(language, labelOf(same), parts), wanted, same)
+      }
+
+      const others = [...new Set(searches.map(labelOf))]
+
+      // Another vehicle, with one in the order: the member decides what becomes of it
+      if (conversation && others.length === 1) {
+        remember({ ...NO_TALK, pending: wanted })
+
+        return answer(REPLIES.cancel(language, others[0]!), wanted)
+      }
+
+      return answer(
+        REPLIES.started(language, labelOf(wanted), parts),
+        wanted,
+        start(wanted, joined())
+      )
     })
   }),
   getGetApiV1WorkspaceLookupsStatsMockHandler(async ({ request }) => {

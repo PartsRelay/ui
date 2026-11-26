@@ -14,7 +14,6 @@ export interface LookupMessageObject {
   /** @nullable */
   parts: string | null;
   missing: string[];
-  /** @nullable */
-  reply: string | null;
+  reply: string;
   lookup: Lookup | null;
 }

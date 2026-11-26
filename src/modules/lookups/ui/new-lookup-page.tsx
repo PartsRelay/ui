@@ -274,6 +274,7 @@ export function NewLookupPage() {
   const textarea = useRef<HTMLTextAreaElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const following = useRef(true)
+  const sliding = useRef(false)
   const [text, setText] = useState(() => messageOf({ plate, vin, query }))
   const [images, setImages] = useState<Picked[]>([])
   const shown = useRef(images)
@@ -354,7 +355,7 @@ export function NewLookupPage() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    if (sending) return
+    if (sending || sliding.current) return
 
     const said = text.trim()
     if (!said && images.length === 0) {
@@ -373,19 +374,25 @@ export function NewLookupPage() {
       })),
       { text: said, images: images.map(({ file }) => file) },
     ])
+    // Asks only once the turn is there to take the answer
     const send = () => {
-      setTurns([...turns, { id: turnId, text: said, images, body, reply: { state: 'sending' } }])
-      setText('')
-      setImages([])
-      setRefused(0)
-      setBlank(false)
+      sliding.current = false
+      flushSync(() => {
+        setTurns([...turns, { id: turnId, text: said, images, body, reply: { state: 'sending' } }])
+        setText('')
+        setImages([])
+        setRefused(0)
+        setBlank(false)
+      })
+      textarea.current?.focus()
+      ask(turnId, body)
     }
 
+    if (started || !document.startViewTransition) return send()
+
     // The first message slides the composer to the bottom
-    if (started || !document.startViewTransition) send()
-    else document.startViewTransition(() => flushSync(send))
-    textarea.current?.focus()
-    ask(turnId, body)
+    sliding.current = true
+    document.startViewTransition(send)
   }
 
   const retry = (turn: Turn) => {
